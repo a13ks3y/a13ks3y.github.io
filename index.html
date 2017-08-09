@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Oleksii Smirnov</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700italic,700,400italic|EB+Garamond' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon" sizes="192x192" href="favicon2.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#D8D8D8">
+    <!--<script src="https://rawgit.com/saabi/vminpoly/master/vminpoly.js"></script>-->
+</head>
+<body class="debugn">
+    <main class="main fadein">
+        <header class="header">
+            <h1 class="header__text">
+                Oleksii Smirnov
+                <div class="touch-area touch-area--qr"></div>
+            </h1>
+            <div class="header__qr">
+                <div class="touch-area touch-area--qr"></div>
+            </div>
+        </header>
+        <footer class="footer no-select">
+            <a class="footer__link" target="_blank" href="https://plus.google.com/u/0/118401701295000898077"><i class="fa fa-google-plus-square" aria-hidden="true"></i></a>
+            <a class="footer__link" target="_blank" href="https://www.facebook.com/a13ks3y"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
+            <a class="footer__link" href="skype:a13ks3y.ass?add" title="a13ks3y.ass"><i class="fa fa-skype" aria-hidden="true"></i></a>
+            <a class="footer__link" target="_blank" href="https://www.linkedin.com/in/a13ks3"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+            <a class="footer__link" target="_blank" href="https://github.com/a13ks3y"><i class="fa fa-github-square" aria-hidden="true"></i></a>
+        </footer>
+    </main>
+    <div class="touch-area touch-area--full-screen"></div>
+    <script type="text/javascript">
+        (function init(){
+            var header = document.querySelector('.header__text');
+            var qr = document.querySelector('.header__qr');
+            Array.prototype.forEach.call(document.querySelectorAll('.touch-area--qr'), function(item){
+                item.addEventListener('click', function(e) {
+                    var first = [header, qr][toggle ? 1 : 0];
+                    var second = [header, qr][toggle ? 0 : 1];
+                    first.classList.add('fadeout');
+                    setTimeout(function(){
+                        first.classList.remove('fadeout');
+                        second.classList.add('fadein');
+                        first.style.display = 'none';
+                        second.style.display = 'block';
+                        toggle = !toggle;
+                    }, 1500);
+                    e.preventDefault();
+                    return false;
+                });
+            });
+
+            var toggle = false;
+
+            /* Enter full screen */
+            function launchIntoFullscreen(element) {
+                if(element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if(element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                } else if(element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if(element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+            }
+
+            document.querySelector('.touch-area--full-screen').addEventListener('click', function(){
+                // Launch fullscreen for browsers that support it!
+                launchIntoFullscreen(document.documentElement);
+            });
+            /* End Enter full screen */
+        }());
+
+
+    </script>
+</body>
+</html>
