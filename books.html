@@ -9,7 +9,7 @@
   <style type="text/css">
     body {
       background: #000;
-      color: #f90;
+      color: #fff;
       font-family: Helvetica, sans;
     }
     ul {
@@ -17,8 +17,10 @@
     }
     ul li {
       padding-left: 1.666rem;
+      border-top: 1px solid #fff;
+      border-bottom: 1px solid #fff;
     }
-    h1, h2, h3, h4, h5, h6 { font-weight: bold; }
+    h1, h2, h3, h4, h5, h6 { font-weight: bold; color: #f90; }
     h1, h2, h3 { border-bottom: 1px solid #f90; }
     h1 { font-size: 2.666rem; }
     h2 { font-size: 1.666rem; }
@@ -26,10 +28,13 @@
     
     .survive {
       display: block;
-      maring: 1.666rem;
+      maring: 0;
       padding: 0.666rem;
-      border: 0.0333rem solid #f90;
-      box-shadow: 0.0666rem 0.0666rem #f90;
+      width: 66.666%      
+    }
+    
+    @media (screen AND orientation:portrait) {
+      /* @todo: mobile addaptive bla bla bla */
     }
   </style>
 </head>
