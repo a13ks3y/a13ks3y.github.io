@@ -21,13 +21,18 @@
 		@duration: 13s;
 		@height: 10%;
 
+		* {
+			transform: translateZ(0);
+		}
+
 
 		body {
 			background: #f90;
 			font-size: 66px;
 		}
+
 		.banana-container {
-			animation: aBananaFadeIn 6s ease-out;
+			animation: BananaFadeIn 3.33s ease-out;
 		}
 
 		.banana-layer {
@@ -42,7 +47,7 @@
 			animation-iteration-count: infinite;
 			animation-fill-mode: forwards;
 			animation-timing-function: linear;
-			animation-name: BananaFloat; 
+			animation-name: BananaFloat, BananaFadeFloat; 
 
 		}
 
