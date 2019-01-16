@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BANANA!</title>
+	<link rel="stylesheet" type="text/css" href="reset.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <link rel="icon" sizes="192x192" href="banana-favicon.png">
+    <link rel="stylesheet/less" type="text/css" href="banana.less" />
+    <script src="less.min.js" data-javascript-enabled="true" type="text/javascript"></script>
+</head>
+<body>
+    <a href="https://github.com/a13ks3y/home" target="_blank">
+	    <img
+	        style="position: absolute; top: 0; right: 0; border: 0;"
+	        src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+	        alt="Fork me on GitHub"
+	    />
+	</a>
+	<script type="text/javascript">
+		const BANANA_MAX_COUNT = 42;
+		const BANANA_LAYERS_COUNT = 6;
+
+		const createBananaLayer = bananaLayerIndex => {
+			// for banana-optimisaton (bananoisation)
+			const bananaLayer = document.createElement("div");
+
+			bananaLayer.classList.add("banana-layer");
+			bananaLayer.classList.add("banana-layer-" + bananaLayerIndex);
+
+			const BANANA_COUNT = BANANA_MAX_COUNT; // Math.floor(Math.random() * BANANA_MAX_COUNT);
+
+			Array.from(new Array(BANANA_COUNT), (nothing, bananaIndex) => {
+				const banana = document.createElement("div");
+				banana.classList.add("banana");
+				banana.innerHTML = "&#x1F34C;";
+				bananaLayer.appendChild(banana);
+			});
+
+			return bananaLayer;
+		};
+		const bananaContainer = document.createElement("main");
+		bananaContainer.classList.add("banana-container");
+
+		Array.from(new Array(BANANA_LAYERS_COUNT), (nothing, bananaLayerIndex) => {
+			bananaContainer.appendChild(createBananaLayer(bananaLayerIndex));
+		});
+		
+		document.body.appendChild(bananaContainer);
+	</script>
+</body>
+</html>

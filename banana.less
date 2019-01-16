@@ -1,0 +1,80 @@
+		@keyframes BananaFadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes BananaFloat {
+			0%   { transform: translateX(99vw); opacity: 1; }
+			98%  { transform: translateX(-101%); opacity: 1; }
+			99%  { transform: translateX(-101%); opacity: 0; }
+			100% { transform: translateX(99vw); opacity: 0; }
+		}
+
+		@keyframes BananaFadeFloat {
+		  	0%, 100% {
+		    	opacity: 0;
+			}
+			5%, 90% {
+				opacity: 1;
+			}
+		}
+		@duration: 13s;
+		@height: 10%;
+
+
+		body {
+			background: #f90;
+			font-size: 66px;
+		}
+		.banana-container {
+			animation: aBananaFadeIn 6s ease-out;
+		}
+
+		.banana-layer {
+			width: calc(6.66rem * 42);
+			height: 100vh;
+			line-height: 100vh;
+			overflow: hidden;
+			position: absolute;
+			display: flex;
+
+			animation-duration: @duration;
+			animation-iteration-count: infinite;
+			animation-fill-mode: forwards;
+			animation-timing-function: linear;
+			animation-name: BananaFloat; 
+
+		}
+
+		.banana-layer-loop(@n, @i: 0) when (@i =< @n) {
+			@s: @i * 1.1;
+			.banana-layer-@{i} {
+				z-index: @i + 1;
+				font-size: unit(@s, rem);
+				animation-duration: unit(6 + @i * 6, s);
+				.banana-loop(42, @s);
+				.banana:nth-child(odd) {
+					margin-top: unit(@s, rem);
+					margin-left: unit(@s / 2, rem);
+				}			
+				.banana:nth-child(even) {
+					margin-top: unit(@s * -1, rem);
+					margin-left: unit(@s / 2 * -1, rem);
+				}	
+			}
+			.banana-layer-loop(@n, (@i + 1));
+		}
+		.banana-layer-loop(6);
+
+		.banana-loop(@n, @l, @i: 1) when (@i =< @n) {
+		  .banana:nth-child(@{i}) {
+		    /* margin-top: unit(@l + sin(@i) * -1, rem); */
+		    /* @r: `Math.floor(Math.random() * 42) + "rem"`;*/
+		    /*margin-top: `Math.floor(Math.random() * 42)`rem;*/
+		  }
+		  .banana-loop(@n, @l, (@i + 1));
+		}
+
+		
+
+
