@@ -1,6 +1,5 @@
-# home
-[Home](https://a13ks3y.github.io/) 
+# [Home Sweet Home](https://a13ks3y.github.io/)
 
-[Books](https://a13ks3y.github.io/home/books.html) (ru)
+[For HR's](https://a13ks3y.github.io/cv.pdf)
 
-[Banana](https://a13ks3y.github.io/home/banana.html)
+[Just For Fun](https://a13ks3y.github.io/home/banana.html)
