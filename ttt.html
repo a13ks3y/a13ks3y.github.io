@@ -1,0 +1,140 @@
+<html>
+<head>
+    <title>TTT</title>
+</head>
+<body>
+    <canvas width="800" height="600" id="ctx"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const CELL_SIZE = 32;
+        const render = state => {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            const gridOffsetX = 0; //state.offsetX % CELL_SIZE;
+            const gridOffsetY = 0; //state.offsetY % CELL_SIZE;
+            const gridWidth = ~~(ctx.canvas.width / CELL_SIZE);
+            const gridHeight = ~~(ctx.canvas.height / CELL_SIZE);
+            for (let x = 0; x < gridWidth; x++) {
+                for (let y = 0; y < gridHeight; y++) {
+                    ctx.strokeStyle = '#abc';
+                    ctx.strokeRect(gridOffsetX + x * CELL_SIZE, gridOffsetY + y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                }
+            }
+            state.cells.forEach(cell => {
+                const x = cell.x;
+                const y = cell.y;
+                ctx.font = '32px monospace';
+                const text = cell.value === 'X' ? 'x' : 'o';
+                ctx.fillText(text, gridOffsetX + x * CELL_SIZE + 6, gridOffsetY + y * CELL_SIZE - 6 + CELL_SIZE);
+            });
+        };
+        const getCellsHash = cells => {
+            const cellsHash = {};
+            // todo use reduce instead
+            cells.forEach(cell => {
+                cellsHash[cell.x + '-' + cell.y] = cell.value;
+            });
+            return cellsHash;
+        };
+
+        const check = cells => {
+            const cellsHash = getCellsHash(cells);
+            function pipka(cell) {
+                let isRWon = true, isLWon = true;
+                let isTWon = true, isBWon = true;
+                let isRTWon = true, isRBWon = true;
+                let isLTWon = true, isLBWon = true;
+                for (let i = 0; i < 5; i++) {
+                    const r =  (cell.x + i) + '-' + (cell.y);
+                    const l =  (cell.x - i) + '-' + (cell.y);
+                    const t =  (cell.x)     + '-' + (cell.y + i);
+                    const b =  (cell.x)     + '-' + (cell.y - i);
+                    const rb = (cell.x + i) + '-' + (cell.y + i);
+                    const rt = (cell.x + i) + '-' + (cell.y - i);
+                    const lb = (cell.x - i) + '-' + (cell.y + i);
+                    const lt = (cell.x - i) + '-' + (cell.y - i);
+
+                    if (cellsHash[r] !== cell.value) {
+                        isRWon = false;
+                    }
+                    if (cellsHash[l] !== cell.value) {
+                        isLWon = false;
+                    }
+                    if (cellsHash[t] !== cell.value) {
+                        isTWon = false;
+                    }
+                    if (cellsHash[b] !== cell.value) {
+                        isBWon = false;
+                    }
+                    if (cellsHash[rb] !== cell.value) {
+                        isRBWon = false;
+                    }
+                    if (cellsHash[rt] !== cell.value) {
+                        isRTWon = false;
+                    }
+                    if (cellsHash[lb] !== cell.value) {
+                        isLBWon = false;
+                    }
+                    if (cellsHash[lt] !== cell.value) {
+                        isLTWon = false;
+                    }
+                }
+                return isRWon || isLWon || isTWon || isBWon || isRBWon  || isRTWon || isLBWon || isLTWon;
+            }
+            for (let i = 0; i < cells.length; i++) {
+                if (pipka(cells[i])) {
+                    return cells[i].value;
+                }
+            }
+            return false;
+        };
+
+        const ai = cells => {
+            const cellsHash = getCellsHash(cells);
+            const chanks = [];
+            cells.forEach(cell => {
+                const chunk = {
+                    r: [], l: [], t: [], b: [],
+                    rt: [], rb: [], lt: [], lb: []
+                };
+                for (let i = 0; i < 4; i++) {
+                    
+                }
+            });
+        };
+
+        let state = {
+            currentPlayer: 'X',
+            offsetX: 0,
+            offsetY: 0,
+            cells: []
+        };
+
+        render(state);
+
+        ctx.canvas.addEventListener('click', e => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const x = ~~(mx / CELL_SIZE);
+            const y = ~~(my / CELL_SIZE);
+
+            console.log('click', mx, my, x, y);
+
+            if (!state.cells.some(cell => cell.x === x && cell.y === y)) {
+                state.cells.push({
+                    value: state.currentPlayer,
+                    x: x, 
+                    y: y
+                });
+                state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X';
+                const winner = check(state.cells);
+                if (winner) {
+                    render(state);
+                    alert(winner + ' is won!');
+                }
+            }
+            render(state);
+        });
+    </script>
+</body>
+</html>
