@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Match 3 Emoji</title>
+</head>
+<body>
+    <canvas id="ctx" width="600" height="800"></canvas>
+    <script type="text/javascript">
+let ITEM_SIZE = 32;
+let ITEM_COLORS = ['🍕', '🍌', '🥥', '🍄', '🍒'];
+let FIELD_WIDTH = 11;
+let FIELD_HEIGHT = 20;
+let ctx = document.getElementById('ctx').getContext('2d');
+ctx.canvas.width = FIELD_WIDTH * ITEM_SIZE;
+ctx.canvas.height = FIELD_HEIGHT * ITEM_SIZE;
+let items = [];
+let deadAlpha = 1;
+let selectedItem = null;
+let start = () => {
+    for (let x = 0; x < FIELD_WIDTH; x++) {
+        items[x] = [];
+        for (let y = 0; y < FIELD_HEIGHT; y++) {
+            items[x][y] = {
+                rx: x, ry: y,
+                x: ITEM_SIZE * x,
+                y: ITEM_SIZE * y,
+                c: ITEM_COLORS[~~(Math.random()*ITEM_COLORS.length)]
+            };
+        }
+    }
+};
+
+let check = () => {
+    for (let x = 0; x < FIELD_WIDTH; x++) {
+        let vc = [items[x][0]];
+        for (let y = 0; y < FIELD_HEIGHT + 1; y++) {
+            if (items[x][y - 1] && items[x][y] && items[x][y].c === items[x][y - 1].c) {
+                vc.push(items[x][y]);
+            } else {
+                if (vc.length >= 3) {
+                    deadAlpha = 0.9;
+                    vc.forEach((v) => v.d = true);
+                }
+                vc = items[x][y] ? [items[x][y]] : [];
+            }
+        }
+    }
+    for (let y = 0; y < FIELD_HEIGHT; y++) {
+        let hc = [items[0][y]];
+        for (let x = 0; x < FIELD_WIDTH + 1; x++) {
+            if (items[x - 1] && items[x] && items[x][y].c === items[x - 1][y].c) {
+                hc.push(items[x][y]);
+            } else {
+                if (hc.length >= 3) {
+                    deadAlpha = 0.9;
+                    hc.forEach((v) => v.d = true);
+                }
+                hc = items[x] ? [items[x][y]] : [];
+            }
+        }
+    }
+};
+let fall = () => {
+    let BIBO = (x, y) => {
+        return {
+            x: x * ITEM_SIZE,
+            y: (y - FIELD_HEIGHT) * ITEM_SIZE,
+            rx: x, ry: y - FIELD_HEIGHT,
+            dry: y,
+            c: ITEM_COLORS[~~(Math.random() * ITEM_COLORS.length)]
+        };
+    };
+    for (let x = 0; x < FIELD_WIDTH; x++) {
+        let offset = 0;
+        for (let y = FIELD_HEIGHT - 1; y >= 0; y--) {
+            let item = items[x][y];
+            if (item.d) {
+                offset++;
+            } else {
+                let tmp = items[x][y + offset];
+                items[x][y + offset] = item;
+                items[x][y] = tmp;
+                item.dry = y + offset;
+            }
+        }
+    }
+    for (let x = 0; x < FIELD_WIDTH; x++) {
+        for (let y = FIELD_HEIGHT - 1; y >= 0; y--) {
+            if (items[x][y].d) {
+                items[x][y] = BIBO(x, y);
+            }
+        }
+    }
+};
+
+let isValidMove = (from, to) => {
+    //from.color = to.color;
+    return true; // todo
+};
+let move = (from, to) => {
+    items[to.rx][to.ry] = from;
+    items[from.rx][from.ry] = to;
+    let frx = from.rx, fry = from.ry;
+    from.rx = to.rx;
+    from.ry = to.ry;
+    to.rx = frx;
+    to.ry = fry;
+    from.x = from.rx * ITEM_SIZE;
+    from.y = from.ry * ITEM_SIZE;
+    to.x = to.rx * ITEM_SIZE;
+    to.y = to.ry * ITEM_SIZE;
+    check();
+};
+
+let render = () => {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    for (let x = 0; x < FIELD_WIDTH; x++) {
+        for (let y = 0; y < FIELD_HEIGHT; y++) {
+            ctx.strokeStyle = selectedItem  && selectedItem.rx === x && selectedItem.ry === y ? 'red' : '#abc';
+            ctx.strokeRect(x * ITEM_SIZE, y * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
+
+            let item = items[x][y];
+            if (!item) continue;
+            if (item.d) {
+                if (deadAlpha < 1 && deadAlpha > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = deadAlpha;
+                    ctx.font = ITEM_SIZE / 2 + 'px monospace';
+                    ctx.fillText(item.c, item.x + ITEM_SIZE / 4, item.y + ITEM_SIZE / 1.5);
+                    ctx.restore();
+                }
+            } else {
+                ctx.font = ITEM_SIZE / 2 + 'px monospace';
+                ctx.fillText(item.c, item.x + ITEM_SIZE / 4, item.y + ITEM_SIZE / 1.5);
+            }
+            /* debug
+            ctx.font = '10px monospace';
+            ctx.fillStyle = '#f0f';
+            ctx.fillText(`${item.rx}:${item.ry}`, item.x, ITEM_SIZE + item.y);
+            ctx.fillStyle = '#0f0';
+            ctx.fillText(`${x}:${y}`, item.x, ITEM_SIZE + item.y - 12);
+            //*/
+        }
+    }        
+};
+
+start();
+check();
+let lastTick = Date.now();
+requestAnimationFrame(function loop() {
+    let dt = Date.now() - lastTick;
+    if (dt > 1000 / 120) {
+
+        for (let x = 0; x < FIELD_WIDTH; x++) {
+            for (let y = 0; y < FIELD_HEIGHT; y++) {
+                let item = items[x][y];
+                if (item && !isNaN(item.dry)) {
+                    if (item.y >= item.dry * ITEM_SIZE) {
+                        item.ry = ~~(item.y / ITEM_SIZE);
+                        item.dry = null;
+                    } else {
+                        item.y += 8;
+                    }
+                }
+            }
+        }
+
+        if (deadAlpha > 0 && deadAlpha < 1) {
+            deadAlpha -= 0.02;
+        } else if (deadAlpha <= 0) {
+            fall();
+            deadAlpha = 1;
+            setTimeout(check, 2500);
+        }
+        lastTick = Date.now();
+    }
+    render();
+    requestAnimationFrame(loop);
+});
+
+ctx.canvas.addEventListener('click', (e) => {
+    let rx = ~~(e.offsetX / ITEM_SIZE);
+    let ry = ~~(e.offsetY / ITEM_SIZE);
+    if (items[rx] && items[rx][ry]) {
+        if (selectedItem) {
+            if (isValidMove(selectedItem, items[rx][ry])) {
+                move(selectedItem, items[rx][ry]);
+                selectedItem = null;
+            } else {
+                selectedItem = items[rx][ry];
+            }
+        } else {
+            selectedItem = items[rx][ry];
+        }
+    } else {
+        selectedItem = null;
+    }
+
+});
+    </script>
+</body>
+</html>

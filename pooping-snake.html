@@ -96,7 +96,10 @@
                 if (state.snake[0].y < 0) state.snake[0].y = FIELD_HEIGHT - 1;
 
                 if (state.apple.x === state.snake[0].x && state.apple.y === state.snake[0].y) {
-                    state.snake.push({ x: state.snake[state.snake.length - 1].x - state.dx, y: state.snake[state.snake.length - 1].y - state.dy });
+                    state.snake.push({ 
+                        x: state.snake[state.snake.length - 1].x - state.dx, 
+                        y: state.snake[state.snake.length - 1].y - state.dy 
+                    });
                     // todo  prevent apple to spawn at the same cell as snake body and poops!
                     state.apple.x = Math.floor(Math.random() * FIELD_WIDTH);
                     state.apple.y = Math.floor(Math.random() * FIELD_HEIGHT);

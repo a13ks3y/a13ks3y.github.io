@@ -37,7 +37,9 @@
         };
 
         const check = cells => {
+            // todo show won cells some how!
             const cellsHash = getCellsHash(cells);
+            let wonCells = [];
             function pipka(cell) {
                 let isRWon = true, isLWon = true;
                 let isTWon = true, isBWon = true;
@@ -78,6 +80,11 @@
                         isLTWon = false;
                     }
                 }
+                if (isRWon) {
+                    for (let i=0; i<5; i++) {
+
+                    }
+                }
                 return isRWon || isLWon || isTWon || isBWon || isRBWon  || isRTWon || isLBWon || isLTWon;
             }
             for (let i = 0; i < cells.length; i++) {
@@ -100,14 +107,24 @@
                     
                 }
             });
+            cells.push({
+                x: ~~(Math.random()*10),
+                y: ~~(Math.random()*10),
+                value: state.currentPlayer
+            });
         };
 
         let state = {
             currentPlayer: 'X',
             offsetX: 0,
             offsetY: 0,
+            isAi: false,
             cells: []
         };
+
+        //if(confirm('Play with AI?')) {
+            state.isAi = true;
+        //}
 
         render(state);
 
@@ -127,10 +144,14 @@
                     y: y
                 });
                 state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X';
+                if (state.isAi) {
+                    ai(state.cells);
+                    state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X';
+                }
                 const winner = check(state.cells);
                 if (winner) {
                     render(state);
-                    alert(winner + ' is won!');
+                    setTimeout(() => alert(winner + ' is won!'), 0);
                 }
             }
             render(state);
