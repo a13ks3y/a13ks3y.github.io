@@ -1,0 +1,131 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Match 3 Like Chess</title>
+    <style type="text/css">
+        body {
+            margin: 0; padding: 0;
+            background: #f90;
+        }
+        canvas {
+            display: block;
+            margin: auto;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <canvas id="ctx"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const rect = document.body.getBoundingClientRect();
+        const FW = 8; const FH = 14;
+        const SIZE = (rect.width < rect.height) ? ~~(rect.width / FW) : ~~(rect.height / FH);
+        ctx.canvas.width = SIZE * FW;
+        ctx.canvas.height = SIZE * FH;
+
+        const W = ctx.canvas.width;
+        const H = ctx.canvas.height;
+
+        const PIECES = '♔♕♖♗♘♙♚♛♜♝♞♟';
+        const field = [];
+        const start = () => {
+            for (let x = 0; x < FW; x++) {
+                field[x] = [];
+                for (let y = 0; y < FH; y++) {
+                    const pi = ~~(Math.random() * PIECES.length);
+                    field[x][y] = {pi, x, y};
+                }
+            }
+        };
+        const isBlack = pi => pi >= 6;
+        const isWhite = pi => pi < 6;
+        start();
+        let selected = null;
+        requestAnimationFrame(function loop() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, W, H);
+            for (let x = 0; x < FW; x++) {
+                for (let y = 0; y < FH; y++) {
+                    ctx.strokeStyle = field[x][y] === selected ? '#0f0' : '#abc' ;
+                    ctx.strokeRect(x * SIZE, y * SIZE, SIZE, SIZE);
+                    ctx.font = SIZE * 0.6 + 'px monospace';
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(PIECES[field[x][y].pi], (x * SIZE) + SIZE / 5, y * SIZE + SIZE - SIZE * 0.3);
+                }
+            }
+            requestAnimationFrame(loop);
+        });
+        const canTake = (pA, pB) => {
+            const isXLO = Math.max(pA.x, pB.x) - Math.min(pA.x, pB.x) <= 1;
+            const isYLO = Math.max(pA.y, pB.y) - Math.min(pA.y, pB.y) <= 1;
+            switch (pA.pi) {
+                case 0: case 1: // white queen and king
+                    return isXLO && isYLO && isBlack(pB.pi);
+                    break;
+                case 6: case 7: // black queen and king
+                    return isXLO && isYLO && isWhite(pB.pi);
+                    break;
+                case 2: // white rook
+                    return isBlack(pB.pi) && ((pA.x === pB.x && isYLO) || (pA.y === pB.y && isXLO)); 
+                    break;
+                case 8: // black rook
+                    return isWhite(pB.pi) && ((pA.x === pB.x && isYLO) || (pA.y === pB.y && isXLO)); 
+                    break;
+                case 3: // white bishop
+                    return isBlack(pB.pi) && (isXLO && isYLO) && ((pA.x !== pB.x)&&(pA.y !== pB.y));
+                    break;
+                case 9: // black bishop
+                    return isWhite(pB.pi) && (isXLO && isYLO) && ((pA.x !== pB.x)&&(pA.y !== pB.y));
+                    break;
+                case 4: // white kinght
+                    return isBlack(pB.pi) && (
+                        (pA.x + 2 === pB.x && isYLO) || (pA.y + 2 === pB.y && isXLO) ||
+                        (pA.x - 2 === pB.x && isYLO) || (pA.y - 2 === pB.y &&  isXLO)
+                    );
+                    break;
+                case 10: // black kinght
+                    return isWhite(pB.pi) && (
+                        (pA.x + 2 === pB.x && isYLO) || (pA.y + 2 === pB.y && isXLO) ||
+                        (pA.x - 2 === pB.x && isYLO) || (pA.y - 2 === pB.y &&  isXLO)
+                    );
+                    break;
+                case 5: // white pawn
+                    return isBlack(pB.pi) && (isXLO && isYLO) && ((pA.x !== pB.x)&&(pA.y !== pB.y)) && (pB.y < pA.y);
+                    break;
+                case 11: // black pawn
+                    return isWhite(pB.pi) && (isXLO && isYLO) && ((pA.x !== pB.x)&&(pA.y !== pB.y)) && (pB.y > pA.y);
+                    break;
+            }
+            return false;
+        };
+        const take = (pA, pB) => {
+            pB.pi = pA.pi;
+            pA.pi = null;
+            for (let y = FH - 1; y > 0; y--) {
+                if (field[pA.x][y].pi === null) {
+                    field[pA.x][y].pi = field[pA.x][y - 1].pi; 
+                    field[pA.x][y - 1].pi = null;  
+                }
+            }
+            const pi = ~~(Math.random() * PIECES.length);
+            field[pA.x][0].pi = pi;
+        };
+        ctx.canvas.addEventListener('click', e => {
+            const x = ~~(e.offsetX / SIZE);
+            const y = ~~(e.offsetY / SIZE);
+            if (field[x] && field[x][y]) {
+                if (!selected) {
+                    selected = field[x][y];
+                } else {
+                    if (canTake(selected, field[x][y])) {
+                        take(selected, field[x][y]);
+                        selected = null;
+                    } else {
+                        selected = field[x][y];
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
