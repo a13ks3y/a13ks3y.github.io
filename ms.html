@@ -1,0 +1,135 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Minesweeper</title>
+    <style type="text/css">
+        * { margin: 0; padding: 0;}
+        #field {
+            width: 736px;
+            display: block;
+            margin: auto;
+        }
+        #field .row {
+            display: flex;
+        }
+        #field button {
+            width: 32px;
+            height: 32px;
+            background: gray;
+            color: blue;
+            outline: none;
+        }
+        #field.fail .cell-bomb {
+            background: red;
+        }
+        #field.fail .cell-bomb:before {
+            content: '💣';
+            font-size: 16px;
+        }
+        #field .cell-open {
+            background: #b7b7b7;
+        }
+        #field .cell-flag {
+            background: #b7b7b7;
+        }
+        #field .cell-flag:before {
+            content: '⚐';
+            color: red;
+            font-size: 16px;
+        }
+        #field.fail .cell-flag.cell-bomb {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="field"></div>
+    <script type="text/javascript">
+        const fieldEl = document.getElementById('field');
+        const W = 23; const H = 12;
+        const ns = (cell) => {
+            const x = +cell.getAttribute('data-x');
+            const y = +cell.getAttribute('data-y');
+            return [
+                getCell(x - 1, y - 1), // top-left
+                getCell(x - 0, y - 1), // top-middle
+                getCell(x + 1, y - 1), // top-right
+                getCell(x - 1, y - 0), // middle-left
+                getCell(x + 1, y - 0), // middle-right
+                getCell(x - 1, y + 1), // bottom-left
+                getCell(x - 0, y + 1), // bottom-middle
+                getCell(x + 1, y + 1), // bottom-right
+            ].filter(cell => !!cell);
+        };
+        function doClick(btn) {
+            if (fieldEl.classList.contains('fail')) {
+                fieldEl.classList.remove('fail');
+                return start();
+            }
+            const v = btn.getAttribute('data-v');
+            if (btn.classList.contains('cell-flag')) return;
+            if (v != 9) {
+                if (v == 0) {
+                    zeroClick(btn);
+                } else {
+                    btn.innerHTML = v;
+                    btn.disabled = true;
+                    btn.classList.add('cell-open');
+                }
+            } else {
+                fieldEl.classList.add('fail');
+            }
+        }
+        function zeroClick(btn) {
+            if (btn.disabled) return;
+            const v = btn.getAttribute('data-v');
+            const n = ns(btn);
+            btn.classList.add('cell-open');
+            btn.innerHTML = '&nbsp;';
+            btn.disabled = true;
+            n.forEach(cell => {
+                if (cell.getAttribute('data-v') == 0) {
+                    zeroClick(cell);
+                }
+            });
+        }
+        function doFlag(e, btn) {
+            if (btn.classList.contains('cell-flag')) {
+                btn.classList.remove('cell-flag');
+            } else {
+                btn.classList.add('cell-flag');
+            }
+            e.preventDefault();
+            return false;
+        }
+        const getCell = (x, y) => {
+            return document.getElementById(`cell_${x}-${y}`);
+        };
+
+        const start = () => {
+            let html = '';
+            for (let y = 0; y < H; y++) {
+                html += '<div class="row">';
+                for (let x = 0; x < W; x++) {
+                    const v = Math.random() > 0.8 ? 9 : 0;
+                    html += `\t\t<button class="cell ${v == 9 ? 'cell-bomb' : 'cell-regular'}" id="cell_${x}-${y}" data-x="${x}" data-y="${y}" data-v="${v}" onclick="doClick(this)" oncontextmenu="doFlag(event, this)">&nbsp;</button>\n`;
+                }
+                html += '</div>';
+            }
+ 
+            fieldEl.innerHTML = html;
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                if (cell.getAttribute('data-v') != 9) {
+                    const n = ns(cell);
+                    const count = n.reduce((a, c) => {
+                        const cc = c.getAttribute('data-v') == 9 ? 1 : 0;
+                        return a + cc;
+                    }, 0);
+                    cell.setAttribute('data-v', count);
+                }
+            });
+        };
+        start();
+    </script>
+</body>
+</html>
