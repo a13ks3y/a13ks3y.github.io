@@ -1,0 +1,172 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Pooping Snake</title>
+</head>
+<body>
+    <canvas id="ctx" width="800" height="600"></canvas>
+    <script>
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const CELL_SIZE = 32;
+        const FIELD_WIDTH = 24;
+        const FIELD_HEIGHT = 16;
+        const POOP = '💩';
+        const APPLE = '🍎';
+        const inPortal = { x: 3, y: 8 };
+        const outPortal = { x: 13, y: 8}
+        const POOP_COUNT_DOWN = 32;
+        const POOP_REMOVE_COUNT_DOWN = 72; // todo maybe make it variable and increse while playing? after each poop or after each odd poop...
+        let state;
+        const start = () => {
+            state = {
+                dx: 1, dy: 0,
+                speed: 256,
+                snake: [{ x: 3, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }],
+                apple: { x: 9, y: 8 },
+                poops: []
+            };
+        };
+        start();
+        const render = (state) => {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.strokeStyle = '#abc';
+            for (let x = 0; x < FIELD_WIDTH; x++) {
+                for (let y = 0; y < FIELD_HEIGHT; y++) {
+                    ctx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                }
+            }
+
+            ctx.fillStyle = '#f90';
+            state.snake.forEach((cell) => {
+                ctx.fillRect(cell.x * CELL_SIZE, cell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            });
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.arc(inPortal.x * CELL_SIZE + CELL_SIZE / 2, inPortal.y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = 'gold';
+            ctx.arc(outPortal.x * CELL_SIZE + CELL_SIZE / 2, outPortal.y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 2, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.font = (CELL_SIZE / 2) + 'px' + ' Verdana';
+            ctx.fillStyle = '#f00';
+            ctx.fillText(APPLE, state.apple.x * CELL_SIZE + CELL_SIZE / 8, state.apple.y * CELL_SIZE + CELL_SIZE / 1.5);
+            ctx.fillStyle = '#990';
+            state.poops.forEach(poop => {
+                ctx.fillText(POOP, poop.x * CELL_SIZE + CELL_SIZE / 8, poop.y * CELL_SIZE + CELL_SIZE / 1.5);
+            });
+        };
+
+        document.body.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                case 'ArrowUp': if (state.dy != 1) { state.dx = 0; state.dy = -1; } break;
+                case 'ArrowDown': if (state.dy != -1) { state.dx = 0; state.dy = 1; } break;
+                case 'ArrowLeft': if (state.dx != 1) { state.dy = 0; state.dx = -1; } break;
+                case 'ArrowRight': if (state.dx != -1) { state.dy = 0; state.dx = 1; } break;
+            }
+        });
+        let dragInPortal = false;
+        let dragOutPortal = false;
+        ctx.canvas.addEventListener('mousedown', e => {
+            const x = ~~(e.offsetX / CELL_SIZE);
+            const y = ~~(e.offsetY / CELL_SIZE);
+            dragInPortal = false;
+            dragOutPortal = false;
+            if (x === inPortal.x && y === inPortal.y) {
+                dragInPortal = true;
+            }
+            if (x === outPortal.x && y === outPortal.y) {
+                dragOutPortal = true;
+            }
+        });
+        ctx.canvas.addEventListener('mousemove', e => {
+            if (dragInPortal) {
+                inPortal.x = ~~(e.offsetX / CELL_SIZE);
+                inPortal.y = ~~(e.offsetY / CELL_SIZE);
+            }
+            if (dragOutPortal) {
+                outPortal.x = ~~(e.offsetX / CELL_SIZE);
+                outPortal.y = ~~(e.offsetY / CELL_SIZE);
+            }
+        });
+        ctx.canvas.addEventListener('mouseup', e => {
+            dragInPortal = false;
+            dragOutPortal = false;
+        })
+        let lastTick = Date.now();
+        let poopCountDown = POOP_COUNT_DOWN;
+        let poopRemoveCountDown = POOP_REMOVE_COUNT_DOWN;
+        const logic = () => {
+            const dt = Date.now() - lastTick;
+            if (dt > state.speed) {
+                poopCountDown--;
+                poopRemoveCountDown--;
+                if (poopCountDown <= 0) {
+                    poopCountDown = POOP_COUNT_DOWN;
+                    if (state.snake.length > 3) {
+                        state.poops.push({
+                            x: state.snake[state.snake.length - 1].x - state.dx,
+                            y: state.snake[state.snake.length - 1].y - state.dy,
+                        });
+                        state.snake.splice(state.snake.length - 3, 2);
+                        if (state.speed > 8) {
+                            state.speed -= 8;
+                        }
+                    }
+                }
+                if (poopRemoveCountDown <= 0) {
+                    state.poops.splice(0, 1);
+                    poopRemoveCountDown = POOP_REMOVE_COUNT_DOWN;
+                }
+                for (let i = state.snake.length - 1; i > 0; i--) {
+                    if (state.snake[i].x === state.snake[0].x + state.dx && state.snake[i].y === state.snake[0].y + state.dy) {
+                        start();
+                        return;
+                    }
+                    state.snake[i].x = state.snake[i - 1].x;
+                    state.snake[i].y = state.snake[i - 1].y;
+                }
+
+                state.snake[0].x += state.dx;
+                state.snake[0].y += state.dy;
+
+                if (state.snake[0].x === inPortal.x && state.snake[0].y === inPortal.y) {
+                    state.snake[0].x = outPortal.x;
+                    state.snake[0].y = outPortal.y;
+                    state.dx *= -1; state.dy *= -1;
+                } else if (state.snake[0].x === outPortal.x && state.snake[0].y === outPortal.y) {
+                    state.snake[0].x = inPortal.x;
+                    state.snake[0].y = inPortal.y;
+                    state.dx *= -1; state.dy *= -1;
+                }
+
+                if (state.snake[0].x >= FIELD_WIDTH) state.snake[0].x = 0;
+                if (state.snake[0].x < 0) state.snake[0].x = FIELD_WIDTH - 1;
+                if (state.snake[0].y >= FIELD_HEIGHT) state.snake[0].y = 0;
+                if (state.snake[0].y < 0) state.snake[0].y = FIELD_HEIGHT - 1;
+
+                if (state.apple.x === state.snake[0].x && state.apple.y === state.snake[0].y) {
+                    state.snake.push({ 
+                        x: state.snake[state.snake.length - 1].x - state.dx, 
+                        y: state.snake[state.snake.length - 1].y - state.dy 
+                    });
+                    // todo  prevent apple to spawn at the same cell as snake body and poops!
+                    state.apple.x = Math.floor(Math.random() * FIELD_WIDTH);
+                    state.apple.y = Math.floor(Math.random() * FIELD_HEIGHT);
+                }
+                if (state.poops.some(poop => poop.x === state.snake[0].x && poop.y === state.snake[0].y)) {
+                    start();
+                    return;
+                }
+                lastTick = Date.now();
+            }
+        };
+        requestAnimationFrame(function loop() {
+            logic();
+            render(state);
+            requestAnimationFrame(loop);
+        });
+    </script>
+</body>
+</html>
