@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Q</title>
+</head>
+<body>
+    <canvas width="800" height="600" id="ctx"></canvas>
+    <script type="text/javascript" id="code">
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const W = ctx.canvas.width;
+        const H = ctx.canvas.height;
+        const SIZE = 32;
+        const code = document.getElementById('code').innerHTML;
+        const level = code.split('\n').reduce((a, line,y) => {
+            return a.concat(line.split('')
+            .map((char, x) => {
+                return {
+                    x: x * SIZE,
+                    y: (y -2) * SIZE,
+                    c: char
+                };
+            }));
+        },[]).filter(cell => cell.c != ' ');
+
+        let ox = -8 * SIZE, oy = 0 * SIZE;
+        let dox = 0, doy = 0;
+        let lastTick = Date.now();
+        let px = 8 * SIZE, py = 8 * SIZE;
+        let pw = SIZE, ph = SIZE;
+        const G = 9;
+        let pdy = G;
+        const restart = () => {
+            px = 8 * SIZE;
+            py = 8 * SIZE;
+            ox = -8 * SIZE;
+            oy = 0 * SIZE;
+        }
+        requestAnimationFrame(function loop(){
+            const dtt = (Date.now() - lastTick) / 1000 * 60
+            ctx.clearRect(0,0,W,H);
+            pdy = G;
+            ctx.fillStyle = '#f0f';
+            ctx.fillRect(px, oy + py, pw, ph);
+            level.forEach(cell => {
+                ctx.fillStyle = '#f00';
+                ctx.fillRect(cell.x + ox, cell.y + oy, SIZE, SIZE);                
+                ctx.fillStyle = '#00f';
+                ctx.font = SIZE * 0.8 + 'px monospace';
+                ctx.fillText(cell.c, cell.x + ox + SIZE / 4, cell.y + oy + SIZE - SIZE / 4);
+                const pcx = px + SIZE / 2;
+                const pcy = py + oy + SIZE / 2;
+                ctx.fillStyle = 'green';
+                ctx.fillRect(pcx, pcy, 10, 10);
+                const A = Math.max(cell.x + ox, pcx) - Math.min(cell.x + ox, pcx);
+                const B = Math.max(cell.y + oy, pcy) - Math.min(cell.y + oy, pcy);
+                const D = Math.sqrt(A* A + B * B);
+                ctx.fillText(~~(D) + '|', cell.x + ox, cell.y + oy, SIZE);
+                if ( pcy < cell.y && D <= SIZE * 0.75) {
+                    ctx.beginPath();
+                    ctx.moveTo(pcx, pcy);
+                    ctx.lineTo(A + pcx, B + pcy);
+                    ctx.stroke();
+                    pdy = 0;
+                    py = cell.y - oy - SIZE;
+                }
+
+            });
+            ox += dox * dtt;
+            oy += doy * dtt;
+            py += pdy * dtt;
+            if (py > H) restart();
+            lastTick = Date.now();
+            requestAnimationFrame(loop);
+        });
+        document.body.addEventListener('keydown', e => {
+            switch(e.code) {
+                case 'ArrowLeft': dox += SIZE / 2; break;
+                case 'ArrowRight': dox -= SIZE / 2; break;
+                case 'ArrowUp': pdy = -32; break;
+                case 'ArrowDown': doy -= SIZE / 2 ; break;
+            }
+        });
+        document.addEventListener('keyup', e => {
+            dox = 0; doy = 0;
+        });
+    </script>
+</body>
+</html>

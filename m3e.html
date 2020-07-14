@@ -9,7 +9,7 @@
 <body>
     <canvas id="ctx" width="600" height="800"></canvas>
     <script type="text/javascript">
-let ITEM_SIZE = 32;
+let ITEM_SIZE = 64;
 let ITEM_COLORS = ['🍕', '🍌', '🥥', '🍄', '🍒'];
 let FIELD_WIDTH = 11;
 let FIELD_HEIGHT = 20;
@@ -174,7 +174,7 @@ requestAnimationFrame(function loop() {
         } else if (deadAlpha <= 0) {
             fall();
             deadAlpha = 1;
-            setTimeout(check, 2500);
+            setTimeout(check, 1000);
         }
         lastTick = Date.now();
     }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tree</title>
+</head>
+<body>
+    <canvas id="ctx" width="800" height="600"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const W = ctx.canvas.width;
+        const H = ctx.canvas.height;
+        const TL = 0xA;
+        const fillTree = (maxRecursion, nested = 0) => {
+            const tree = [];
+            for(let i = 0; i < TL; i++){
+                const xOfsset = (i+1) * 64 + nested * 8;
+                const yOffset = -(i+1) * 64 + nested * -8;
+                const children = maxRecursion > 0 && Math.random() > 0.5 ? fillTree(maxRecursion - 1, nested + 1) : null;
+                
+                
+                tree.push({
+                    x: W / 2 + xOfsset, y: H + yOffset,
+                    i: i,
+                    w: TL / (i + 1),
+                    h: TL / (i + 2),
+                    children: children,
+                    nested: nested
+                });
+            }
+            return tree;
+        }
+        const tree = fillTree(2);
+        
+        const renderTree = (tree, maxRecursion) => {
+            tree.forEach(branch => {
+                ctx.moveTo(branch.x, branch.y);
+                ctx.lineTo(branch.x + branch.w, branch.y + branch.h);     
+                if (maxRecursion > 0) {
+                    if (branch.children) {
+                        renderTree(branch.children);
+                    }
+                }           
+            });
+        };
+        requestAnimationFrame(function loop(){
+            ctx.strokeStyle = '#f90';
+            ctx.beginPath();
+            renderTree(tree, 32);
+            ctx.stroke();
+            requestAnimationFrame(loop);
+        })
+    </script>
+</body>
+</html>

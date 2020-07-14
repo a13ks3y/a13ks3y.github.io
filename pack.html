@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pack/Unpuck JavaScript Code</title>
+</head>
+<body>
+    <textarea name="toPack" id="toPack" cols="80" rows="40">
+        console.log('packing', code.length);
+        var result = '';
+        var replaceMap = {
+            'function': '%',
+            'var': '@',
+            '++': '#',
+            '==': '$',
+            'Math': '±',
+            'Object':'&',
+        };    
+        result = code.replace(/[\s\n;]/g, '');
+        console.log('replace spaces etc', result, result.length);
+        replaceMap.values(to => {
+            result = result.replace(new RegExp('(' + to + ')', 'g'), '\\$0');
+        });
+        console.log('escape', result, result.length);
+        Object.keys(replaceMap).forEach((replace) => {
+            var to = replaceMap[replace];
+            result = result.replace(new RegExp(replace, 'g'), to);
+        });
+        console.log('replace keywords etc', result, result.length);
+        return result;
+    </textarea>
+    <button onclick="doPack()">PACK</button>
+    <script type="text/javascript">
+        function pack(code, includeUnpuck = false) {
+            console.log('packing', code.length);
+            var result = '';
+            var replaceMap = {
+                'function': '%',
+                'var': '@',
+                '\\+\\+': '#',
+                '==': '$',
+                'Math': '±',
+                'Object':'&',
+            };    
+            result = code.replace(/[\s\n;]/g, '');
+            console.log('replace spaces etc', result, result.length);
+            Object.values(replaceMap).forEach(to => {
+                result = result.replace(new RegExp('(' + to + ')', 'g'), '\\$0');
+            });
+            console.log('escape', result, result.length);
+            Object.keys(replaceMap).forEach((replace) => {
+                var to = replaceMap[replace];
+                result = result.replace(new RegExp(replace, 'g'), to);
+            });
+            console.log('replace keywords etc', result, result.length);
+            return result;
+        };
+        function doPack() {
+            var str = document.getElementById('toPack').value;
+            pack(str);
+        }
+    </script>
+</body>
+</html>

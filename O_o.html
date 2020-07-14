@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>O_o</title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="800" height="600" id="ctx"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const W = ctx.canvas.width;
+        const H = ctx.canvas.height;
+        const PW = 64; const PH = 64;
+        const CELL_SIZE = 64;
+        const field = [
+            '############################################################################',
+            '                                                                            ',
+            '                                                                            ',
+            '                                                                            ',
+            '                     ###                                                    ',
+            '            #                                                               ',
+            '        #   #    #                                                          ',
+            '     #      #    #                                                          ',
+            '############################################################################',
+        ];
+        const index = (x, y) => `${x}-${y}`;
+        class Cell {
+            constructor(x, y, level) {
+                this.x = x * CELL_SIZE;
+                this.y = y * CELL_SIZE;
+                this.level = level;
+            }
+            render(ctx) {
+                ctx.strokeStyle = '#abc';
+                ctx.strokeRect(this.x + this.level.x, this.y + this.level.y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        class Wall extends Cell {
+            render(ctx) {
+                super.render(ctx);
+                ctx.fillStyle = '#cba';
+                ctx.fillRect(this.x + this.level.x, this.y + this.level.y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        const fieldCellFactory = (cellData, x, y, level) => {
+            switch(cellData) {
+                case '#': return new Wall(x, y, level); break;
+                default:
+                    return new Cell(x, y, level);
+                 break;
+            }
+        };
+        class Level {
+            x = 0
+            y = 0
+            constructor(field) {
+                this.field = {};
+                for (let y = 0; y < field.length; y++) {
+                    for (let x = 0; x < field[y].length; x++) {
+                        this.field[index(x,y)] = fieldCellFactory(field[y][x], x, y, this);
+                    }
+                }
+            }
+            render(ctx) {
+                ctx.strokeStyle = 'green';
+                ctx.strokeRect(this.x, this.y, W, H);
+                Object.values(this.field).forEach(cell => cell.render(ctx));
+                
+            }
+            logic(dtt) {
+                
+            }
+        }
+        class O_o {
+            x = PW * 3
+            y = CELL_SIZE * 2//H - PH
+            w = PW
+            h = PH
+            dx = 0
+            dy = 64
+            sx = 32
+            sy = 64
+            state = 'idle'
+            constructor(level) {
+                this.level = level;
+            }
+            render(ctx) {
+                ctx.fillStyle = '#f90';
+                ctx.fillRect(this.x, this.y, this.w, this.h);
+                
+            }
+            logic(dtt) {
+                this.y += this.dy * dtt;
+                if (this.x + this.dx * dtt >= W - PW * 2) {
+                    this.level.x -= Math.abs(this.dx + dtt);
+                } else if (this.x + this.dx * dtt <= PW * 2) {
+                    this.level.x += Math.abs(this.dx + dtt);
+                } else {
+                    this.x += this.dx * dtt;
+                }
+                const isColideWithWall = Object.values(this.level.field).some(cell => {
+                    if(cell instanceof Wall) {
+                        if (this.x >= cell.x && this.x <= cell.x + CELL_SIZE) {
+                            if (this.y + this.w >= cell.y && this.y + this.w <= cell.y + CELL_SIZE) {
+                                this.stop();
+                                this.y = cell.y - this.h;
+                            
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
+            }
+            moveLeft() {
+                if (this.state === 'idle') {
+                    this.state = 'moveLeft';
+                    this.dx = -this.sx;
+                    this.dy = 0;
+                }
+            }
+            moveRight() {
+                if (this.state === 'idle') {
+                    this.state = 'moveRight';
+                    this.dx = this.sx;
+                    this.dy = 0;
+                }
+            }
+            stop() {
+                this.dx = 0;
+                this.dy = 0;
+                this.state = 'idle';
+            }
+        };
+        const level = new Level(field);
+        const o_O = new O_o(level);
+        let lastTick = Date.now();
+        requestAnimationFrame(function loop() {
+            const dt = Date.now() - lastTick;
+            const dtt = dt / 1000 * 60;
+            lastTick = Date.now();
+            ctx.clearRect(0,0, W, H);
+            level.render(ctx);
+            o_O.render(ctx);
+
+            level.logic(dtt);
+            o_O.logic(dtt);
+            requestAnimationFrame(loop);
+        });
+        document.body.addEventListener('keydown', e => {
+            switch(e.code) {
+                case 'ArrowLeft': o_O.moveLeft(); break;
+                case 'ArrowRight': o_O.moveRight(); break;
+            }
+        });
+        document.body.addEventListener('keyup', e => {
+            switch(e.code) {
+                case 'ArrowRight':
+                case 'ArrowUp':
+                case 'ArrowDown':
+                case 'ArrowLeft': o_O.stop(); break;
+            }
+        })
+    </script>
+</body>
+</html>
