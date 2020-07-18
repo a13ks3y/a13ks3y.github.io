@@ -1,0 +1,286 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>NN</title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+            float: left;
+            margin-left: 1rem;
+        }
+    </style>
+    <script src="three.js" type="text/javascript"></script>
+    <script src="OrbitControls.js" type="text/javascript"></script>
+</head>
+<body>
+    <header>
+        <input type="number" value="0" name="learn" id="learn" min="0" max="9" step="1" />
+        <button onclick="app.learn()">Learn</button>
+        <button onclick="app.recognize()">Recognize</button>
+        <button onclick="app.clear()">Clear</button>
+        <button onclick="app.clearAll()">Clear All</button>
+    </header>
+    <canvas width="256" height="256" id="ctx-in"></canvas>
+    <canvas width="16" height="16" id="ctx-out"></canvas>
+    <footer id="output"></footer>
+
+    <script type="text/javascript">
+        const THREASHOLD = 32;
+        class NN {
+            init(layersInfo) {
+                let prevCount;
+                this.layersInfo = layersInfo;
+                const W = (prevCount) => {
+                    const result = Array(prevCount).fill(0);
+                    return result.map(() => ~~(Math.random()*2));
+                };
+                this.layers = layersInfo.map(layerInfo => {
+                    const count = layerInfo.out || layerInfo.w * layerInfo.h;
+                    const layer = Array(count);
+                    for (let i = 0; i < layer.length; i++) {
+                        const w = prevCount ? W(prevCount) : undefined;
+                        layer[i] = {
+                            v: 0, w
+                        };
+                        
+                    }
+                    prevCount = count;
+                    return layer;
+                });
+            }
+            clear() {
+                this.layers.forEach(layer => layer.forEach(n => n.v = 0));
+            }
+            activate(i) {
+                const inputLayer = this.layers[0];
+                if (inputLayer[i]) {
+                    inputLayer[i].v = THREASHOLD * 2;
+                } else {
+                    throw new Error(`inputLayer[${i}] is undefined!`);
+                }
+            }
+            learn(actualNumber) {
+                const result = this.recognize();
+                if (result != actualNumber) {
+                    // panish wrong weights
+                    for (let i = this.layers.length - 1; i > 1; i--) {
+                        const layer = this.layers[i];
+                        const prevLayer = this.layers[i - 1];
+                        layer.forEach((n, ni) => {
+                            if (n.v && prevLayer.w) {
+                                prevLayer.w[ni] = 0;
+                            }
+                        })
+                    }
+                    // revord for right weights
+                    const output = this.layers[this.layers.length - 1];
+                    output[actualNumber].v = 1;
+                    for (let i = this.layers.length - 1; i > 1; i--) {
+                        const layer = this.layers[i];
+                        const prevLayer = this.layers[i - 1];
+                        layer.forEach((n, ni) => {
+                            if (n.v && n.w) {
+                                prevLayer.forEach((pn, pi) => {
+                                    if (pn.v) n.w[pi]++;
+                                });
+                            }
+                        })
+                    }
+                    console.log('result is:', result);
+                    
+                } else {
+                    console.log(actualNumber, 'is learned!');
+                }
+                return result;
+            }
+            recognize() {
+                this.layers.forEach((layer, li) => {
+                    const nextLayer = this.layers[li + 1];
+                    if (nextLayer) {
+                        nextLayer.forEach(nn => {
+                            const sum = nn.w.reduce((a, c, wi) => a + c * layer[wi].v, 0);
+                            nn.v = sum > THREASHOLD ? THREASHOLD * 2 : 0;
+                        });
+                    }
+                });
+
+                const output = this.layers[this.layers.length - 1];
+                return output.findIndex(n => n.v > 0);
+            }
+            load() {
+                try {
+                    const layers = localStorage.getItem('nn');
+                    const layersInfo = localStorage.getItem('nn-layers-info');
+                    if (layers && layersInfo) {
+                        this.layers = JSON.parse(layers);
+                        this.layersInfo = JSON.parse(layersInfo);
+                    } else {
+                        return false;
+                    }
+                } catch (e) {
+                    return false;
+                }
+                return true;
+            }
+            save() {
+                localStorage.setItem('nn', JSON.stringify(this.layers));
+                localStorage.setItem('nn-layers-info', JSON.stringify(this.layersInfo));
+            }
+        }
+        class App {
+            constructor() {
+                const layersInfo = [
+                    { w: 16, h: 16, c: 0xff0000 },
+                    { w: 16, h: 16, c: 0x0000ff },
+                    { out: 10, c: 0xaabbcc }
+                ];
+                this.nn = new NN();
+                this.nn.load() || this.nn.init(layersInfo);
+                this.ctxIn = document.getElementById('ctx-in').getContext('2d');
+                this.ctxOut = document.getElementById('ctx-out').getContext('2d');
+                this.ctxIn.canvas.addEventListener('mousemove', this.mousemove.bind(this));
+                this.learnEl = document.getElementById('learn');
+                this.outputEl = document.getElementById('output');
+                this.initTree();
+            }
+            initTree() {
+                const w = window.innerWidth / 2;
+                const h = w;
+                var scene = new THREE.Scene();
+                var camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+                
+                var renderer = new THREE.WebGLRenderer();
+                renderer.setSize(w, h);
+                document.body.appendChild(renderer.domElement);
+                window.scene = scene;
+                window.camera = camera;
+
+                this.updateNNView();
+                var controls = new THREE.OrbitControls(camera, renderer.domElement);
+                camera.position.set(0, 20, 300);
+                controls.update();
+                requestAnimationFrame(function loop() {
+                    renderer.render(scene, camera);
+                    controls.update();
+                    requestAnimationFrame(loop);
+                });
+            }
+            updateNNView() {
+                scene.children = [];
+                this.nn.layers.forEach((layer, li) => {
+                    const layerInfo = this.nn.layersInfo[li];
+                    const w = layerInfo.out || layerInfo.w;
+                    let x = 0;
+                    let y = 0;
+                    layer.forEach((n, ni) => {
+
+                        var geometry = new THREE.SphereGeometry();
+                        const z = li * 32;
+                        
+                        geometry.translate(x * 8, y * 8, z);
+                        var material = new THREE.MeshBasicMaterial({ color: n.v > THREASHOLD ? (layerInfo.c || 0x00ff00) : 0x00ffff });
+                        var nv = new THREE.Mesh(geometry, material);
+                        scene.add(nv);
+                        x++;
+                        if (x >= w) {
+                            x = 0;
+                            y++;
+                        }            
+                    });
+                });
+            }
+            mousemove(e) {
+                if (e.buttons) {
+                    this.ctxIn.fillStyle = 'black';
+                    this.ctxIn.fillRect(e.offsetX, e.offsetY, 16, 16);
+                }
+            }
+            clear() {
+                this.ctxIn.clearRect(0, 0, this.ctxIn.canvas.width, this.ctxIn.canvas.height);
+                this.ctxOut.clearRect(0, 0, this.ctxOut.canvas.width, this.ctxOut.canvas.height);
+            }
+            learn() {
+                const W = this.ctxIn.canvas.width;
+                const H = this.ctxIn.canvas.height;
+                const w = this.ctxOut.canvas.width;
+                const h = this.ctxOut.canvas.height;
+                const actualNumber = parseInt(this.learnEl.value);
+                this.ctxOut.clearRect(0, 0, w, h);
+                this.ctxOut.drawImage(this.ctxIn.canvas, 0, 0, W, H, 0, 0, w, h);
+
+                setTimeout(() => {
+                    const imageData = this.ctxOut.getImageData(0, 0, w, h);
+                    this.nn.clear();
+                    let j = 0;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        if (imageData.data[i + 3] != 0) {
+                            imageData.data[i + 0] = 255;
+                            imageData.data[i + 1] = 0;
+                            imageData.data[i + 2] = 0;
+                            this.nn.activate(j);
+                        } else {
+                            
+                            imageData.data[i + 0] = 0;
+                            imageData.data[i + 1] = 0;
+                            imageData.data[i + 2] = 255;
+
+                        }
+                        imageData.data[i + 3] = 255;
+                        j++;
+                    }
+                    this.ctxOut.putImageData(imageData, 0, 0);
+                    
+                    const result = this.nn.learn(actualNumber);
+                    this.outputEl.innerHTML = result;
+                    this.updateNNView();
+                    this.nn.save();
+                }, 0);
+                
+            }
+            recognize() {
+                const W = this.ctxIn.canvas.width;
+                const H = this.ctxIn.canvas.height;
+                const w = this.ctxOut.canvas.width;
+                const h = this.ctxOut.canvas.height;
+
+                this.ctxOut.clearRect(0, 0, w, h);
+                this.ctxOut.drawImage(this.ctxIn.canvas, 0, 0, W, H, 0, 0, w, h);
+
+                setTimeout(() => {
+                    const imageData = this.ctxOut.getImageData(0, 0, w, h);
+                    this.nn.clear();
+                    let j = 0;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        if (imageData.data[i + 3] != 0) {
+                            imageData.data[i + 0] = 255;
+                            imageData.data[i + 1] = 0;
+                            imageData.data[i + 2] = 0;
+                            this.nn.activate(j);
+                        } else {
+
+                            imageData.data[i + 0] = 0;
+                            imageData.data[i + 1] = 0;
+                            imageData.data[i + 2] = 255;
+
+                        }
+                        imageData.data[i + 3] = 255;
+                        j++;
+                    }
+                    this.ctxOut.putImageData(imageData, 0, 0);
+
+                    const result = this.nn.recognize();
+                    this.outputEl.innerHTML = result;
+                    this.updateNNView();
+                }, 0);
+            }
+            clearAll() {
+                if (confirm('Are you sure?')) {
+                    this.clear();
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+        }
+        const app = new App();
+    </script>
+</body>
+</html>
