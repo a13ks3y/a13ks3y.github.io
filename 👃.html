@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>👃</title>
+    <style type="text/css">
+        /* Inspired by: http://www.nikesh.me/demo/zooming.html */
+        /* emojis been used: */
+        /* 🔭 👃 💨 */
+        @keyframes 🔭 {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(5);
+            }
+            75% {
+                transform: scale(10);
+            }
+            85% {
+                transform: scale(125);
+            }
+            100% {
+                transform: scale(400);
+            }
+        }
+
+        body {
+            background: black;
+            transform: translateX(-25%);
+            overflow: hidden;
+        }
+
+        #👃 {
+            transform-origin: 376px 404px;
+            position: fixed;
+            left: 50%;
+            top: 25%;
+            transform: scale(0) translate(-50%, -50%);
+            animation-name: 🔭;
+            animation-duration: 6.66s;
+            animation-delay: 0.666s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+    </style>
+    <link rel="shortcut icon" type="image/png" id="favicon" href="👃.png">
+</head>
+<body>
+    <img id="👃" src="👃.jpg" alt="👃" />
+</body>
+</html>
