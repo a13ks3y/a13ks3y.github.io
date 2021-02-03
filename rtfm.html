@@ -11,6 +11,7 @@
         h3 {
             font-size: 300%;
             padding: 1rem;
+            background: #8c20cb;
         }
         ul {
             padding: 1.666rem;
@@ -18,10 +19,16 @@
         ul li {
             padding: 0.666rem;
         }
+        .char {
+            display: inline-block;
+            width: 3rem;
+            height: 3rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h3>READ THE <strong>FUCKING</strong> MANUAL!!!</h3>
+    <h3>READ THE FUCKING MANUAL!!!</h3>
     <ul>
         <li><a href="https://javascript.info/"></a>JS</li>
         <li><a href="https://ru.wikipedia.org/wiki/%D0%9E%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%BD%D0%BE-%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B5_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5">OOP</a></li>
@@ -30,5 +37,38 @@
         <li><a href="https://github.com/awesome-css-group/awesome-css#readme">CSS</a></li>
         <li><a href="https://github.com/sindresorhus/awesome">ТЫСЯЧИ ИХ!!!</a></li>
     </ul>
+    <script type="text/javascript">
+       const colors = [
+           '#f00',
+           '#0f0',
+           '#00f',
+           '#0ff',
+           '#ff0',
+           '#f90',
+       ];
+       const bgColors = colors.reverse();
+       const txtEl = document.getElementsByTagName('h3')[0];
+       const txt = txtEl.innerText;
+       const chars = txt.split('');
+       const charsHTML = chars.map((char, index) => `<span id="char-${index}" class="char char-${char}">${char == ' ' ? '&nbsp;' : char}</span>`);
+       txtEl.innerHTML = charsHTML.join('\n');
+       let currentCharIndex = charsHTML.length;
+       let currentColorIndex = 0;
+       let timeOffset = 0;
+       function recursion() {
+           setTimeout(() => {
+               currentCharIndex = currentCharIndex >= charsHTML.length - 1? 0 : currentCharIndex + 1;
+               currentColorIndex = currentColorIndex >= colors.length - 1 ? 0 :currentColorIndex + 1;
+               timeOffset = timeOffset < 200 ? timeOffset + 13 : 0;
+               const charEl = document.getElementById(`char-${currentCharIndex}`);
+               if (chars[currentCharIndex] !== ' ') {
+                   charEl.style.backgroundColor = bgColors[currentColorIndex];
+                   charEl.style.color = colors[currentColorIndex !== 0 ? currentColorIndex - 1 : colors.length];
+               }
+               recursion(timeOffset);
+           }, timeOffset);
+       }
+       recursion();
+    </script>
 </body>
 </html>
