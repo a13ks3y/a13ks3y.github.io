@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisdoms</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700italic,700,400italic|EB+Garamond' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon" sizes="192x192" href="favicon2.png">
+
+</head>
+<body>
+    <main class="main fadein">
+        <header class="header">
+            <h1 class="header__text">
+                <span id="wisdom"></span>
+                <div class="touch-area touch-area--qr"></div>
+            </h1>
+            <div class="header__qr">
+                <div class="touch-area touch-area--qr"></div>
+            </div>
+        </header>
+    </main>
+    <script type="text/javascript">
+        const wisdoms = [
+            'Некоторые люди, пиздец ТУПЫЕ!',
+            'Весь мир подъезд, а люди - управдомы.',
+            'Не будите и небудимы будете'
+        ];
+        const wisdomEl = document.getElementById('wisdom');
+        let cw = 0;
+        (function pipka() {
+            wisdomEl.innerHTML = wisdoms[cw];
+            cw = cw >= wisdoms.length - 1 ? 0 : cw + 1;
+            setTimeout(pipka, 60 * 1000);
+        }());
+    </script>
+</body>
+</html>
