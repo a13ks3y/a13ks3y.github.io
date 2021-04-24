@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>THE QUEST</title>
+    <link rel="stylesheet" href="reset.css">
+    <style type="text/css">
+        html, body {
+            font-size: 16px;
+            font-family: monospace;
+            background: #abcdef;
+        }
+
+        header, main, section, p {
+            padding: 0.0666rem;
+            margin: 0.666rem;
+        }
+        li {
+            margin: 0.666rem 0.333rem;
+        }
+        h1 {
+            font-size: xxx-large;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Дохуя квест</h1>
+</header>
+<main>
+    <section class="description">
+    </section>
+    <section class="actions">
+        <ul class="actions-list">
+        </ul>
+    </section>
+
+</main>
+<script type="text/javascript">
+    const actionsListEl = document.getElementsByClassName('actions-list')[0];
+    const descriptionEl = document.getElementsByClassName('description')[0];
+    const pages = {
+        index: {
+            description: `
+            <p>
+                Вы приходите в себя на полу общественного (по всей видимости вокзального) туалета, абсолютно голый, с головной болью, а в кулаке зажато 100 гривен.
+            </p>
+            <p>
+                Осмотревшись, вы замечаете, что одна из раковин расшатана и держится "на честном слове".
+            </p>
+
+                `,
+            actions: [{href: '#next', text: 'Оторвать раковину от стены, и дождаться пока кто-то зайдет.'}]
+        },
+        next: {
+            description: `
+            <p>
+                Кто-то вошёл и вы ударили его раковиной по голове, надели его одежду, и зажали в руку 100 гривен.
+            </p>
+            <p>
+                Нужно выбираться отсюда поскорее. Направо или налево?
+            </p>
+
+                `,
+            actions: [
+                {href: '#left', text: 'Выйти из туалета, и с невозмутимым видом повернуть налево.'},
+                {href: '#right', text: 'Выйти из туалета, и с невозмутимым видом повернуть направо.'}
+            ]
+        },
+        left: {
+            description: `
+                <p>Молодой человек! В той стороне тупик! А что это, на вас одежда того кто вошел...</p>
+                <p>Бдительная бабушка лихорадочно начинает набирать какой-то номер, не отрывая от вас наполненного ужасом взгляда</p>
+                `,
+            actions: [
+                {href: '#fuck', text: 'Постараться успокоить бабку и объяснить ситуацию.'},
+                {href: '#tryToEscape', text: 'Молча развернуться и рвануть прочь.'}
+            ]
+        },
+        right: {
+            description: `
+                <p>Бабуля равнодушно скользнула по вам глазами и снова уставилась в кроссворд. Вы вышли к дверям центрального входа в Киевский железнодорожный вокзал, на улице приблизительно полдень, вы по прежнему ничего не помните и не знаете что делать дальше.</p>
+                <p>Размышляя какими будут ваши следующие действия вы машинально сунули руки в карманы и нашли там какую-то записку.</p>
+            `,
+            actions: [
+                {href: '#read-instruction', text: 'Отойти в сторону, и никому не мешая внимательно прочитать инструкцию'},
+                {href: '#read-instruction-on-the-go', text: 'Парня которого я оглушил могут обнаружить в любой момент. Пожалуй двинусь куда глаза глядят, а бумажку можно прочесть и на ходу.'},
+            ]
+        },
+        tryToEscape: {
+            description: `
+                <p>Конечно бабке за вами не угнаться. Слегка запыхавшись, вы вышли к дверям центрального входа в Киевский железнодорожный вокзал, на улице приблизительно полдень, вы по прежнему ничего не помните и не знаете что делать дальше.</p>
+                <p>Размышляя какими будут ваши следующие действия вы машинально сунули руки в карманы и нашли там какую-то записку.</p>
+            `,
+            actions: [
+                {href: '#readInstruction', text: 'Отойти в сторону, и никому не мешая внимательно прочитать инструкцию'},
+                {href: '#readInstructionOnTheGo', text: 'Парня которого я оглушил могут обнаружить в любой момент. Пожалуй двинусь куда глаза глядят, а бумажку можно прочесть и на ходу.'},
+            ]
+        },
+        readInstruction: {
+            description: ``,
+            actions: [
+                {href: ''}
+            ]
+        },
+        fuck: {
+            description: `<h3>ВАМ ПИЗДЕЦ</h3>`,
+            actions: [{
+                href: '#',
+                text: 'В глазах темнеет, вам кажется что вы падаете, очертания комнаты размываются и со звуком похожим на пердеж ваше тело исчезает и несется куда-то далеко-далеко...'
+            }]
+        }
+    };
+    window.addEventListener('hashchange', hashChanged);
+
+    function hashChanged() {
+        const hash = location.hash.length > 1 ? location.hash.substr(1) : 'index';
+        console.info('Hash is:', hash);
+        const currentPage = pages[hash] || pages.index;
+        if (currentPage) {
+            actionsListEl.innerHTML = currentPage.actions.map(a => `<li><a href="${a.href}">${a.text}</a></li>`).join('\n');
+            descriptionEl.innerHTML = currentPage.description;
+        } else {
+            // WTF?!!!
+            console.error('currentPage is NULL!!!!')
+        }
+    }
+
+    hashChanged();
+</script>
+</body>
+</html>
