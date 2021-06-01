@@ -71,7 +71,7 @@ body {
     width: 100vw;
     height: 15vh;
 }
-.touch-area--qr {
+.touch-area__qr {
     position: absolute;
     top: 15vh;
     left: 0;
@@ -90,7 +90,7 @@ body {
 /* End Layout landscape */
 
 /* Typography */
-.header__text, .header__text:active  {
+.header__text, .header__text:active, .header__subtext, .header__subtext a  {
     font-family: 'EB Garamond', serif;
     text-transform: uppercase;
     background-color: #929292;
@@ -102,6 +102,13 @@ body {
     font-size: 4.25vw;
     cursor: pointer;
     outline: none;
+    text-decoration: none;
+}
+.header__subtext {
+    margin-top: 0.666rem;
+}
+.header__subtext a {
+    font-size: 2.25vw;
 }
 .header__qr {
     cursor: pointer;
@@ -127,48 +134,18 @@ body {
     .header__text, .header__text:active {
         font-size: 6.2vw;
     }
+    .header__subtext {
+        margin-top: 4.2rem;
+    }
+    .header__subtext a, .header__subtext a:active {
+        font-size: 3.2vw;
+    }
     .footer__link, .footer__link:hover, .footer__link:active, .footer__link:visited, .footer__link:focus {
         font-size: 8vw;
     }
 }
 /* End Typography */
 
-
-/* Debug section */
-.debug .header__text:after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    width: 62vw;
-    height: 100vh;
-    background: yellow;
-    opacity: 0.5;
-}
-.debug .footer:after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    width: 38vw;
-    height: 100vh;
-    background: red;
-    opacity: 0.5;
-}
-.debug .touch-area {
-    border: 1px solid blue;
-}
-@media (orientation: portrait) {
-    .debug .header__text:after {
-        width: 90vw;
-    }
-    .debug .footer:after {
-        width: 68vw;
-    }
-}
-/* End Debug section*/
 
 /* Animation */
 .fadein {
