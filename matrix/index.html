@@ -14,67 +14,6 @@
 <body>
     <main id="main">     
     </main>
-    <script type="text/javascript" id="code">
-        let oC = 0, oR = 0;
-
-        const mainEl = document.getElementById('main');
-        const mainRect = mainEl.getBoundingClientRect();
-        const theCode = document.body.innerHTML;//document.getElementById('code').innerHTML;
-
-        const rows = theCode.split('\n').filter(row => !!row.length);
-        const longestRow = rows.sort((a, b) => b.length - a.length)[0];
-        
-        const FONT_SIZE = 16;
-        const CELL_SIZE = FONT_SIZE;//~~(FONT_SIZE * 1.666);
-        const avaliableCols = ~~(mainRect.width / CELL_SIZE);
-        const avaliableRows = ~~(mainRect.height / CELL_SIZE);
-        //console.log(avaliableCols, avaliableRows, longestRow.length, rows.length);
-        const columns = [];
-        init();
-        render(0, 0);
-        function init() {
-            for (let c = 0; c < avaliableCols; c ++) {
-                columns[c] = [];
-                for (let r = 0; r < avaliableRows; r ++) {
-                    const charEl = document.createElement('span');
-                    //charEl.classList.add('');
-                    charEl.dataset.c = c;
-                    charEl.dataset.r = r;
-                    columns[c][r] = charEl;
-                    mainEl.appendChild(charEl);
-                }
-            }
-            document.body.addEventListener('keyup', e => {
-                switch(e.key) {
-                    case 'ArrowUp': oR--; break;
-                    case 'ArrowRight': oC++; break;
-                    case 'ArrowDown': oR++; break;
-                    case 'ArrowLeft': oC--; break;
-                }
-                render(oC, oR);
-            });
-        }
-
-        function render(offsetCol, offsetRow) {
-            for (let c = 0; c < avaliableCols; c ++) {
-                for (let r = 0; r < avaliableRows; r ++) {
-                    const row = rows[r + offsetRow];
-                    const char = row ? row[c +  offsetCol] : '🎱';
-                    const charEl = columns[c][r];
-                    if (charEl) {
-                        if (char) {
-                            charEl.innerHTML = char === ' ' ? '&nbsp;' : char;
-                        } else {
-                            charEl.innerHTML = '😵';
-                        }
-                    } else {
-                        console.error(c, r, ':(');
-                    }
-                }
-            }
-        }
-
-
-    </script>
+    <script type="text/javascript" src="main.js"></script>
 </body>
 </html>

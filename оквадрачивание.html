@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ОКВАДРАЧИВАНИЕ</title>
+    <style type="text/css">
+        table, tr, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <p>
+        Два входа, один выход. Нужно построить эффективную(это как?) пирамиду.
+    </p>
+</header>
+<main id="main"></main>
+<script type="text/javascript">
+    const result = [];
+    console.time();
+    (function recursion(i, depth) {
+        const two = i * 2;
+        const sqrtOfTwo = Math.sqrt(two);
+        const side = (sqrtOfTwo % 2 === 0) ? two : Math.floor(sqrtOfTwo) + 1;
+        const next = side * side;
+        result.push({
+            i,
+            side,
+            next
+        });
+        i < depth && recursion(next, depth);
+    }(1, 100));
+    const rows = result.map(item => `<tr><td>${item.i}</td><td>${item.side} x ${item.side}</td><td> = ${item.next}</td></tr>`).join('\n');
+    const table = `<table>${rows}</table>`;
+    const mainEl = document.getElementById('main');
+    mainEl.innerHTML = table;
+    console.timeEnd();
+</script>
+</body>
+</html>
