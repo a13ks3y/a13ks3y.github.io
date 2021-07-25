@@ -32,7 +32,7 @@ main span {
     width: 1rem;
     height: 1rem;
     display: inline-block;
-    /* border: 1px solid gray; */
+    border: 1px solid black;
     color: green;
     margin: 0; padding: 0;
 }
@@ -94,6 +94,29 @@ main span {
     animation-delay: 5.666s;
     animation-iteration-count: 1;
 }
+.fadeInOut-7 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 5.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-8 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 5.666s;
+    animation-iteration-count: 1;
+}
+
+.fadeInOut-9 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 5.666s;
+    animation-iteration-count: 1;
+}
+
 
 @keyframes fadeIn{
     from {
@@ -114,11 +137,11 @@ main span {
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 1;}
-    20% { opacity: 0.5; }
-    40% { opacity: 0;}
-    60% { opacity: 0.5;}
-    80% { opacity: 1;}
+    0% { opacity: 1; color: green;}
+    20% { opacity: 0.5; color: lightgreen;}
+    40% { opacity: 0; color: green;}
+    60% { opacity: 0.5; color: lightgreen;}
+    80% { opacity: 1; color: green;}
 }
 
 /**
