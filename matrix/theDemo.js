@@ -38,7 +38,7 @@ fetch('main.js')
     setInterval(()=>{
         columns.forEach(column => {
             const el = column.chars[~~(Math.random()*column.chars.length)].el;
-            el.contains('fadeInOut') ? el.classList.remove('fadeInOut') : el.classList.add('fadeInOut');
+            el.classList.contains('fadeInOut') ? el.classList.remove('fadeInOut') : el.classList.add('fadeInOut');
         })
     }, 666)
 });
