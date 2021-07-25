@@ -1,0 +1,132 @@
+@font-face {
+    font-family: Bitwise;
+    src: url('Bitwise-m19x.ttf');
+}
+html {
+    font-size: 16px;
+}
+body {
+    display: flex;
+    flex-direction: column;    
+    color: green;
+    background-color: black;
+}
+h1, h2, h3 { 
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+main {
+    font-family: monospace;
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+}
+main > div {
+    display: flex;
+    flex-direction: column;
+    width: 1rem;
+        
+}
+main span {
+
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    /* border: 1px solid gray; */
+    color: green;
+    margin: 0; padding: 0;
+}
+
+.fadeInOut {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 666ms;
+    animation-iteration-count: infinite;
+}
+
+.fadeInOut-0 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 0;
+    animation-iteration-count: 1;
+}
+.fadeInOut-1 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 1.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-2 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 2.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-3 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 3.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-4 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 4.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-5 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 5.666s;
+    animation-iteration-count: 1;
+}
+.fadeInOut-6 {
+    animation-name: fadeInOut;
+    animation-timing-function: ease-in-out;
+    animation-duration: 6.66s;
+    animation-delay: 5.666s;
+    animation-iteration-count: 1;
+}
+
+@keyframes fadeIn{
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }    
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 1;}
+    20% { opacity: 0.5; }
+    40% { opacity: 0;}
+    60% { opacity: 0.5;}
+    80% { opacity: 1;}
+}
+
+/**
+    I need just to create a grid for characters.
+    Or even columns. 
+    Column is moving, but characters (related to each other) - don't
+*/
+
+.debug, main ul li.debug {
+    background-color: gold;
+}
