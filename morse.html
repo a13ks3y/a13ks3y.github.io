@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Morse Code Learning Tool</title>
+    <link rel="icon" sizes="192x192" href="banana-favicon.png">
+</head>
+<body>
+<h1>This is Morse code from A to Z.</h1>
+<h2>Listen to it carefully.</h2>
+<h3>You have listened it <span id="counter"></span> times.</h3>
+<audio autoplay controls loop preload="auto" src="assets/A_through_Z_in_Morse_code.ogg"></audio>
+<script type="text/javascript">
+    const COUNTER_LOCAL_STORAGE_KEY = 'morse-counter';
+    const audioEl = document.getElementsByTagName('audio')[0];
+    const updateCounter = () => {
+        const counter = localStorage.getItem(COUNTER_LOCAL_STORAGE_KEY);
+        const counterValue = counter && counter.length ? (parseInt(counter) + 1).toString() : '1';
+        localStorage.setItem(COUNTER_LOCAL_STORAGE_KEY, counterValue);
+        document.getElementById('counter').innerHTML = counterValue;
+    };
+    audioEl.addEventListener('play', updateCounter);
+</script>
+</body>
+</html>
