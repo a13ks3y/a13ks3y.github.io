@@ -15,14 +15,63 @@
         body{margin: 0; padding: 0; overflow: hidden;}
     </style>
     <script type="text/javascript">
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
+        let size = 32; // doesn't metter ;)
+        let xOffset = -6 * size; let yOffset = 0;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
      
      
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
-        var code = document.body.innerHTML;
-        var codeRows = code.split('\n').filter(c => c && c.length > 16);
-        
+        const code = document.body.innerHTML;
+        const codeRows = code.split('\n').map(row => row.split(''));
+        const longestRow = codeRows.sort((a, b) => b.length - a.length)[0];
+        const longestRowLength = longestRow.length;
+        const longestColumnLength = codeRows.length;
+
+        const codeColumns = [];
+        codeRows.forEach((row, rowIndex) => {
+            row.forEach((char, charIndex) => {
+                codeColumns[charIndex] = codeColumns[charIndex] || [];
+                codeColumns[charIndex][rowIndex] = char;
+            });
+        }); 
+
+        let lastTick = Date.now();
+        requestAnimationFrame(function loop() {
+            const dt = Date.now() - lastTick;
+            render(ctx, dt);
+            lastTick = Date.now();
+            requestAnimationFrame(loop);
+        });
+        let alpha = 1;
+        function render(ctx, dt) {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0,0, ctx.canvas.width, ctx.canvas.height);                        
+            renderRows(ctx, dt);
+        }
+        let pipka = 0.001;
+        function renderRows(ctx, dt) {
+            codeRows.forEach((row, rowIndex) => {
+                row.speed = row.speed ? row.speed - 0.0666 : Math.random() + 0.666; 
+                if (row.speed < -66.666) row.speed = null;
+                row.forEach((char, charIndex) => {
+                    const xo = xOffset;
+                    const yo = yOffset + (row.speed * dt);
+                    ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
+                    ctx.font = `${size}px monospace`;
+                    ctx.fillText(char, rowIndex * size + xo, charIndex * size + yo);                
+                });
+            });
+        }
+        function renderColumns(ctx, dt) {
+            codeColumns.forEach((column, columnIndex) => {
+                    column.forEach((char, charIndex) => {
+                    ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
+                    ctx.font = `${size}px monospace`;
+                    ctx.fillText(char, columnIndex * size + xOffset, charIndex * size + yOffset);                
+                });
+            });
+        }
     </script>
     </body></html>
