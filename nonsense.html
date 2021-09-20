@@ -28,8 +28,10 @@
         }
         .controls {
             background-color: rebeccapurple;
+            
         }
         .uncontrols {
+            padding: 0.666rem;
             display: flex;
             background-color: salmon;
             flex-wrap: wrap;
@@ -54,6 +56,16 @@
             width: 16rem;
             height: 16rem;
             background-color: gold;
+        }
+        @media (max-width: 23.666rem) {
+            .blinker {
+                width: 6.666rem;
+                height: 6.666rem;                
+            }
+            button {
+                font-size: 2.666rem;
+                margin: 0.666rem;
+            }
         }
     </style>
 </head>
@@ -86,9 +98,21 @@
                 })
             },
             addBlinker: (container, ctr) => {
+                const blinkers = Array.from(container.querySelectorAll('.blinker'));
+                if (blinkers.length >= 9) {
+                    container.removeChild(blinkers[0]);
+                }
+
                 const blinker = document.createElement('div');
                 blinker.classList.add('blinker');
                 container.appendChild(blinker);
+            },
+            reload: () => {
+                window.location.href = window.location.href;
+            },
+            markBlinker: (container) => {
+                const blinkers = Array.from(container.querySelectorAll('.blinker')).filter(blinker => !blinker.dataset.interval);
+                blinkers.forEach(blinker => blinker.style.backgroundColor = '#060');                
             }
         };
         
@@ -104,6 +128,18 @@
                 text: 'Add Blinker',
                 fa: 'plus-square',
                 click: 'addBlinker'
+            },
+            {
+                tagName: 'button',
+                text: 'Mark Not Blinking Blinker',
+                fa: 'recycle',
+                click: 'markBlinker'
+            },
+            {
+                tagName: 'button',
+                text: 'Reload Page',
+                fa: 'sync',
+                click: 'reload'
             }
         ].map(control => {
             const ctr = document.createElement(control.tagName);
