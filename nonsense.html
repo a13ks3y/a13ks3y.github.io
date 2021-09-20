@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nonsence</title>
     <style type="text/css">
+        button {
+            color: red;
+            background-color: cyan;
+            font-size: 6.66rem;
+            padding: 0.666rem;
+            cursor: pointer;
+        }
+        button:active {
+            background-color: darkmagenta;
+        }
         .blinker {
             display: block;
             width: 16rem;
@@ -39,7 +49,7 @@
                         }, 666);
                     } else {
                         clearInterval(interval);
-                        blinker.dataset.interval = null;
+                        blinker.dataset.interval = '';
                     }
                 })
             }
@@ -48,7 +58,7 @@
         const controls = [
             {
                 tagName: 'button',
-                text: 'PIPKA',
+                text: '🚨',
                 click: 'blink'
             }
         ].map(control => {
