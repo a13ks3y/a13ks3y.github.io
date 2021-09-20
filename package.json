@@ -1,0 +1,26 @@
+{
+  "name": "a13ks3y.github.io",
+  "version": "1.0.0",
+  "description": "Description",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server --host=0.0.0.0",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a13ks3y/a13ks3y.github.io.git"
+  },
+  "keywords": [
+    "Keywords"
+  ],
+  "author": "a13ks3y.ass@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/a13ks3y/a13ks3y.github.io/issues"
+  },
+  "homepage": "https://github.com/a13ks3y/a13ks3y.github.io#readme",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}

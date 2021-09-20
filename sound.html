@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔊</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link rel="icon" sizes="152x152" href="gear.png">
+    <style>
+        html, body {
+            font-size: 16px;
+        }        
+        button {
+            font-size: 6.66rem;
+            color: purple;
+            background-color: salmon;
+            border: 0.666rem solid gold;
+        }
+        button:active {
+            color: salmon;
+            background-color: gold;
+            border: 0.666rem solid purple;
+        }
+    </style>
+</head>
+<body>
+    <audio id="sfx-portal-gun" src="assets/sfx-portal-gun.mp3"></audio>
+    <button onclick="document.getElementById('sfx-portal-gun').play();">🕳</button>
+</body>
+</html>
