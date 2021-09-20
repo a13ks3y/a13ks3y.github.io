@@ -5,13 +5,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nonsence</title>
+    <link rel="stylesheet" href="reset.css">
+    <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet">
     <style type="text/css">
+        @keyframes anyColor {
+            3% { color: #000; }
+            6% { color: #006; }
+            12% { color: #00f; }
+            24% { color: #060; }
+            36% { color: #0f0; }
+            48% { color: #600; }
+            96% { color: #f00; }
+            100% { color: #000; }
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            background-color: seagreen;
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+        }
+        .controls {
+            background-color: rebeccapurple;
+        }
+        .uncontrols {
+            display: flex;
+            background-color: salmon;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            height: 100%;
+        }
         button {
-            color: red;
+            color: black;
             background-color: cyan;
             font-size: 6.66rem;
             padding: 0.666rem;
             cursor: pointer;
+            margin: 1.666rem;
+
+            animation: anyColor 6.66s ease-in-out 666ms infinite;
         }
         button:active {
             background-color: darkmagenta;
@@ -38,7 +71,6 @@
         
         const actions = {
             blink: (container) => {
-                console.dir(container);
                 const blinkers = Array.from(container.querySelectorAll('.blinker'));
                 blinkers.forEach(blinker => {
                     const interval = blinker.dataset.interval;
@@ -52,14 +84,26 @@
                         blinker.dataset.interval = '';
                     }
                 })
+            },
+            addBlinker: (container, ctr) => {
+                const blinker = document.createElement('div');
+                blinker.classList.add('blinker');
+                container.appendChild(blinker);
             }
         };
         
         const controls = [
             {
                 tagName: 'button',
-                text: '🚨',
+                text: 'Blink',
+                fa: 'smile-wink',
                 click: 'blink'
+            },
+            {
+                tagName: 'button',
+                text: 'Add Blinker',
+                fa: 'plus-square',
+                click: 'addBlinker'
             }
         ].map(control => {
             const ctr = document.createElement(control.tagName);
@@ -67,7 +111,7 @@
                 const action = actions[control.click];
                 action && action(uncontrolsEl, ctr);
             });
-            ctr.innerHTML = control.text;
+            ctr.innerHTML = control.fa ? `<i class="fa fa-${control.fa}"></i>` : control.text;
             controlsEl.appendChild(ctr);
             control.ctr = ctr;
             return control;
