@@ -89,7 +89,8 @@
                     if (!interval) {
                         blinker.dataset.interval = setInterval(() => { 
                             const isRed = blinker.style.backgroundColor === 'red';
-                            blinker.style.backgroundColor = isRed ? 'blue' : 'red';
+                            const isGreen = blinker.style.backgroundColor == 'green'
+                            blinker.style.backgroundColor = isRed ? 'green' : (isGreen ? 'blue' : 'red');
                         }, 666);
                     } else {
                         clearInterval(interval);
@@ -112,7 +113,11 @@
             },
             markBlinker: (container) => {
                 const blinkers = Array.from(container.querySelectorAll('.blinker')).filter(blinker => !blinker.dataset.interval);
-                blinkers.forEach(blinker => blinker.style.backgroundColor = '#060');                
+                blinkers.forEach(blinker => {
+                    const isGreen = blinker.style.backgroundColor == 'green'
+                    const isBlue = blinker.style.backgroundColor == 'blue'
+                    blinker.style.backgroundColor = !isGreen && !isBlue ? 'green' : (isBlue ? 'red' : 'blue'); 
+                });                
             }
         };
         
