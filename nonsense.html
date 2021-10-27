@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonsence</title>
+    <link rel="stylesheet" href="reset.css">
+    <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet">
+    <style type="text/css">
+        @keyframes anyColor {
+            3% { color: #000; }
+            6% { color: #006; }
+            12% { color: #00f; }
+            24% { color: #060; }
+            36% { color: #0f0; }
+            48% { color: #600; }
+            96% { color: #f00; }
+            100% { color: #000; }
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            background-color: seagreen;
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+        }
+        .controls {
+            background-color: rebeccapurple;
+            text-align: center;
+        }
+        .uncontrols {
+            padding: 0.666rem;
+            display: flex;
+            background-color: salmon;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            height: 100%;
+        }
+        button {
+            color: black;
+            background-color: cyan;
+            font-size: 6.66rem;
+            padding: 0.666rem;
+            cursor: pointer;
+            margin: 1.666rem;
+
+            animation: anyColor 6.66s ease-in-out 666ms infinite;
+        }
+        button:active {
+            background-color: darkmagenta;
+        }
+        .blinker {
+            display: block;
+            width: 16rem;
+            height: 16rem;
+            background-color: gold;
+        }
+        @media (max-width: 45rem) {
+            .blinker {
+                width: 6.666rem;
+                height: 6.666rem;                
+            }
+            button {
+                font-size: 2.666rem;
+                margin: 0.666rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="controls"></section>
+        <section class="uncontrols">            
+            <div class="blinker"></div>
+        </section>
+    </main>
+    <script type="text/javascript">
+        // github pages do not want to update for some reason...
+        const controlsEl = document.getElementsByClassName('controls')[0];
+        const uncontrolsEl = document.getElementsByClassName('uncontrols')[0];
+        
+        const actions = {
+            blink: (container) => {
+                const blinkers = Array.from(container.querySelectorAll('.blinker'));
+                blinkers.forEach(blinker => {
+                    const interval = blinker.dataset.interval;
+                    if (!interval) {
+                        blinker.dataset.interval = setInterval(() => { 
+                            const isRed = blinker.style.backgroundColor === 'red';
+                            const isGreen = blinker.style.backgroundColor == 'green'
+                            blinker.style.backgroundColor = isRed ? 'green' : (isGreen ? 'blue' : 'red');
+                        }, 666);
+                    } else {
+                        clearInterval(interval);
+                        blinker.dataset.interval = '';
+                    }
+                })
+            },
+            addBlinker: (container, ctr) => {
+                const blinkers = Array.from(container.querySelectorAll('.blinker'));
+                if (blinkers.length >= 9) {
+                    container.removeChild(blinkers[0]);
+                }
+
+                const blinker = document.createElement('div');
+                blinker.classList.add('blinker');
+                container.appendChild(blinker);
+            },
+            reload: () => {
+                window.location.href = window.location.href;
+            },
+            markBlinker: (container) => {
+                const blinkers = Array.from(container.querySelectorAll('.blinker')).filter(blinker => !blinker.dataset.interval);
+                blinkers.forEach(blinker => {
+                    const isGreen = blinker.style.backgroundColor == 'green'
+                    const isBlue = blinker.style.backgroundColor == 'blue'
+                    blinker.style.backgroundColor = !isGreen && !isBlue ? 'green' : (isBlue ? 'red' : 'blue'); 
+                });                
+            }
+        };
+        
+        const controls = [
+            {
+                tagName: 'button',
+                text: 'Blink',
+                fa: 'smile-wink',
+                click: 'blink'
+            },
+            {
+                tagName: 'button',
+                text: 'Add Blinker',
+                fa: 'plus-square',
+                click: 'addBlinker'
+            },
+            {
+                tagName: 'button',
+                text: 'Mark Not Blinking Blinker',
+                fa: 'recycle',
+                click: 'markBlinker'
+            },
+            {
+                tagName: 'button',
+                text: 'Reload Page',
+                fa: 'sync',
+                click: 'reload'
+            }
+        ].map(control => {
+            const ctr = document.createElement(control.tagName);
+            control.click && ctr.addEventListener('click', () => {
+                const action = actions[control.click];
+                action && action(uncontrolsEl, ctr);
+            });
+            ctr.innerHTML = control.fa ? `<i class="fa fa-${control.fa}"></i>` : control.text;
+            controlsEl.appendChild(ctr);
+            control.ctr = ctr;
+            return control;
+        });
+    </script>
+</body>
+</html>
