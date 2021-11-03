@@ -204,6 +204,10 @@
         }
 
         step() {
+            // stop play if playing
+            if (this.play) {
+                this.togglePlay();
+            }
             const prevState = JSON.parse(JSON.stringify(this.cells));
             prevState.forEach((row, r) => row.forEach((cell, c) => {
                 const neighbors = [
