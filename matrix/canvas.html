@@ -37,41 +37,31 @@
             });
         }); 
 
-        let lastTick = Date.now();
-        requestAnimationFrame(function loop() {
-            const dt = Date.now() - lastTick;
-            render(ctx, dt);
-            lastTick = Date.now();
-            requestAnimationFrame(loop);
-        });
-        let alpha = 1;
-        function render(ctx, dt) {
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0,0, ctx.canvas.width, ctx.canvas.height);                        
-            renderRows(ctx, dt);
-        }
-        let pipka = 0.001;
-        function renderRows(ctx, dt) {
+
+        const FONT_SIZE = 24;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+        ctx.font = `monospace ${FONT_SIZE}px`;
+
+
+        function renderAllWithOffset(ctx, offsetX, offsetY) {
             codeRows.forEach((row, rowIndex) => {
-                row.speed = row.speed ? row.speed - 0.0666 : Math.random() + 0.666; 
-                if (row.speed < -66.666) row.speed = null;
-                row.forEach((char, charIndex) => {
-                    const xo = xOffset;
-                    const yo = yOffset + (row.speed * dt);
+                row.forEach((char, colIndex) => {
+                    const alpha = 100 / (Math.floor(Math.random() * 42) + 10);
                     ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
-                    ctx.font = `${size}px monospace`;
-                    ctx.fillText(char, rowIndex * size + xo, charIndex * size + yo);                
-                });
-            });
-        }
-        function renderColumns(ctx, dt) {
-            codeColumns.forEach((column, columnIndex) => {
-                    column.forEach((char, charIndex) => {
-                    ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
-                    ctx.font = `${size}px monospace`;
-                    ctx.fillText(char, columnIndex * size + xOffset, charIndex * size + yOffset);                
-                });
-            });
-        }
+                    const  x = colIndex * FONT_SIZE + offsetX;
+                    const y = rowIndex * FONT_SIZE + offsetY;
+                    ctx.fillText(char, x, y);
+                })
+            })
+        };
+
+
+
+        setInterval(function loop() {
+            renderAllWithOffset(ctx, 0, 0);
+        }, 666);
+
     </script>
-    </body></html>
+    </body>
+    </html>
