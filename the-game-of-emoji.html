@@ -164,8 +164,7 @@
                 }
             });
             const clickHandler = () => {
-                this.step();
-                this.render();
+                this.togglePlay();
             };
             document.addEventListener('click', clickHandler);
             document.addEventListener('touchend', clickHandler);
