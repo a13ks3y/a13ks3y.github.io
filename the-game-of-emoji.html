@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>The Game Of Emoji</title>
+    <style type="text/css">
+        html, body {
+            text-align: center;
+            font-size: 16px;
+        }
+        @media (max-width: 1024px) {
+            html, body {
+                font-size: 12px;
+            }
+        }
+        @media (max-width: 720px) {
+            html, body {
+                font-size: 10px;
+            }
+        }
+        @media (max-width: 420px) {
+            html, body {
+                font-size: 8px;
+            }
+        }
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        header, main, h1, h3, p {
+            padding: 0.666rem;
+        }
+        #main {
+            user-select: none;
+        }
+
+        #main div {
+            display: flex;
+            justify-content: center;
+        }
+
+        #main div span {
+            border: 1px solid black;
+            background-color: #f90;
+            width: 2rem;
+            height: 2rem;
+            display: block;
+        }
+        h1 {
+            font-size: 3.666rem;
+        }
+        h3 {
+            font-size: 2.666rem;
+        }
+        p {
+            font-size: 1.666rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>The Game of Emoji</h1>
+    <h3>Rules:</h3>
+    <p>
+        Rules are too complicated to describe. Please see the code for more details.
+    </p>
+    <h3>Controls:</h3>
+    <p>
+        Press "R" key to reset game-field with random values.
+        Press "S" to go to one step forward.
+        Press "P" to toggle playing (1 step per 666 milliseconds).
+    </p>
+</header>
+<main id="main"></main>
+<script type="text/javascript">
+    // The field of cells. Each cell can hold one (and only one) item.
+    // Item could be a human
+    const ITEM_TYPES = {
+        ' ': {
+            title: 'The Great Emptiness',
+            producedBy: {},
+            destroyedBy: {},
+        },
+        '🍎': {
+            producedBy: {'🌳': [1, 2, 3, 4, 5, 6]},
+            destroyedBy: {'😀': [1, 2], '🐄': [1, 2, 3, 4, 5, 6, 7, 8], '🐛': [3]}
+        },
+        '💩': {
+            producedBy: {'😀': [5, 6, 7], '🐄': [4, 5, 6, 7]},
+            destroyedBy: {'🐛': [1, 2, 3, 4, 5, 6, 7, 8], '💩': [8]},
+        },
+        '🐛': {
+            producedBy: {'🐛': [1, 2, 3, 4], '💩': [3,4,5,6,7,8]},
+            destroyedBy: {'😀': [3, 4, 5, 6, 7, 8], '🐛': [3,4, 6, 7, 8]},
+        },
+        '🌳': {
+            producedBy: {'🐛': [1, 2, 3, 4], '😀': [6], '💩': [3, 4, 6, 7, 8], '🍎': [3, 4, 5, 6]},
+            destroyedBy: {'🐄': [1, 2, 3, 6, 7, 8], '😀': [4, 5, 7, 8], '🌳': [1, 5, 6, 7, 8]}
+        },
+        '🐄': {
+            producedBy: {'🐄': [2, 3, 4]},
+            destroyedBy: {'😀': [6, 7, 8], '🐄': [6, 7, 8], '💩': [2,3,4,5,6,7,8]},
+        },
+        '🥛': {
+            producedBy: {'🐄': [1, 2, 3, 4, 5, 6, 7, 8]},
+            destroyedBy: {'😀': [1, 2, 3]},
+        },
+        '😀': {
+            canWalk: false,
+            producedBy: {'😀': [3, 4], '💩': [6, 7, 8]},
+            destroyedBy: {'😀': [6, 7, 8], '🐛': [6, 7, 8], '💩': [4, 5]},
+        }
+    };
+    // Determinate probability of creating cell with particular type
+    const ITEM_TYPE_PROBABILITY_ARR = [
+        " ", " ", " ", " ", " ", " ", " ", " ",
+        "🌳", "🌳", "🌳",
+        "🐛", "🐛", "🐛", "🐛",
+        //"💩",
+        "🍎",
+        "🐄",
+        "😀"
+    ];
+
+    class TheGame {
+        rowsCount = 16
+        colsCount = 24
+        cells = [];
+        rootElement;
+        play = false;
+        interval;
+
+        constructor(rootElement) {
+            this.rootElement = rootElement;
+            this.generateCells();
+            document.body.addEventListener('keypress', (e) => {
+                switch (e.key) {
+                    case 'r':
+                    case 'R':
+                        this.randomizeCells();
+                        this.render();
+                        break;
+                    case 's':
+                    case 'S':
+                        this.step();
+                        this.render();
+                        break;
+                    case 'P': case 'p':
+                        this.togglePlay();
+                        break;
+                }
+            });
+        }
+
+        randomizeCells() {
+            this.cells.forEach((row, r) => row.forEach((cell, c) => {
+                const cellType = ITEM_TYPE_PROBABILITY_ARR[Math.floor(Math.random() * ITEM_TYPE_PROBABILITY_ARR.length)];
+                if (cell instanceof String) {
+                    this.cells[r][c] = cellType;
+                } else {
+                    // noinspection JSPrimitiveTypeWrapperUsage
+                    cell.type = cellType;
+                }
+            }));
+        }
+
+        generateCells() {
+            for (let r = 0; r < this.rowsCount; r++) {
+                this.cells[r] = this.cells[r] || [];
+                for (let c = 0; c < this.colsCount; c++) {
+                    const randomCellType = ITEM_TYPE_PROBABILITY_ARR[Math.floor(Math.random() * ITEM_TYPE_PROBABILITY_ARR.length)];
+                    this.cells[r][c] = {
+                        r, c, type: this.cells[r][c] || randomCellType, hp: 100,
+                    };
+                }
+            }
+        }
+
+        render() {
+            const mapCell = cell => `<span style="color: rgba(255,255,255, ${cell.hp > 0 && cell.type === '🐄' ? cell.hp / 100 : 1});" class="${cell.type}" data-r="${cell.r}" data-c="${cell.c}">${cell.type === ' ' ? '&nbsp;' : cell.type}</span>`;
+            const mapRow = row => row.map(mapCell).join(' ');
+            const html = this.cells.map(row => `<div class="row">${mapRow(row)}</div>`).join('\n');
+            // Instead of using React, I decided to follow easier way...
+            this.rootElement.innerHTML = html;
+        }
+
+        step() {
+            const prevState = JSON.parse(JSON.stringify(this.cells));
+            prevState.forEach((row, r) => row.forEach((cell, c) => {
+                const neighbors = [
+                    {r: -1, c: -1},
+                    {r: -1, c: 0},
+                    {r: -1, c: 1},
+
+                    {r: 0, c: -1},
+                    {r: 0, c: 1},
+
+                    {r: 1, c: -1},
+                    {r: 1, c: 0},
+                    {r: 1, c: 1},
+
+                ].map(p =>
+                    (prevState[cell.r + p.r]) ? prevState[cell.r + p.r][cell.c + p.c] : null
+                ).filter(p => !!p && p !== cell);
+                const neighborsByType = neighbors.reduce((a, c) => {
+                    a[c.type] = a[c.type] || [];
+                    if (!a[c.type].includes(c)) a[c.type].push(c);
+                    return a;
+                }, {});
+                // console.log(`${cell.r}:${cell.c}`, neighbors, neighborsByType);
+                const ItemType = ITEM_TYPES[cell.type];
+                const notEmptyNeighbors = neighbors.filter(n => n.type !== ' ');
+                const notEmptyNeighborsExceptPoop = notEmptyNeighbors.filter(n => n.type !== '💩');
+                const emptyNeighbors = neighbors.filter(n => n.type === ' ');
+                const die = cell => {
+                    if (cell.type === '💩' || (cell.type === '🌳')) {
+                        this.cells[cell.r][cell.c].type = ' ';
+                    } else {
+                        this.cells[cell.r][cell.c].type = '💩';
+                    }
+                }
+                if (cell.type !== ' ' && cell.type !== '💩') {
+                    if (!Object.keys(ItemType.destroyedBy).some(dType => {
+                        if (neighborsByType[dType] && ItemType.destroyedBy[dType].includes(neighborsByType[dType].length)) {
+                            if (cell.type === '🍎' && neighborsByType['🐄']) {
+                                neighborsByType['🐄'].forEach(n => {
+                                    n.hp += 10;
+                                    this.cells[n.r][n.c].hp += 10;
+                                });
+                            }
+                            die(cell);
+                            return true;
+                        }
+                    })) {
+                        // if not die, then can continue
+                        if (cell.type === '🐄') {
+                            if (cell.hp <= 0) {
+                                die(cell);
+                            } else {
+                                cell.hp -= 6;
+                                this.cells[cell.r][cell.c].hp -= 6;
+                            }
+                        }
+                        if (ITEM_TYPES[cell.type].canMove && emptyNeighbors.length) {
+                            const en = emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
+                            this.cells[en.r][en.c].type = cell.type;
+                            this.cells[cell.r][cell.c].type = ' ';
+                        }
+                    }
+                } else {
+                    if (notEmptyNeighbors.length) {
+                        Object.keys(ITEM_TYPES).forEach((typeToProduce) => {
+                            if (Object.keys(ITEM_TYPES[typeToProduce].producedBy).some((produceType) => {
+                                if (ITEM_TYPES[typeToProduce].producedBy[produceType].includes(neighborsByType[typeToProduce] && neighborsByType[typeToProduce].length)) {
+                                    return true;
+                                }
+                            })) {
+                                this.cells[cell.r][cell.c].type = typeToProduce;
+                                this.cells[cell.r][cell.c].hp = 100;
+                            }
+                        })
+                    }
+                }
+
+
+            }));
+        }
+
+        togglePlay() {
+            this.play = !this.play;
+            if (this.interval) clearInterval(this.interval);
+            if (this.play) {
+                this.interval = setInterval(() => {
+                    this.step();
+                    this.render();
+                }, 666);
+            }
+        }
+    }
+
+    const game = new TheGame(document.getElementById('main'));
+    game.render();
+</script>
+</body>
+</html>
