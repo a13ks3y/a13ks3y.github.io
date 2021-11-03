@@ -11,28 +11,34 @@
             text-align: center;
             font-size: 16px;
         }
+
         @media (max-width: 1024px) {
             html, body {
                 font-size: 12px;
             }
         }
+
         @media (max-width: 720px) {
             html, body {
                 font-size: 10px;
             }
         }
+
         @media (max-width: 420px) {
             html, body {
                 font-size: 8px;
             }
         }
+
         * {
             padding: 0;
             margin: 0;
         }
+
         header, main, h1, h3, p {
             padding: 0.666rem;
         }
+
         #main {
             user-select: none;
         }
@@ -49,12 +55,15 @@
             height: 2rem;
             display: block;
         }
+
         h1 {
             font-size: 3.666rem;
         }
+
         h3 {
             font-size: 2.666rem;
         }
+
         p {
             font-size: 1.666rem;
         }
@@ -69,9 +78,9 @@
     </p>
     <h3>Controls:</h3>
     <p>
-        Press "R" key to reset game-field with random values.
-        Press "S" to go to one step forward.
-        Press "P" to toggle playing (1 step per 666 milliseconds).
+        Press "R" key (or reload the page) to reset game-field with random values.
+        Press "S" to go one step forward.
+        Press "P" or tap/click anywhere, to toggle playing (1 step per 666 milliseconds).
     </p>
 </header>
 <main id="main"></main>
@@ -93,8 +102,8 @@
             destroyedBy: {'🐛': [1, 2, 3, 4, 5, 6, 7, 8], '💩': [8]},
         },
         '🐛': {
-            producedBy: {'🐛': [1, 2, 3, 4], '💩': [3,4,5,6,7,8]},
-            destroyedBy: {'😀': [3, 4, 5, 6, 7, 8], '🐛': [3,4, 6, 7, 8]},
+            producedBy: {'🐛': [1, 2, 3, 4], '💩': [3, 4, 5, 6, 7, 8]},
+            destroyedBy: {'😀': [3, 4, 5, 6, 7, 8], '🐛': [3, 4, 6, 7, 8]},
         },
         '🌳': {
             producedBy: {'🐛': [1, 2, 3, 4], '😀': [6], '💩': [3, 4, 6, 7, 8], '🍎': [3, 4, 5, 6]},
@@ -102,7 +111,7 @@
         },
         '🐄': {
             producedBy: {'🐄': [2, 3, 4]},
-            destroyedBy: {'😀': [6, 7, 8], '🐄': [6, 7, 8], '💩': [2,3,4,5,6,7,8]},
+            destroyedBy: {'😀': [6, 7, 8], '🐄': [6, 7, 8], '💩': [2, 3, 4, 5, 6, 7, 8]},
         },
         '🥛': {
             producedBy: {'🐄': [1, 2, 3, 4, 5, 6, 7, 8]},
@@ -148,11 +157,18 @@
                         this.step();
                         this.render();
                         break;
-                    case 'P': case 'p':
+                    case 'P':
+                    case 'p':
                         this.togglePlay();
                         break;
                 }
             });
+            const clickHandler = () => {
+                this.step();
+                this.render();
+            };
+            document.addEventListener('click', clickHandler);
+            document.addEventListener('touchend', clickHandler);
         }
 
         randomizeCells() {
