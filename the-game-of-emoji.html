@@ -85,6 +85,15 @@
     </p>
 </header>
 <main id="main"></main>
+<footer>
+    <h3>ToBeDone:</h3>
+    <p>
+        This should be refactored, and moved to a separate repository (or at least in a separate folder).
+        The hole concept should be reviewed.
+        Should be configurable (field sizes, rules etc.)
+        Rules could be configurate in a tool-box (like in minecraft)
+    </p>
+</footer>
 <script type="text/javascript">
     // The field of cells. Each cell can hold one (and only one) item.
     // Item could be a human
@@ -155,6 +164,11 @@
                         break;
                     case 's':
                     case 'S':
+                        // stop play if playing
+                        if (this.play) {
+                            this.togglePlay();
+                        }
+
                         this.step();
                         this.render();
                         break;
@@ -164,11 +178,7 @@
                         break;
                 }
             });
-            const clickHandler = () => {
-                this.togglePlay();
-            };
-            document.addEventListener('click', clickHandler);
-            document.addEventListener('touchend', clickHandler);
+            document.addEventListener('click', () => this.togglePlay());
         }
 
         randomizeCells() {
@@ -204,10 +214,6 @@
         }
 
         step() {
-            // stop play if playing
-            if (this.play) {
-                this.togglePlay();
-            }
             const prevState = JSON.parse(JSON.stringify(this.cells));
             prevState.forEach((row, r) => row.forEach((cell, c) => {
                 const neighbors = [
