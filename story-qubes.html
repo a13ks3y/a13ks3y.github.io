@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Story Qubes</title>
     <link rel="shortcut icon" href="gear.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         html, body {
             text-align: center;
@@ -12,24 +13,6 @@
             height: 100%;
             position: absolute;
             left: 0; top: 0;
-        }
-
-        @media (max-width: 1024px) {
-            html, body {
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 720px) {
-            html, body {
-                font-size: 10px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            html, body {
-                font-size: 8px;
-            }
         }
 
         * {
@@ -53,15 +36,15 @@
             user-select: none;
             display: grid;
             flex: 1;
-            grid-template-rows: repeat(3, 6.99rem);
-            grid-template-columns: repeat(3, 6.99rem);
+            grid-template-rows: repeat(3, 13.666rem);
+            grid-template-columns: repeat(3, 13.666rem);
         }
         main .qube {
-            width: 6.66rem;
-            height: 6.66rem;
+            width: 13rem;
+            height: 13rem;
+            font-size: 7.77rem;
             background-color: #f90;
             border: 1px solid black;
-            font-size: 3.333rem;
         }
 
         h1 {
@@ -75,6 +58,52 @@
         p {
             font-size: 1.666rem;
         }
+
+        @media (max-width: 1024px) {
+            html, body {
+                font-size: 12px;
+            }
+            main {
+                grid-template-rows: repeat(3, 7.77rem);
+                grid-template-columns: repeat(3, 7.77rem);
+            }
+            main .qube {
+                width: 7.2rem;
+                height: 7.2rem;
+                font-size: 4.666rem;
+            }
+        }
+
+        @media (max-width: 720px) {
+            html, body {
+                font-size: 10px;
+            }
+            main {
+                grid-template-rows: repeat(3, 6.99rem);
+                grid-template-columns: repeat(3, 6.99rem);
+            }
+            main .qube {
+                width: 6.66rem;
+                height: 6.66rem;
+                font-size: 3.333rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            html, body {
+                font-size: 8px;
+            }
+            main {
+                grid-template-rows: repeat(3, 9.99rem);
+                grid-template-columns: repeat(3, 9.99rem);
+            }
+            main .qube {
+                width: 9.99rem;
+                height: 9.99rem;
+                font-size: 6.66rem;
+            }
+        }
+
 
     </style>
 </head>
