@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Sissors</title>
+    <style>
+        html, body {
+            font-size: 24px;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #111;
+            color: white;
+            text-align: center;            
+        }
+        main {
+            user-select: none;
+            display: grid;            
+        }
+        main > div {
+            background-color: black;
+            text-align: center;
+            line-height: 3rem;
+            border: 1px solid green;
+        }
+        h1 {
+            color: gold;
+            font-size: 1.666rem;
+            margin: 0.666rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Rock Paper Scissors "Game"</h1>
+        <p>Space toggle play, "s" key for one step</p>       
+    </header>
+    <main>
+    <!--    
+        <span>🥌</span>
+        <span>🧻</span>
+        <span>✂</span>
+    -->
+    </main>
+    <footer>
+        Too lazy to describe it.
+    </footer>
+    <script type="text/javascript">
+        const R = '🥌';
+        const P = '🧻';
+        const S = '✂';
+        const RPS = [R, P, S];
+
+        const w = 9;
+        const h = 13;
+        
+        const rootEl = document.getElementsByTagName('main')[0];
+        const cols =  [];
+        const get = (x, y) => {
+            return cols[x] && cols[x][y];
+        }
+        const ns = (item) => {
+            const x = item.x;
+            const y = item.y;
+            return [
+                get(x + -1, y + -1),    
+                get(x +  0, y + -1),    
+                get(x +  1, y + -1),    
+                get(x + -1, y +  0),    
+                get(x +  1, y +  0),    
+                get(x + -1, y +  1),    
+                get(x +  0, y +  1),    
+                get(x +  1, y +  1),    
+            ].filter(n => !!n && n !== item);
+        }
+        const step = () => {
+            cols.forEach(col => col.forEach(item => {
+                const itemNs = ns(item);
+            }));
+        };
+
+        const init = () => {
+            for (let x = 0; x < w; x++) {
+                cols[x] = [];
+                for (let y = 0; y < h; y++) {
+                    cols[x][y] = {
+                        value: RPS[Math.floor(Math.random()*RPS.length)],
+                        x, y,
+                        looses: 0
+                    };                    
+                }                
+            }
+            rootEl.style.gridTemplateColumns = `repeat(${h}, 3rem)`;
+            rootEl.style.gridTemplateRows = `repeat(${w}, 3rem)`;
+            document.body.addEventListener('keypress', e => {
+                switch(e.key) {
+                    case 's': step(); render(); break;
+                    case 'p': togglePlay(); break;
+                }
+            });
+        }
+        const render = () => {
+            const itemAttrs = item => `data-x="${item.x}" data-y="${item.y}" title="${item.x}:${item.y}"`;
+            const html = cols.map(col => col.map(item => `<div ${itemAttrs(item)}>${item.value}</div>`).join('\n\t')).join('\n');
+            rootEl.innerHTML = html;
+        }
+        let interval = false;
+        const togglePlay = () => {
+            if (interval) {
+                clearInterval(interval);
+                interval = false;
+            } else {
+                interval = setInterval(() => {
+                    step();
+                    render();                
+                }, 666);
+            }
+        }
+        init();
+        render();
+    </script>
+</body>
+</html>

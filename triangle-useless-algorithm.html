@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Useless Algorithm</title>
+</head>
+<body>
+    <canvas id="ctx" width="1024" height="1024"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById("ctx").getContext('2d');
+        let color = '#0f0';
+
+        // pick 3 random points
+        // build a triangle
+        // find medianas (lines perpendicular to sides at the middle points)
+        // pick a random point on each mediana-line
+        // [optional] change color by some condition, to see generations of dots
+        // repeat from second step
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        let ax = Math.floor(Math.random() * ctx.canvas.width);
+        let ay = Math.floor(Math.random() * ctx.canvas.height);
+        let bx = Math.floor(Math.random() * ctx.canvas.width);
+        let by = Math.floor(Math.random() * ctx.canvas.height);
+        let cx = Math.floor(Math.random() * ctx.canvas.width);
+        let cy = Math.floor(Math.random() * ctx.canvas.height);
+        setInterval(() => {
+            ctx.fillStyle = color;
+            ctx.fillRect(ax, ay, 1, 1);
+            ctx.fillRect(bx, by, 1, 1);
+            ctx.fillRect(cx, cy, 1, 1);
+
+        }, 666);
+    </script>
+</body>
+</html>
