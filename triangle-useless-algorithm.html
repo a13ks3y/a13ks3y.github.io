@@ -7,10 +7,10 @@
     <title>Triangle Useless Algorithm</title>
 </head>
 <body>
-    <canvas id="ctx" width="1024" height="1024"></canvas>
+    <canvas id="ctx" width="800" height="600" style="display: block; margin: auto;"></canvas>
     <script type="text/javascript">
         const ctx = document.getElementById("ctx").getContext('2d');
-        let color = '#0f0';
+        let color = '#fff';
 
         // pick 3 random points
         // build a triangle
@@ -21,19 +21,45 @@
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
-        let ax = Math.floor(Math.random() * ctx.canvas.width);
-        let ay = Math.floor(Math.random() * ctx.canvas.height);
-        let bx = Math.floor(Math.random() * ctx.canvas.width);
-        let by = Math.floor(Math.random() * ctx.canvas.height);
-        let cx = Math.floor(Math.random() * ctx.canvas.width);
-        let cy = Math.floor(Math.random() * ctx.canvas.height);
-        setInterval(() => {
-            ctx.fillStyle = color;
-            ctx.fillRect(ax, ay, 1, 1);
-            ctx.fillRect(bx, by, 1, 1);
-            ctx.fillRect(cx, cy, 1, 1);
+        let ax;
+        let ay;
+        let bx;
+        let by;
+        let cx;
+        let cy;
 
-        }, 666);
+        const init = () => {
+            ax = Math.floor(Math.random() * ctx.canvas.width);
+            ay = Math.floor(Math.random() * ctx.canvas.height);
+            bx = Math.floor(Math.random() * ctx.canvas.width);
+            by = Math.floor(Math.random() * ctx.canvas.height);
+            cx = Math.floor(Math.random() * ctx.canvas.width);
+            cy = Math.floor(Math.random() * ctx.canvas.height);
+        }
+        const THREASHOLD = 32;
+        init();
+        requestAnimationFrame(function loop() {
+            ctx.fillStyle = color;
+            const w = 8, h = 8;
+            ctx.fillRect(ax, ay, w, h);
+            ctx.fillRect(bx, by, w, h);
+            ctx.fillRect(cx, cy, w, h);
+
+            ay = ay / 2;
+            ax = ax / 2;
+            bx = bx / 2;
+            by = by / 2;
+            cx = cx / 2;
+            cy = cy / 2;
+            if (
+                (ax <= THREASHOLD) || (ay <= THREASHOLD) ||
+                (bx <= THREASHOLD) || (by <= THREASHOLD) ||
+                (cx <= THREASHOLD) || (cy <= THREASHOLD)
+            ){
+                init();
+            }
+            requestAnimationFrame(loop);
+        });
     </script>
 </body>
 </html>
