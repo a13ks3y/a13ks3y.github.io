@@ -62,7 +62,7 @@
             ctx.fill();
 
             ctx.beginPath();
-                ctx.arc(cx, cy, w + h, 0, 2 * Math.PI);
+                ctx.arc(cx, cy, Math.floor((w + h) / 2), 0, 2 * Math.PI);
             ctx.fill();
 
             ay = ay / 2;
@@ -76,7 +76,7 @@
                 (bx <= THREASHOLD) || (by <= THREASHOLD) ||
                 (cx <= THREASHOLD) || (cy <= THREASHOLD)
             ){
-                color = color >= 0xffffff ? 0x9f : color + 0x8;
+                color = color >= 0xfffff ? 0x9f : color + 0x8;
                 w = w <= 0 ? THREASHOLD : w - 1;
                 h = h <= 0 ? THREASHOLD : h - 1;
                 init();
