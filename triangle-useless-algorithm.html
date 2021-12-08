@@ -9,15 +9,14 @@
 <body>
     <canvas id="ctx" width="800" height="600" style="display: block; margin: auto;"></canvas>
     <script type="text/javascript">
-        const ctx = document.getElementById("ctx").getContext('2d');
-        let color = '#fff';
-
         // pick 3 random points
         // build a triangle
         // find medianas (lines perpendicular to sides at the middle points)
         // pick a random point on each mediana-line
         // [optional] change color by some condition, to see generations of dots
         // repeat from second step
+        const ctx = document.getElementById("ctx").getContext('2d');
+        let color = 0x9f;
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
@@ -39,7 +38,7 @@
         const THREASHOLD = 32;
         init();
         requestAnimationFrame(function loop() {
-            ctx.fillStyle = color;
+            ctx.fillStyle = `#${color.toString(16)}`;
             const w = 8, h = 8;
             ctx.fillRect(ax, ay, w, h);
             ctx.fillRect(bx, by, w, h);
@@ -56,8 +55,9 @@
                 (bx <= THREASHOLD) || (by <= THREASHOLD) ||
                 (cx <= THREASHOLD) || (cy <= THREASHOLD)
             ){
+                color += 0x8;
                 init();
-            }
+            }            
             requestAnimationFrame(loop);
         });
     </script>
