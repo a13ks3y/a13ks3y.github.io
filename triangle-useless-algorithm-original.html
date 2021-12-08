@@ -19,6 +19,12 @@
 <body>
     <canvas id="ctx" width="800" height="600" style="display: block; margin: auto; width: 100%; height: 100%;"></canvas>
     <script type="text/javascript">
+        // pick 3 random points
+        // build a triangle
+        // find medianas (lines perpendicular to sides at the middle points)
+        // pick a random point on each mediana-line
+        // [optional] change color by some condition, to see generations of dots
+        // repeat from second step
         const ctx = document.getElementById("ctx").getContext('2d');
         let color = 0x9f;
         ctx.fillStyle = '#000';
@@ -59,12 +65,12 @@
                 ctx.arc(cx, cy, Math.floor((w + h) / 2), 0, 2 * Math.PI);
             ctx.fill();
 
-            ax = ax / 2;
-            ay = ay / 2;
-            bx = bx / 2;
-            by = by / 2;
-            cx = cx / 2;
-            cy = cy / 2;
+            ax = Math.floor(Math.random() * bx);
+            ay = Math.floor(Math.random() * by);
+            bx = Math.floor(Math.random() * cx);
+            by = Math.floor(Math.random() * cy);
+            cx = Math.floor(Math.random() * ax);
+            cy = Math.floor(Math.random() * ay);
 
             if (
                 (ax <= THREASHOLD) || (ay <= THREASHOLD) ||
