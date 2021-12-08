@@ -40,9 +40,20 @@
         let w = 8, h = 8;
         requestAnimationFrame(function loop() {
             ctx.fillStyle = `#${color.toString(16)}`;
-            ctx.fillRect(ax, ay, w, h);
-            ctx.fillRect(bx, by, w, h);
-            ctx.fillRect(cx, cy, w, h);
+            // ctx.fillRect(ax, ay, w, h);
+            // ctx.fillRect(bx, by, w, h);
+            // ctx.fillRect(cx, cy, w, h);
+            ctx.beginPath();
+                ctx.arc(ax, ay, w, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(bx, by, h, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(cx, cy, w + h, 0, 2 * Math.PI);
+            ctx.fill();
 
             ay = ay / 2;
             ax = ax / 2;
