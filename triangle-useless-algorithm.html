@@ -37,9 +37,9 @@
         }
         const THREASHOLD = 32;
         init();
+        let w = 8, h = 8;
         requestAnimationFrame(function loop() {
             ctx.fillStyle = `#${color.toString(16)}`;
-            const w = 8, h = 8;
             ctx.fillRect(ax, ay, w, h);
             ctx.fillRect(bx, by, w, h);
             ctx.fillRect(cx, cy, w, h);
@@ -55,7 +55,9 @@
                 (bx <= THREASHOLD) || (by <= THREASHOLD) ||
                 (cx <= THREASHOLD) || (cy <= THREASHOLD)
             ){
-                color += 0x8;
+                color = color >= 0xffffff ? 0x9f : color + 0x8;
+                w = w <= 0 ? THREASHOLD : w - 1;
+                h = h <= 0 ? THREASHOLD : h - 1;
                 init();
             }            
             requestAnimationFrame(loop);
