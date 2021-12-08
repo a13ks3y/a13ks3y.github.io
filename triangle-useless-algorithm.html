@@ -23,6 +23,10 @@
         let color = 0x9f;
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        ctx.canvas.width = screen.availWidth - 32;
+        ctx.canvas.height = screen.availHeight - 32;
+
         
         let ax;
         let ay;
