@@ -61,9 +61,17 @@
         let w = THREASHOLD, h = THREASHOLD;
         requestAnimationFrame(function loop() {
             ctx.fillStyle = rgba(r, g, b, 0.5);
-            ctx.fillRect(ax - Math.floor(w / 2), ay - Math.floor(h / 2), w, h);
-            ctx.fillRect(bx - Math.floor(w / 2), by - Math.floor(h / 2), w, h);
-            ctx.fillRect(cx - Math.floor(w / 2), cy - Math.floor(h / 2), w, h);
+            // ctx.fillRect(ax - Math.floor(w / 2), ay - Math.floor(h / 2), w, h);
+            // ctx.fillRect(bx - Math.floor(w / 2), by - Math.floor(h / 2), w, h);
+            // ctx.fillRect(cx - Math.floor(w / 2), cy - Math.floor(h / 2), w, h);
+            ctx.strokeStyle = rgba(r, g, b, 1);
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(cx, cy);
+            ctx.lineTo(ax, ay);
+            ctx.stroke();
+            ctx.fill();
             // ctx.beginPath();
             //     ctx.arc(ax, ay, w, 0, 2 * Math.PI);
             // ctx.fill();
@@ -99,14 +107,25 @@
                 (dbc <= THREASHOLD) ||
                 (dca <= THREASHOLD) 
             ){
-                r = (r >= 0xff) ? 0x6 : r + COLOR_STEP;
-                g = (r >= 0xff && g >= 0xff) ? 0x6 : g + COLOR_STEP;
-                b = (r >= 0xff && g >= 0xff && b >= 0xff) ? 0x6 : b + COLOR_STEP;
+                b+=COLOR_STEP;
+                if (b > 0xff) {
+                    b = COLOR_STEP;
+                    g += COLOR_STEP;                    
+                }
+                if (g > 0xff) {
+                    g = COLOR_STEP;
+                    r += COLOR_STEP;
+                }
+                if (r > 0xff) {
+                    r = COLOR_STEP;
+                    g = COLOR_STEP;
+                    b = COLOR_STEP;                    
+                }
                 w = w <= 0 ? THREASHOLD : w - 1;
                 h = h <= 0 ? THREASHOLD : h - 1;
                 
                 init();
-            }            
+            }                        
             requestAnimationFrame(loop);
         });
     </script>
