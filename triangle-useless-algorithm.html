@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Useless Algorithm</title>
+    <style type="text/css">
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ctx" width="800" height="600" style="display: block; margin: auto; width: 100%; height: 100%;"></canvas>
+    <script type="text/javascript">
+        const ctx = document.getElementById("ctx").getContext('2d');
+        let color = 0x9f;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        ctx.canvas.width = screen.availWidth - 32;
+        ctx.canvas.height = screen.availHeight - 32;
+
+        
+        let ax;
+        let ay;
+        let bx;
+        let by;
+        let cx;
+        let cy;
+
+        const init = () => {
+            ax = Math.floor(Math.random() * ctx.canvas.width);
+            ay = Math.floor(Math.random() * ctx.canvas.height);
+            bx = Math.floor(Math.random() * ctx.canvas.width);
+            by = Math.floor(Math.random() * ctx.canvas.height);
+            cx = Math.floor(Math.random() * ctx.canvas.width);
+            cy = Math.floor(Math.random() * ctx.canvas.height);
+        }
+        const THREASHOLD = 32;
+        init();
+        let w = 8, h = 8;
+        requestAnimationFrame(function loop() {
+            ctx.fillStyle = `#${color.toString(16)}`;
+            // ctx.fillRect(ax, ay, w, h);
+            // ctx.fillRect(bx, by, w, h);
+            // ctx.fillRect(cx, cy, w, h);
+            ctx.beginPath();
+                ctx.arc(ax, ay, w, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(bx, by, h, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(cx, cy, Math.floor((w + h) / 2), 0, 2 * Math.PI);
+            ctx.fill();
+
+            ax = ax / 2;
+            ay = ay / 2;
+            bx = bx / 2;
+            by = by / 2;
+            cx = cx / 2;
+            cy = cy / 2;
+
+            if (
+                (ax <= THREASHOLD) || (ay <= THREASHOLD) ||
+                (bx <= THREASHOLD) || (by <= THREASHOLD) ||
+                (cx <= THREASHOLD) || (cy <= THREASHOLD)
+            ){
+                color = color >= 0xffff ? 0x9f : color + 0xf;
+                w = w <= 0 ? THREASHOLD : w - 1;
+                h = h <= 0 ? THREASHOLD : h - 1;
+                init();
+            }            
+            requestAnimationFrame(loop);
+        });
+    </script>
+</body>
+</html>

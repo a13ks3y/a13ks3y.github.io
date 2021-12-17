@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Useless Algorithm</title>
+    <style type="text/css">
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ctx" width="800" height="600" style="display: block; margin: auto; width: 100%; height: 100%;"></canvas>
+    <script type="text/javascript">
+        function rnd(min, max) {
+            const mn = Math.min(min, max);
+            const mx = Math.max(min, max);
+            return Math.floor(Math.random() * (mx - mn) + mn);
+        }
+        function rgba(r, g, b, a) {
+            a = a || 1;
+            return `rgba(${r}, ${g}, ${b}, ${a})`;            
+        }
+        // pick 3 random points
+        // build a triangle
+        // find medianas (lines perpendicular to sides at the middle points)
+        // pick a random point on each mediana-line
+        // [optional] change color by some condition, to see generations of dots
+        // repeat from second step
+        const ctx = document.getElementById("ctx").getContext('2d');
+        ctx.canvas.width = screen.availWidth - 32;
+        ctx.canvas.height = screen.availHeight - 32;
+        let r = 6, g = 6, b = 6;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        let COLOR_STEP = 2;
+        let ax;
+        let ay;
+        let bx;
+        let by;
+        let cx;
+        let cy;
+
+        const init = () => {
+            ax = Math.floor(Math.random() * ctx.canvas.width);
+            ay = Math.floor(Math.random() * ctx.canvas.height);
+            bx = Math.floor(Math.random() * ctx.canvas.width);
+            by = Math.floor(Math.random() * ctx.canvas.height);
+            cx = Math.floor(Math.random() * ctx.canvas.width);
+            cy = Math.floor(Math.random() * ctx.canvas.height);
+        }
+        let THREASHOLD = 64;
+        init();
+        let w = THREASHOLD, h = THREASHOLD;
+        requestAnimationFrame(function loop() {
+            ctx.fillStyle = rgba(r, g, b, 0.5);
+            ctx.fillRect(ax - Math.floor(w / 2), ay - Math.floor(h / 2), w, h);
+            ctx.fillRect(bx - Math.floor(w / 2), by - Math.floor(h / 2), w, h);
+            ctx.fillRect(cx - Math.floor(w / 2), cy - Math.floor(h / 2), w, h);
+            // ctx.beginPath();
+            //     ctx.arc(ax, ay, w, 0, 2 * Math.PI);
+            // ctx.fill();
+
+            // ctx.beginPath();
+            //     ctx.arc(bx, by, h, 0, 2 * Math.PI);
+            // ctx.fill();
+
+            // ctx.beginPath();
+            //     ctx.arc(cx, cy, Math.floor((w + h) / 2), 0, 2 * Math.PI);
+            // ctx.fill();
+
+            //ax = Math.floor(Math.random() * bx);
+            //ay = Math.floor(Math.random() * by);
+            //bx = Math.floor(Math.random() * cx);
+            //by = Math.floor(Math.random() * cy);
+            //cx = Math.floor(Math.random() * ax);
+            //cy = Math.floor(Math.random() * ay);
+
+            const dab = Math.sqrt(Math.abs(ax - bx) ** 2 + Math.abs(ay - by) ** 2);
+            const dbc = Math.sqrt(Math.abs(bx - cx) ** 2 + Math.abs(by - cy) ** 2);
+            const dca = Math.sqrt(Math.abs(cx - ax) ** 2 + Math.abs(cy - ay) ** 2);
+            
+            ax = rnd(bx, cx);
+            ay = rnd(by, cy);
+            bx = rnd(ax, cx);
+            by = rnd(ay, cy);
+            cx = rnd(ax, bx);
+            cy = rnd(ay, by);
+
+            if (
+                (dab <= THREASHOLD) || 
+                (dbc <= THREASHOLD) ||
+                (dca <= THREASHOLD) 
+            ){
+                //r = (r >= 0xff) ? 0x6 : r + COLOR_STEP;
+                g = (g >= 0xff) ? 0x6 : g + COLOR_STEP;
+                //b = (r >= 0xff && g >= 0xff && b >= 0xff) ? 0x6 : b + COLOR_STEP;
+                w = w <= 0 ? THREASHOLD : w - 1;
+                h = h <= 0 ? THREASHOLD : h - 1;
+                
+                init();
+            }            
+            requestAnimationFrame(loop);
+        });
+    </script>
+</body>
+</html>

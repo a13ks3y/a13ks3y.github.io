@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Useless Algorithm</title>
+    <style type="text/css">
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ctx" width="800" height="600" style="display: block; margin: auto; width: 100%; height: 100%;"></canvas>
+    <script type="text/javascript">
+        function rnd(min, max) {
+            const mn = Math.min(min, max);
+            const mx = Math.max(min, max);
+            return Math.floor(Math.random() * (mx - mn) + mn);
+        }
+
+        const ctx = document.getElementById("ctx").getContext('2d');
+        ctx.canvas.width = screen.availWidth - 32;
+        ctx.canvas.height = screen.availHeight - 32;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        let COLOR_STEP = 0xF;
+        let color = COLOR_STEP;
+        let ax;
+        let ay;
+        let bx;
+        let by;
+        let cx;
+        let cy;
+
+        const init = () => {
+            ax = Math.floor(Math.random() * ctx.canvas.width);
+            ay = Math.floor(Math.random() * ctx.canvas.height);
+            bx = Math.floor(Math.random() * ctx.canvas.width);
+            by = Math.floor(Math.random() * ctx.canvas.height);
+            cx = Math.floor(Math.random() * ctx.canvas.width);
+            cy = Math.floor(Math.random() * ctx.canvas.height);
+        }
+        let THREASHOLD = 64;
+        init();
+        let w = THREASHOLD, h = THREASHOLD;
+        requestAnimationFrame(function loop() {
+            const currentColor = '#' + ('00000' + color.toString(16)).slice(-6);
+            ctx.fillStyle = currentColor;
+            ctx.strokeStyle = currentColor;
+
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(bx, by);
+            ctx.stroke();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(cx, cy);
+            ctx.stroke();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(cx, cy);
+            ctx.stroke();
+
+            ctx.beginPath();
+                ctx.arc(ax, ay, w, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(bx, by, h, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.beginPath();
+                ctx.arc(cx, cy, Math.floor((w + h) / 2), 0, 2 * Math.PI);
+            ctx.fill();
+
+            const dab = Math.sqrt(Math.abs(ax - bx) ** 2 + Math.abs(ay - by) ** 2);
+            const dbc = Math.sqrt(Math.abs(bx - cx) ** 2 + Math.abs(by - cy) ** 2);
+            const dca = Math.sqrt(Math.abs(cx - ax) ** 2 + Math.abs(cy - ay) ** 2);
+            
+            ax = rnd(bx, cx);
+            ay = rnd(by, cy);
+            bx = rnd(ax, cx);
+            by = rnd(ay, cy);
+            cx = rnd(ax, bx);
+            cy = rnd(ay, by);
+
+            if (
+                (dab <= THREASHOLD) || 
+                (dbc <= THREASHOLD) ||
+                (dca <= THREASHOLD) 
+            ){
+                color = color >= 0xffffff ? COLOR_STEP : color + COLOR_STEP;
+                w = w <= 0 ? THREASHOLD : w - 1;
+                h = h <= 0 ? THREASHOLD : h - 1;
+                
+                init();
+            }                        
+            requestAnimationFrame(loop);
+        });
+    </script>
+</body>
+</html>
