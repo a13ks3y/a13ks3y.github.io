@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Sissors</title>
+    <title>Rock Paper Scissors</title>
     <style>
         html, body {
             font-size: 24px;
@@ -67,7 +67,7 @@
         const h = 13;
         
         const rootEl = document.getElementsByTagName('main')[0];
-        const cols =  [];
+        let cols =  [];
         const get = (x, y) => {
             return cols[x] && cols[x][y];
         }
@@ -86,9 +86,37 @@
             ].filter(n => !!n && n !== item);
         }
         const step = () => {
+            const newCols = JSON.parse(JSON.stringify(cols));
             cols.forEach(col => col.forEach(item => {
                 const itemNs = ns(item);
+                const rocks = itemNs.filter(item => item.value === R);
+                const papers = itemNs.filter(item => item.value === P);
+                const scissors = itemNs.filter(item => item.value === S);
+                switch(item.value) {
+                    case R:
+                        if (papers.length > 3 && rocks.length < 3) {
+                            newCols[item.x][item.y].value = P;
+                        } else if (rocks.length > 4) {
+                            newCols[item.x][item.y].value = S;
+                        }
+                    break;
+                    case P:
+                        if (scissors.length > 3 && papers.length < 3) {
+                            newCols[item.x][item.y].value = S;
+                        } else if (papers.length > 4) {
+                            newCols[item.x][item.y].value = R;
+                        }
+                    break;
+                    case S:
+                        if (rocks.length > 3 && scissors.length < 3) {
+                            newCols[item.x][item.y].value = S;
+                        } else if (scissors.length > 4) {
+                            newCols[item.x][item.y].value = P;
+                        }
+                    break;
+                }
             }));
+            cols = newCols;
         };
 
         const init = () => {

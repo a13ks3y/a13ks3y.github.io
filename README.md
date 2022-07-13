@@ -8,6 +8,10 @@
 
 [Tetris](https://a13ks3y.github.io/tetris/)
 
+[Pooping Snake](https://a13ks3y.github.io/pooping-snake.html)
+
+[Match 3](https://a13ks3y.github.io/m3e.html)
+
 [Flood-it](https://a13ks3y.github.io/flood-it/)
 
 [Wire-World](https://a13ks3y.github.io/wire-world/)
