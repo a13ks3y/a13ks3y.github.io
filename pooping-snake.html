@@ -1,18 +1,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Pooping Snake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="reset.css">
+    <style type="text/css">
+        body {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            align-content: center;
+            flex-direction: column;
+        }
+        #ctx {
+        }
+    </style>
 </head>
 <body>
     <canvas id="ctx" width="800" height="600"></canvas>
     <script>
+        const bodyRect = document.body.getBoundingClientRect();
         const ctx = document.getElementById('ctx').getContext('2d');
         const CELL_SIZE = 32;
-        const FIELD_WIDTH = 24;
-        const FIELD_HEIGHT = 16;
+        ctx.canvas.width = CELL_SIZE * ~~(bodyRect.width / CELL_SIZE);
+        ctx.canvas.height = CELL_SIZE * ~~(bodyRect.height / CELL_SIZE);
+        const FIELD_WIDTH = ctx.canvas.width / CELL_SIZE;
+        const FIELD_HEIGHT = ctx.canvas.height / CELL_SIZE;
         const POOP = '💩';
         const APPLE = '🍎';
         const POOP_COUNT_DOWN = 32;
-        const POOP_REMOVE_COUNT_DOWN = 72; // todo maybe make it variable and increse while playing? after each poop or after each odd poop...
+        // @todo: maybe make it variable and increase while playing? after each poop or after each odd poop...
+        const POOP_REMOVE_COUNT_DOWN = 72;
         let state;
         const start = () => {
             state = {
@@ -44,13 +61,29 @@
                 ctx.fillText(POOP, poop.x * CELL_SIZE + CELL_SIZE / 8, poop.y * CELL_SIZE + CELL_SIZE / 1.5);
             });
         };
-
-        document.body.addEventListener('keyup', (e) => {
-            switch (e.key) {
+        const updateStateByKeyName = (key) => {
+            switch (key) {
                 case 'ArrowUp': if (state.dy != 1) { state.dx = 0; state.dy = -1; } break;
                 case 'ArrowDown': if (state.dy != -1) { state.dx = 0; state.dy = 1; } break;
                 case 'ArrowLeft': if (state.dx != 1) { state.dy = 0; state.dx = -1; } break;
                 case 'ArrowRight': if (state.dx != -1) { state.dy = 0; state.dx = 1; } break;
+            }
+        }
+        document.body.addEventListener('keyup', (e) => {
+            updateStateByKeyName(e.key);
+        });
+        document.body.addEventListener('touchend', (e) => {
+            const touch = e.changedTouches.item(0);
+            if (!touch) return;
+            const x = touch.clientX;
+            const y = touch.clientY;
+            const isLeft = x <= bodyRect.width / 2;
+            const isTop = y <= bodyRect.height / 2;
+            const isCenter = x >= bodyRect.width / 4 && x <= bodyRect.width - (bodyRect.width / 4);
+            if (isCenter) {
+                updateStateByKeyName(isTop ? 'ArrowUp' : 'ArrowDown');
+            } else {
+                updateStateByKeyName(isLeft ? 'ArrowLeft' : 'ArrowRight');
             }
         });
         let lastTick = Date.now();
@@ -96,9 +129,9 @@
                 if (state.snake[0].y < 0) state.snake[0].y = FIELD_HEIGHT - 1;
 
                 if (state.apple.x === state.snake[0].x && state.apple.y === state.snake[0].y) {
-                    state.snake.push({ 
-                        x: state.snake[state.snake.length - 1].x - state.dx, 
-                        y: state.snake[state.snake.length - 1].y - state.dy 
+                    state.snake.push({
+                        x: state.snake[state.snake.length - 1].x - state.dx,
+                        y: state.snake[state.snake.length - 1].y - state.dy
                     });
                     // todo  prevent apple to spawn at the same cell as snake body and poops!
                     state.apple.x = Math.floor(Math.random() * FIELD_WIDTH);
