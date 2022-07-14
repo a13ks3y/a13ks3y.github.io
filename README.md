@@ -8,6 +8,8 @@
 
 [Tetris](https://a13ks3y.github.io/tetris/)
 
+[Story Qubes](https://a13ks3y.github.io/story-qubes.html)
+
 [Pooping Snake](https://a13ks3y.github.io/pooping-snake.html)
 
 [Match 3](https://a13ks3y.github.io/m3e.html)
