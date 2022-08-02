@@ -105,7 +105,7 @@
                 } else {
                     this.x += this.dx * dtt;
                 }
-                const isColideWithWall = Object.values(this.level.field).some(cell => {
+                const isCollideWithWall = Object.values(this.level.field).some(cell => {
                     if(cell instanceof Wall) {
                         if (this.x >= cell.x && this.x <= cell.x + CELL_SIZE) {
                             if (this.y + this.w >= cell.y && this.y + this.w <= cell.y + CELL_SIZE) {
@@ -118,6 +118,9 @@
                     }
                     return false;
                 });
+                if (isCollideWithWall) {
+                    this.dy = 0;
+                }
             }
             moveLeft() {
                 if (this.state === 'idle') {

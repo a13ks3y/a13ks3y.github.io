@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="reset.css">
+  <title>Do not even try</title>
+  <style type="text/css">
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    header {
+      max-height: 32px;
+    }
+    footer {
+      max-height: 64px;
+    }
+    #ctx {
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h3>The Game You Never Can Win</h3>
+</header>
+<main>
+  <canvas id="ctx"></canvas>
+</main>
+<footer>
+  The Goal is to fill all cells in one color.
+</footer>
+<script type="text/javascript">
+  const ctx = document.getElementById('ctx').getContext('2d');
+  const bodyRect = document.body.getBoundingClientRect();
+  ctx.canvas.width = bodyRect.width;
+  ctx.canvas.height = bodyRect.height - 96;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+  const cells = {};
+  const CELL_WIDTH = 32;
+  const CELL_HEIGHT = 32;
+  const COLS_COUNT = ~~(ctx.canvas.width / CELL_WIDTH) - 2;
+  const ROWS_COUNT = ~~(ctx.canvas.height / CELL_HEIGHT) - 2;
+  const X_CENTER_OFFSET = ~~((ctx.canvas.width - COLS_COUNT * CELL_WIDTH) / 2);
+  const Y_CENTER_OFFSET = ~~((ctx.canvas.height - ROWS_COUNT * CELL_HEIGHT) / 2);
+  const COLORS = ['#7f3838', '#316031'];
+  const randomColor = () => COLORS[~~(Math.random() * COLORS.length)];
+  const crToHash = (c, r) => `${c}:${r}`;
+  const nn = (cell) => {
+    const c = cell.c;
+    const r = cell.r;
+    return [
+      // { c: -1, r: -1 }, // left-top
+      { c:  0, r: -1 }, // center-top
+      // { c:  1, r: -1 }, // right-top
+
+      { c: -1, r:  0 }, // left
+      { c:  1, r:  0 }, // right
+
+      // { c: -1, r:  1 }, // left-bottom
+      { c:  0, r:  1 }, // center-bottom
+      // { c:  1, r:  1 }, // right-bottom
+    ].map(cellOffset => {
+      return cells[crToHash(c + cellOffset.c, r + cellOffset.r)];
+    }).filter(cell => !!cell);
+  }
+  const sameNNs = (cell, result = []) => {
+    cell.selected = true;
+    const nns = nn(cell);
+    const sameColorCells = nns
+            .filter(nCell => {
+              return nCell.color === cell.color;
+            });
+    sameColorCells.forEach(sameColorCell => {
+      result.push(sameColorCell);
+      if (!sameColorCell.selected) {
+        result = [cell, ...result, ...sameNNs(sameColorCell)];
+      }
+    });
+    return result;
+  }
+
+
+  const cellClick = (cell) => {
+/*
+    if (cell.selected) {
+      Object.values(cells).forEach(cell => {
+        if (cell.selected) {
+          cell.destroyCounter = 1000;
+        }
+      })
+    }
+*/
+    if (!cell.selected) {
+      Object.values(cells).forEach(cell => cell.selected = false);
+      const sameColorCells = sameNNs(cell);
+      console.log('SameColorCells', sameColorCells);
+      if (sameColorCells.length >= 2) {
+        sameColorCells.forEach(cell => {
+          cell.selected = true;
+          cell.destroyCounter = 1000;
+        });
+      } else {
+        Object.values(cells).forEach(cell => cell.selected = false);
+      }
+    }
+  }
+  const destroyCells = () => {
+    const allCells = Object.values(cells);
+    allCells.filter(cell => cell.selected).forEach(cell => {
+      cell.color = cell.color === '#0f0' ? randomColor() : '#0f0'; //'#0f0'//= randomColor();
+      cell.selected = false;
+    });
+    if (allCells.every(cell => cell.color === firstCell.color)) {
+      alert("You WIN!\nPlease, screenshot it and send to @a13ks3y!!!")
+    }
+  }
+  const init = () => {
+    for (let c = 0; c < COLS_COUNT; c++) {
+      for (let r = 0; r < ROWS_COUNT; r++) {
+        cells[crToHash(c, r)] = {
+          c, r,
+          color: randomColor()
+        }
+      }
+    }
+    ctx.canvas.addEventListener('click', e => {
+      const x = e.offsetX - X_CENTER_OFFSET;
+      const y = e.offsetY - Y_CENTER_OFFSET;
+      const c = ~~(x / CELL_WIDTH);
+      const r = ~~(y / CELL_HEIGHT);
+      const cell = cells[crToHash(c, r)];
+      if (cell) {
+        cellClick(cell);
+      }
+    })
+  }
+  const render = (dt) => {
+    let needToDestroy = false;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0, ctx.canvas.width, ctx.canvas.height);
+    Object.values(cells).forEach((cell) => {
+      const x = cell.c * CELL_WIDTH + X_CENTER_OFFSET;
+      const y = cell.r * CELL_HEIGHT + Y_CENTER_OFFSET;
+      if (cell.destroyCounter > 0) {
+        cell.destroyCounter -= dt;
+        const shrinkWidth = CELL_WIDTH * (cell.destroyCounter / 1000);
+        const shrinkHeight = CELL_HEIGHT * (cell.destroyCounter / 1000);
+        const xOffset = (CELL_WIDTH - shrinkWidth) / 2;
+        const yOffset = (CELL_HEIGHT - shrinkHeight) / 2;
+        ctx.fillStyle = cell.color;
+        ctx.fillRect(x + xOffset, y + yOffset, shrinkWidth, shrinkHeight);
+
+        if (cell.destroyCounter <= 0) {
+          cell.destroyCounter = 0;
+          needToDestroy = true;
+        }
+      } else {
+        ctx.fillStyle = cell.selected ? '#f90' : cell.color;
+        ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        /*
+        if (cell.selected) {
+          ctx.strokeStyle = '#f90';
+          ctx.strokeWidth = 2;
+          ctx.strokeRect(x + 2, y + 2, CELL_WIDTH - 4, CELL_HEIGHT - 4);
+        }
+        //*/
+      }
+      /*
+      ctx.fillStyle = 'white';
+      ctx.fontStyle = '14px monospace';
+      ctx.fillText(dt, 32, 32);
+      //*/
+      if (needToDestroy) {
+        destroyCells();
+      }
+    });
+  }
+  init();
+  let lastTick = Date.now();
+  requestAnimationFrame(function loop() {
+    render(Date.now() - lastTick);
+    lastTick = Date.now();
+    requestAnimationFrame(loop);
+  })
+</script>
+</body>
+</html>
