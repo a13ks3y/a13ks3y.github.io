@@ -8,6 +8,8 @@
 
 [Tetris](https://a13ks3y.github.io/tetris/)
 
+[Annoy](https://a13ks3y.github.io/annoy.html) (The game you can not win by definition)
+
 [Story Qubes](https://a13ks3y.github.io/story-qubes.html)
 
 [Pooping Snake](https://a13ks3y.github.io/pooping-snake.html)
