@@ -116,6 +116,7 @@
       cell.color = cell.color === '#0f0' ? randomColor() : '#0f0'; //'#0f0'//= randomColor();
       cell.selected = false;
     });
+    const firstCell = allCells[0];
     if (allCells.every(cell => cell.color === firstCell.color)) {
       alert("You WIN!\nPlease, screenshot it and send to @a13ks3y!!!")
     }
