@@ -37,14 +37,60 @@
             <a class="footer__link" href="https://a13ks3y.github.io/jarvis/" title="" target="_blank"><i class="fa fa-assistive-listening-systems" aria-hidden="true"></i></a>
             <a class="footer__link" href="tg://resolve?domain=a13ks3y" title="@a13ks3y" ><i class="fa fa-paper-plane" aria-hidden="true"></i></a>
             <a class="footer__link" href="https://www.facebook.com/a13ks3y" target="_blank"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
-            <a class="footer__link" href="https://a13ks3y.github.io/m3e.html" title="Simple Match3 Game"><i class="fa fa-steam-square" aria-hidden="true"></i></a>
+            <a class="footer__link" href="#" id="gameListBtn" title="Games List"><i class="fa fa-steam-square" aria-hidden="true"></i></a>
             <a class="footer__link" href="https://a13ks3y.github.io/keys/" target="_blank"><i class="fa fa-music" aria-hidden="true"></i></a>
         </footer>
     </main>
-
     <div class="touch-area touch-area--full-screen"></div>
+    <div class="games-list closed" id="games-list">
+        <h3>Games List</h3>
+        <ul>
+            <li>
+                <a href="https://a13ks3y.github.io/netwalk/">NetWalk</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/tetris/">Tetris</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/annoy.html">Annoy</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/story-qubes.html">Story Qubes</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/pooping-snake.html">Pooping Snake</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/m3e.html">Match 3</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/flood-it/">Flood-it</a>
+            </li>
+            <li>
+                <a href="https://a13ks3y.github.io/wire-world/">Wire-World</a>
+            </li>
+        </ul>
+        <button id="closeGameListBtn">
+            <i class="fa fa-close"></i>
+        </button>
+    </div>
     <script type="text/javascript">
         (function init(){
+            var showGamesListBtn = document.getElementById('gameListBtn');
+            var gamesList = document.getElementById('games-list');
+            showGamesListBtn.addEventListener('click', () => {
+                if (gamesList.classList.contains('closed')) {
+                    gamesList.classList.remove('closed');
+                } else {
+                    gamesList.classList.add('closed');
+                }
+            });
+            var closeGameListBtn = document.getElementById('closeGameListBtn');
+            closeGameListBtn.addEventListener('click', () => {
+                if (!gamesList.classList.contains('closed')){
+                    gamesList.classList.add('closed');
+                }
+            });
             var header = document.querySelector('.header__text');
             var qr = document.querySelector('.header__qr');
             Array.prototype.forEach.call(document.querySelectorAll('.touch-area--qr'), function(item){

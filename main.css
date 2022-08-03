@@ -79,6 +79,38 @@ body {
     bottom: 0;
     z-index: 1;
 }
+.games-list {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 66.6%;
+    min-height: 33.6%;
+    background-color: #929292;
+    padding: 1.333rem;
+    transition-property: transform;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
+    border-radius: 0.666rem;
+}
+.games-list.closed {
+    transform: translate(-50%, -333%);
+}
+.games-list h3 {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: bold;
+    color: #006660;
+}
+.games-list ul {
+    padding: 1.333rem;
+}
+.games-list ul li {
+    list-style: none;
+}
+.games-list ul li a {
+    font-family: monospace;
+    color: #000666;
+}
 /* End Layout portrait */
 
 /* Layout landscape */
