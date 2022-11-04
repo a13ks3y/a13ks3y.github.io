@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Revers Snake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="reset.css">
+    <style type="text/css">
+        body {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            align-content: center;
+            flex-direction: column;
+        }
+        #ctx {
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ctx"></canvas>
+    <script>
+        const bodyRect = document.body.getBoundingClientRect();
+        const ctx = document.getElementById('ctx').getContext('2d');
+        const CELL_SIZE = 16;
+        ctx.canvas.width = CELL_SIZE * ~~(bodyRect.width / CELL_SIZE);
+        ctx.canvas.height = CELL_SIZE * ~~(bodyRect.height / CELL_SIZE);
+        const COLS_COUNT = ctx.canvas.width / CELL_SIZE;
+        const ROWS_COUNT = ctx.canvas.height / CELL_SIZE;
+        const POOP = '💩';
+        const APPLE = '🍎';
+        const DIRECTIONS = [
+            { oc:  0, or: -1 }, // top
+            { oc:  1, or:  0 }, // right
+            { oc:  0, or:  1 }, // bottom
+            { oc: -1, or:  0 }, // left
+        ];
+        const distance = (ac, ar, bc, br) => {
+            const dc = Math.max(ac, bc) - Math.min(ac, bc);
+            const dr = Math.max(ar, br) - Math.min(ar, br);
+            return ~~(Math.sqrt(dc ** 2 + dr ** 2));
+
+        }
+        const MAX_DISTANCE = distance(0,0,COLS_COUNT, ROWS_COUNT);
+        const range = (n, start2, stop1, stop2) => {
+            const start1 = 0;
+            return (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+        };
+        class Cell {
+            constructor(c, r) {
+                this.c = c;
+                this.r = r;
+                this.size = CELL_SIZE;
+                this.x = this.c * this.size;
+                this.y = this.r * this.size;
+                this.state = 'empty';
+                this.clearState();
+            }
+            getColor() {
+                switch (this.state) {
+                    case 'snake': return '#f90';
+                    case 'empty': return `rgb(${range(this.distanceToHead, MAX_DISTANCE, 0, 255)}, 0, 0)`;
+                    default: return '#abc';
+                }
+            }
+            render(ctx) {
+                ctx.fillStyle = this.getColor();
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+                if (this.state === APPLE || this.state === POOP) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(
+                        this.state,
+                        this.x + this.size / 8,
+                        this.y + this.size - this.size * 0.3,
+                    );
+                }
+                if (this.state === 'snake') {
+                    // ctx.fillStyle = '#000';
+                    // ctx.fillText(
+                    //     this.index,
+                    //     this.x + this.size / 3,
+                    //     this.y + this.size - this.size * 0.42,
+                    // );
+                }
+            }
+            getDistanceToHead(head) {
+                const dc = Math.max(this.c, head.c) - Math.min(this.c, head.c);
+                const dr = Math.max(this.r, head.r) - Math.min(this.r, head.r);
+                return ~~(Math.sqrt(dc ** 2 + dr ** 2));
+            }
+            setDistanceToHead(head) {
+                this.distanceToHead = this.getDistanceToHead(head);
+            }
+            setSnakeState(index) {
+                this.state = 'snake';
+                this.isObstacle = true;
+                this.index = index;
+            }
+            setPoopState() {
+                this.state = POOP;
+                this.isObstacle = true;
+            }
+            setAppleState() {
+                this.state = APPLE;
+                this.isTarget = true;
+            }
+            clearState() {
+                if (this.state === 'snake') {
+                    this.state = 'empty';
+                }
+                this.isObstacle = false;
+                this.isTarget = false;
+                this.isVisited = false;
+            }
+            setEmptyState() {
+                this.state = 'empty';
+                this.clearState();
+            }
+        }
+        class Grid {
+            cells = []
+            apples = []
+            constructor(colsCount, rowsCount) {
+                this.colsCount = colsCount;
+                this.rowsCount = rowsCount;
+                for (let c = 0; c < this.colsCount; c++) {
+                    this.cells[c] = Array(this.rowsCount);
+                    for (let r = 0; r < this.rowsCount; r++) {
+                        this.cells[c][r] = new Cell(c, r);
+                    }
+                }
+            }
+            forEach(callback) {
+                for (let c = 0; c < this.colsCount; c++) {
+                    for (let r = 0; r < this.rowsCount; r++) {
+                        callback(this.cells[c][r], c, r);
+                    }
+                }
+            }
+            render(ctx) {
+                this.forEach(cell => cell.render(ctx));
+            }
+            getC(oc, bc) {
+                let c = bc + oc;
+                if (c < 0) { c = this.colsCount - 1 }
+                if (c >= this.colsCount) { c = 0 }
+                return c;
+            }
+            getR(or, br) {
+                let r = br + or;
+                if (r < 0) { r = this.rowsCount - 1 }
+                if (r >= this.rowsCount) { r = 0 }
+                return r;
+            }
+            nextCells(c, r) {
+                const rootCell = this.cells[c][r];
+                return DIRECTIONS.map(dir => {
+                    const c = this.getC(dir.oc, rootCell.c);
+                    const r = this.getR(dir.or, rootCell.r);
+                    return this.cells[c][r];
+                }).filter(cell => cell && !cell.isObstacle);
+            }
+
+            getCell(c, r) {
+                c = this.getC(c, 0);
+                r = this.getR(r, 0);
+                return this.cells[c] && this.cells[c][r];
+            }
+            createApple(c, r) {
+                if (c === undefined) c = ~~(Math.random() * this.colsCount);
+                if (r === undefined) r = ~~(Math.random() * this.rowsCount);
+                const appleCell = this.getCell(c, r);
+                appleCell.setAppleState();
+                this.apples.push(appleCell);
+            }
+        }
+        class Snake {
+            constructor(length = 3) {
+                this.body = Array(length);
+                for (let i = 0; i < length; i++) {
+                    this.body[i] = {
+                        c: length - i,
+                        r: 0
+                    }
+                }
+                this.direction = 1; // 0 - top, 1 - right, 2 - bottom, 3 - left
+            }
+            render(grid) {
+                this.body.forEach((b, i) => {
+                    const bodyCell = grid.getCell(b.c, b.r);
+                    bodyCell && bodyCell.setSnakeState(i);
+                });
+            }
+            step(grid) {
+                const direction = DIRECTIONS[this.direction];
+                const oldBody = this.body.map(b => {
+                    return {
+                        c: b.c,
+                        r: b.r
+                    }
+                });
+                const head = this.body[0];
+                head.c = grid.getC(direction.oc, head.c);
+                head.r = grid.getR(direction.or, head.r);
+                for (let i = this.body.length - 1; i >= 0; i--) {
+                    const b = oldBody[i];
+                    const nextB = this.body[i + 1];
+                    if (nextB) {
+                        nextB.c = b.c;
+                        nextB.r = b.r;
+                    }
+                }
+                const headCell = grid.getCell(head.c, head.r);
+                if (headCell && headCell.state === APPLE) {
+                    const tail = this.body[this.body.length - 1];
+                    this.body.push({
+                        c: tail.c - direction.oc,
+                        r: tail.r - direction.or
+                    });
+                }
+                grid.apples.forEach(apple => {
+                    apple.setDistanceToHead(head);
+                });
+                grid.apples.sort((a, b) => a.distanceToHead - b.distanceToHead);
+                const apple = grid.apples[0];
+                if (apple) {
+
+                    (function recursion(cell) {
+                        cell.isVisited = true;
+                        const nextCells = grid.nextCells(cell.c, cell.r);
+                        nextCells.filter(nc => !nc.isVisited).forEach(nc => {
+                            nc.setDistanceToHead(head);
+                        });
+                    }(apple));
+
+                    if (apple.c === head.c) {
+                        if (apple.r > head.r) {
+                            this.setDirection(2); // bottom
+                        } else {
+                            this.setDirection(0); // top
+                        }
+                    }
+                    if (apple.r === head.r) {
+                        if (apple.c > head.c) {
+                            this.setDirection(1); // right
+                        } else {
+                            this.setDirection(3); // left
+                        }
+                    }
+                } else {
+                    grid.createApple();
+                }
+                const nextNextCell = grid.getCell(
+                    grid.getC(direction.oc, headCell.c),
+                    grid.getR(direction.or, headCell.r)
+                );
+                if (nextNextCell && nextNextCell.state === 'snake') {
+                    this.turn();
+                }
+
+            }
+            turn() {
+                const newDirection = this.direction + 1;
+                this.setDirection(newDirection < 4  ? newDirection : 0);
+                console.log('turn');
+            }
+            setDirection(direction) {
+                switch(this.direction) {
+                    // top right bottom left
+                    case 0: if (direction !== 2) this.direction = direction; break;
+                    case 1: if (direction !== 3) this.direction = direction; break;
+                    case 2: if (direction !== 0) this.direction = direction; break;
+                    case 3: if (direction !== 1) this.direction = direction; break;
+                }
+            }
+        }
+        class App {
+            constructor() {
+                this.grid = new Grid(COLS_COUNT, ROWS_COUNT);
+                this.snake = new Snake(8);
+                ctx.canvas.addEventListener('click', (e) => {
+                   const mx = e.offsetX;
+                   const my = e.offsetY;
+                   const mc = ~~(mx / CELL_SIZE);
+                   const mr = ~~(my / CELL_SIZE);
+                   this.grid.createApple(mc, mr);
+                });
+            }
+            render() {
+                ctx.fillStyle = '#abc';
+                ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+                this.grid.render(ctx);
+            }
+            step() {
+                this.grid.apples = this.grid.apples.filter(apple => apple.state === APPLE);
+                this.snake.step(this.grid);
+
+                this.grid.forEach(cell => cell.clearState());
+                this.snake.render(this.grid);
+                this.render();
+            }
+            start() {
+                this.interval = setInterval(this.step.bind(this), 64);
+            }
+        }
+        const app = new App();
+        app.start();
+        app.grid.createApple(12, 0);
+    </script>
+</body>
+</html>

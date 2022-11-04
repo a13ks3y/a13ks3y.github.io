@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIQ</title>
+    <link rel="stylesheet" href="../reset.css">
+    <style>
+        html {
+            font-family: monospace;
+            font-size: 16px;
+        }
+        main {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            background-color: red;
+        }
+        .canvas-wrapper {
+            width: 100%;
+            height: 100%;
+            background-color: blue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        input, button {
+            margin: 0.666rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <input type="text" id="input-seed" placeholder="SEED"/>
+    <div class="canvas-wrapper">
+        <canvas id="ctx"></canvas>
+    </div>
+    <button id="btn-generate">GENERATE</button>
+</main>
+<script type="text/javascript">
+    const ctx = document.getElementById('ctx').getContext('2d');
+    const parentRect = ctx.canvas.parentElement.getBoundingClientRect();
+    const canvasWidth = Math.floor(parentRect.width * 0.9);
+    const canvasHeight = Math.floor(parentRect.height * 0.9);
+    ctx.canvas.width = canvasWidth;
+    ctx.canvas.height = canvasHeight;
+    const btnGenerate = document.getElementById('btn-generate');
+    const inputSeed = document.getElementById('input-seed');
+
+    function tokenToColor(token) {
+        const r = token.charCodeAt(0);
+        const g = r * 2;
+        const b = r / 2;
+        return `rgba(${r}, ${g}, ${b}, 0.5)`;
+    }
+    function tokenToFloat(token) {
+        return token.charCodeAt(0) / 255;
+    }
+    const halfWidth = ctx.canvas.width / 2;
+    const halfHeight = ctx.canvas.height / 2;
+    btnGenerate.addEventListener('click', () => {
+        if (!inputSeed.value.length) {
+            inputSeed.value = Math.floor(Math.random() * 0xfffff).toString(16);
+        }
+        const seed = inputSeed.value;
+        const base64Seed = btoa(seed);
+        const tokens = base64Seed.split('');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+        tokens.forEach(token => {
+            ctx.fillStyle = tokenToColor(token);
+            const tokenFloat = tokenToFloat(token);
+            if (token.charCodeAt(0) % 2 == 0) {
+
+                ctx.beginPath();
+                ctx.arc(
+                    tokenFloat * ctx.canvas.width,
+                    tokenFloat * ctx.canvas.height,
+                    tokenFloat * halfWidth / 4,
+                    0, 2 * Math.PI
+                );
+                ctx.fill();
+            } else {
+                ctx.fillRect(
+                    tokenFloat * ctx.canvas.width,
+                    tokenFloat * ctx.canvas.height,
+                    tokenFloat * halfWidth,
+                    tokenFloat * halfHeight
+                );
+            }
+        });
+    });
+</script>
+</body>
+</html>

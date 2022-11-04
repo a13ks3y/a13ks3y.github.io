@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="reset.css">
+  <title>Revertris</title>
+  <style type="text/css">
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    header {
+      max-height: 32px;
+    }
+    footer {
+      max-height: 64px;
+    }
+    #ctx {
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h3>Revertris</h3>
+</header>
+<main>
+  <canvas id="ctx"></canvas>
+</main>
+<footer>
+  The Goal is to fill all cells in one color.
+</footer>
+<script type="text/javascript">
+  const ctx = document.getElementById('ctx').getContext('2d');
+  const bodyRect = document.body.getBoundingClientRect();
+  ctx.canvas.width = bodyRect.width;
+  ctx.canvas.height = bodyRect.height - 96;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+  const cells = {};
+  const CELL_WIDTH = 32;
+  const CELL_HEIGHT = 32;
+  const COLS_COUNT = ~~(ctx.canvas.width / CELL_WIDTH) - 1;
+  const ROWS_COUNT = ~~(ctx.canvas.height / CELL_HEIGHT);
+  const X_CENTER_OFFSET = ~~((ctx.canvas.width - COLS_COUNT * CELL_WIDTH) / 2);
+  const Y_CENTER_OFFSET = ~~((ctx.canvas.height - ROWS_COUNT * CELL_HEIGHT) / 2);
+
+  const COLORS = [
+    '#a00',
+    '#0a0',
+    '#00a',
+    //'#aa0',
+    //'#aaa',
+    '#0aa',
+  ];
+
+  // LJITOSZ
+  const PIECE_NATURES = {
+    'O' : [[
+      [1,1],
+      [1,1]
+    ]],
+    'I' : [
+      [
+        [1,1,1,1]
+      ],
+      [
+        [1],
+        [1],
+        [1],
+        [1]
+      ]
+    ],
+    'S' : [
+      [
+        [0,1],
+        [1,1],
+        [1,0]
+      ],
+      [
+        [1,1,0],
+        [0,1,1]
+      ]
+    ],
+
+    'Z' : [
+      [
+        [1,0],
+        [1,1],
+        [0,1]
+      ],
+      [
+        [0,1,1],
+        [1,1,0]
+      ]
+    ],
+    'T' : [
+      [
+        [0,1,0],
+        [1,1,1]
+      ],
+      [
+        [1,0],
+        [1,1],
+        [1,0]
+      ],
+      [
+        [1,1,1],
+        [0,1,0]
+      ],
+      [
+        [0,1],
+        [1,1],
+        [0,1]
+      ]
+    ],
+    'L' : [
+      [
+        [1,0],
+        [1,0],
+        [1,1]
+      ],
+      [
+        [1,1,1],
+        [1,0,0]
+      ],
+      [
+        [1,1],
+        [0,1],
+        [0,1]
+      ],
+      [
+        [0,0,1],
+        [1,1,1]
+      ]
+    ],
+    'J' : [
+      [
+        [0,1],
+        [0,1],
+        [1,1]
+      ],
+      [
+        [1,0,0],
+        [1,1,1]
+      ],
+      [
+        [1,1],
+        [1,0],
+        [1,0]
+      ],
+      [
+        [1,1,1],
+        [0,0,1]
+      ]
+    ]
+  };
+
+  const randomColor = () => COLORS[~~(Math.random() * COLORS.length)];
+  const crToHash = (c, r) => `${c}:${r}`;
+  const nn = (cell) => {
+    const c = cell.c;
+    const r = cell.r;
+    return [
+      // { c: -1, r: -1 }, // left-top
+      { c:  0, r: -1 }, // center-top
+      // { c:  1, r: -1 }, // right-top
+
+      { c: -1, r:  0 }, // left
+      { c:  1, r:  0 }, // right
+
+      // { c: -1, r:  1 }, // left-bottom
+      { c:  0, r:  1 }, // center-bottom
+      // { c:  1, r:  1 }, // right-bottom
+    ].map(cellOffset => {
+      return cells[crToHash(c + cellOffset.c, r + cellOffset.r)];
+    }).filter(cell => !!cell);
+  }
+  const sameNNs = (cell, result = []) => {
+    cell.selected = true;
+    const nns = nn(cell);
+    const sameColorCells = nns
+            .filter(nCell => {
+              return nCell.color === cell.color;
+            });
+    sameColorCells.forEach(sameColorCell => {
+      result.push(sameColorCell);
+      if (!sameColorCell.selected) {
+        result = [...result, ...sameNNs(sameColorCell)];
+      }
+    });
+    return result;
+  }
+  const allAbove = (cell) => {
+    const result = [];
+    for (let r = 1; r <= cell.r; r++) {
+      const abCell = cells[crToHash(cell.c, cell.r - r)];
+      if (abCell) {
+        result.push(abCell);
+      }
+    }
+    console.log('all above:', result);
+    return result;
+  }
+
+  function init() {
+    for (let c = 0; c < COLS_COUNT; c++) {
+      for (let r = 0; r < ROWS_COUNT; r++) {
+        cells[crToHash(c, r)] = {
+          c, r,
+          x: c * CELL_WIDTH,
+          y: (r+2) * CELL_HEIGHT - (CELL_HEIGHT * ROWS_COUNT),
+          dx: 0,
+          dy: 0.1,
+          color: randomColor(),
+          state: 'fall'
+        }
+      }
+    }
+    ctx.canvas.addEventListener('click', e => {
+      const x = e.offsetX - X_CENTER_OFFSET;
+      const y = e.offsetY - Y_CENTER_OFFSET;
+      const c = ~~(x / CELL_WIDTH);
+      const r = ~~(y / CELL_HEIGHT);
+      const cell = cells[crToHash(c, r)];
+      if (cell) {
+        cellClick(cell);
+      }
+    })
+  }
+  function cellClick(clickedCell) {
+    Object.values(cells).forEach(cell => cell.selected = false);
+    const sameCells = sameNNs(clickedCell);
+    console.table(sameCells);
+    if (sameCells.length === 6) {
+      sameCells.forEach(cell => cell.state = 'destroy');
+    }
+  }
+  function logic(dt) {
+    const allCells = Object.values(cells);
+    allCells.forEach(cell => {
+      switch(cell.state) {
+        case 'fall':
+            cell.y += dt * cell.dy;
+            if (~~(cell.y / CELL_HEIGHT) >= cell.r) {
+              cell.state = 'idle';
+              cell.y = ~~(cell.y / CELL_HEIGHT) * CELL_HEIGHT;
+            }
+          break;
+        case 'destroy':
+          cell.y -= ROWS_COUNT * CELL_HEIGHT + CELL_HEIGHT;
+          cell.state = 'fall';
+          break;
+      }
+    });
+  }
+  function render(ctx, dt) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+
+    const allCells = Object.values(cells);
+    allCells.forEach(cell => {
+      ctx.fillStyle = cell.color;
+
+      ctx.fillRect(
+              cell.x + X_CENTER_OFFSET + 1,
+              cell.y + 1,
+              CELL_WIDTH - 2,
+              CELL_HEIGHT - 2
+      );
+
+      ctx.font = '12px monospace';
+      ctx.fillStyle = '#0f0';
+      ctx.fillText(dt, 16, 10);
+/*
+      ctx.fillText(
+              `${cell.c}:${cell.r}`,
+              cell.x + X_CENTER_OFFSET + 4,
+              cell.y + Y_CENTER_OFFSET + CELL_HEIGHT / 2
+      );
+*/
+
+    })
+  }
+  init();
+  let lastTick = Date.now();
+  requestAnimationFrame(function loop() {
+    const dt = Date.now() - lastTick;
+    logic(dt);
+    render(ctx, dt);
+    lastTick = Date.now();
+    requestAnimationFrame(loop);
+  });
+
+</script>
+</body>
+</html>

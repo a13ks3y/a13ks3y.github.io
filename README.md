@@ -14,7 +14,7 @@
 
 [Pooping Snake](https://a13ks3y.github.io/pooping-snake.html)
 
-[Match 3](https://a13ks3y.github.io/m3e.html)
+[Match 3](https://a13ks3y.github.io/mtg/)
 
 [Flood-it](https://a13ks3y.github.io/flood-it/)
 

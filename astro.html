@@ -97,16 +97,23 @@
             this.x += dx;
             this.y += dy;
         }
+        getDistanceToSprite(sprite) {
+            const diffX = Math.max(sprite.x, this.x) - Math.min(sprite.x, this.x);
+            const diffY = Math.max(sprite.y, this.y) - Math.min(sprite.x, this.y);
+            return Math.sqrt(Math.abs(diffX) ** 2 + Math.abs(diffY) ** 2);
+        }
         isCollideWith(sprite) {
-            return (sprite.x + sprite.size >= this.x - this.size) &&
-                (sprite.x - sprite.size <= this.x + this.size) &&
-                (sprite.y + sprite.size >= this.y - this.size) &&
-                (sprite.y - sprite.size <= this.y + this.size);
+            const distance = this.getDistanceToSprite(sprite);
+            return distance <= this.size + sprite.size;
+            // return (sprite.x + sprite.size >= this.x - this.size) &&
+            //     (sprite.x - sprite.size <= this.x + this.size) &&
+            //     (sprite.y + sprite.size >= this.y - this.size) &&
+            //     (sprite.y - sprite.size <= this.y + this.size);
         }
     }
     class BasicBullet extends Sprite {
         bodyColor = '#fff';
-        lifeTime = 1.666;
+        lifeTime = 6.666;
         constructor(x, y, directionAngle, acc) {
             super(x, y);
             this.directionAngle = directionAngle;
@@ -124,6 +131,18 @@
         render (ctx) {
             const dirX = Math.sin(this.directionAngle) * this.size;
             const dirY = Math.cos(this.directionAngle) * this.size;
+            ctx.beginPath();
+                const gradient = ctx.createRadialGradient(this.x, this.y, this.size / 8, this.x, this.y, this.size * 4);
+                gradient.addColorStop(0, 'rgba(171,204,186,1)');
+                gradient.addColorStop(0.5, 'rgba(171,204,186,0.5)');
+                gradient.addColorStop(1, 'rgba(171,204,186,0)');
+
+                ctx.arc(this.x, this.y, this.size * 8, 0, 2 * Math.PI);
+
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+            ctx.fill();
             ctx.beginPath();
                 ctx.fillStyle = this.bodyColor;
                 ctx.ellipse(this.x, this.y, this.size, this.size * 3, -this.directionAngle, 0, Math.PI * 2, true);
@@ -162,11 +181,15 @@
             }
         }
         shoot() {
-            const dirX = this.x + Math.sin(this.directionAngle) * this.size * 3;
-            const dirY = this.y + Math.cos(this.directionAngle) * this.size * 3;
-            const bullet = new BasicBullet(dirX, dirY, this.directionAngle, this.acc);
+            const dirX = this.x + Math.sin(this.directionAngle) * this.size * 6;
+            const dirY = this.y + Math.cos(this.directionAngle) * this.size * 6;
+            const bullet = new BasicBullet(dirX, dirY, this.directionAngle, this.acc + 16);
             this.shootLock = true;
             return bullet;
+        }
+        isCollideWith(sprite) {
+            const distance = this.getDistanceToSprite(sprite);
+            return distance <= this.size * 3.6 + sprite.size;
         }
     }
     class Enemy extends Sprite {
@@ -264,21 +287,21 @@
                     bullet.destroy = true;
                 }
                 this.enemies.forEach(enemy => {
-                    if (enemy.isCollideWith(this.ship)) {
-                        //this.init();
-                        enemy.destroy = true;
-                    }
-                    if (bullet.isCollideWith(enemy)) {
+                    if (enemy.isCollideWith(bullet)) {
                         enemy.destroy = true;
                     }
                 })
             });
             this.enemies.forEach(enemy => {
+                if (this.ship.isCollideWith(enemy)) {
+                    //this.init();
+                    enemy.destroy = true;
+                }
                 enemy.logic(dtt, this);
             });
             //this.ship.directionAngle += 0.1;
             this.bullets = this.bullets.filter(bullet => bullet.destroy !== true);
-            this.enemies = this.enemies.filter(bullet => bullet.destroy !== true);
+            this.enemies = this.enemies.filter(enemy => enemy.destroy !== true);
             if (this.enemies.length === 0) {
                 this.initEnemies();
             }
