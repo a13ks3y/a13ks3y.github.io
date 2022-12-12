@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quad Tree</title>
+  <link rel="stylesheet" href="./reset.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .body {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      width: 100vw;
+      height: 90vh;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <canvas id="ctx"></canvas>
+</main>
+<footer>
+  <label for="qt-enabled"></label>
+  <input id="qt-enabled" type="checkbox"/>
+</footer>
+<script>
+  class QuadTree {
+    constructor(x, y, w, h) {
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.points = [];
+      this.leftTop = null;
+      this.rightTop = null;
+      this.leftBottom = null;
+      this.rightBottom = null;
+    }
+    addPoint(x, y, value) {
+        if (x > this.x + this.w || x < this.x || y > this.y + this.h || y < this.y) {
+            // Point is not belong to this rectangle.
+            return false;
+        }
+        if (this.w / 2 > 1 && this.h / 2 > 1) {
+            if (this.points.length < 2) {
+                this.points.push({x, y, value});
+            } else {
+                this.leftTop = this.leftTop || new QuadTree(this.x, this.y, this.w / 2, this.h / 2);
+                this.rightTop = this.rightTop || new QuadTree(this.x + this.w / 2, this.y, this.w / 2, this.h / 2);
+                this.leftBottom = this.leftBottom || new QuadTree(this.x, this.y + this.h / 2, this.w / 2, this.h / 2);
+                this.rightBottom = this.rightBottom || new QuadTree(this.x + this.w / 2, this.y + this.h / 2, this.w / 2, this.h / 2);
+                if (this.leftTop.addPoint(x, y, value)===false) {
+                    if(this.rightTop.addPoint(x, y, value)===false) {
+                        if(this.leftBottom.addPoint(x, y, value)===false){
+                            this.rightBottom.addPoint(x, y, value);
+                        }
+                    }
+                }
+            }
+        } else {
+            this.points.push({x, y, value});
+        }
+    }
+
+      walk(callback) {
+          callback(this);
+          if (this.leftTop) this.leftTop.walk(callback);
+          if (this.rightTop) this.rightTop.walk(callback);
+          if (this.leftBottom) this.leftBottom.walk(callback);
+          if (this.rightBottom) this.rightBottom.walk(callback);
+      }
+  }
+  class App {
+    constructor(ctx) {
+      this.ctx = ctx;
+      this.updateCanvasSize();
+      this.points = [];
+      for (let i = 0; i < 200; i++) {
+          this.points.push({
+              x: Math.floor(Math.random() * this.ctx.canvas.width),
+              y: Math.floor(Math.random() * this.ctx.canvas.height)
+          });
+      }
+      this.qtree = new QuadTree(0, 0, ctx.canvas.width, ctx.canvas.height);
+      for (let point of this.points) {
+          this.qtree.addPoint(point.x, point.y, point);
+      }
+      this.render();
+    }
+    updateCanvasSize() {
+      const parentEl = this.ctx.canvas.parentElement;
+      const parentRect = parentEl.getBoundingClientRect();
+      this.ctx.canvas.width = parentRect.width;
+      this.ctx.canvas.height = parentRect.height;
+    }
+    render() {
+        const ctx = this.ctx;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+        ctx.fillStyle = 'green';
+        for (let point of this.points) {
+            ctx.fillRect(point.x, point.y, 1, 1);
+        }
+        this.qtree.walk(item => {
+            ctx.strokeStyle = 'red';
+            ctx.strokeWeight = 8;
+            ctx.strokeRect(item.x, item.y, item.w, item.h);
+        })
+    }
+  }
+  const app = new App(document.getElementById('ctx').getContext('2d'));
+</script>
+</body>
+</html>

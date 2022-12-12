@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../reset.css">
+    <title>Tor Pool</title>
+    <style>
+        html, body {
+            position: absolute;
+            left: 0; top: 0;
+            bottom: 0; right: 0;
+        }
+    </style>
+</head>
+<body>
+  <canvas id="ctx"></canvas>
+  <script type="text/javascript">
+    class Ball {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.vx = 0;
+            this.vy = 0;
+            this.ax = 0;
+            this.ay = 0;
+            this.r = 16;
+            this.color = color;
+        }
+        render(ctx) {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        logic(dtt) {
+            this.vx += this.ax * dtt;
+            this.vy += this.ay * dtt;
+            this.x += this.vx * dtt;
+            this.y += this.vy * dtt;
+        }
+        applyForce(fx, fy) {
+            this.ax += fx;
+            this.ay += fy;
+        }
+        intersects(x, y, r) {
+            const dx = x - this.x;
+            const dy = y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            return dist <= r;
+        }
+    }
+    class App {
+        constructor() {
+            this.ctx = document.getElementById('ctx').getContext('2d');
+            this.updateCanvasSize();
+
+            this.balls = [new Ball(100,100, 'red')];
+
+            this.ctx.canvas.addEventListener('mousedown', this.mousedown.bind(this));
+            this.ctx.canvas.addEventListener('mouseup', this.mouseup.bind(this));
+            this.ctx.canvas.addEventListener('mousemove', this.mousemove.bind(this));
+
+            this.lastTick = Date.now();
+            this.loop();
+        }
+        mouseup() {
+            const dx = this.selectedBall.x - this.mx;
+            const dy = this.selectedBall.y - this.my;
+            this.selectedBall.applyForce(dx * 10, dy * 10);
+            this.selectedBall = null;
+        }
+        mousedown(e) {
+            const mx = e.offsetX;
+            const my = e.offsetY;
+            this.selectedBall = this.balls.find(ball => ball.intersects(mx, my, ball.r));
+        }
+        mousemove(e) {
+            this.mx = e.offsetX;
+            this.my = e.offsetY;
+        }
+
+        updateCanvasSize() {
+            const parentEl = this.ctx.canvas.parentElement;
+            const parentRect = parentEl.getBoundingClientRect();
+            this.ctx.canvas.width = parentRect.width;
+            this.ctx.canvas.height = parentRect.height;
+        }
+        render(ctx, dtt) {
+            ctx.fillStyle = '#316031';
+            ctx.fillRect(0,0,this.ctx.canvas.width, this.ctx.canvas.height);
+            // ctx.fillStyle = 'black';
+            // ctx.font = '42px monospace';
+            // ctx.fillText(`dtt: ${dtt}`, 32, 64);
+            for (let ball of this.balls) {
+                ball.render(ctx);
+            }
+            const sb = this.selectedBall;
+            if (sb) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                ctx.strokeWidth = 2;
+                ctx.moveTo(sb.x, sb.y);
+                ctx.lineTo(this.mx, this.my);
+                ctx.stroke();
+            }
+        }
+        logic(dtt) {
+            for (let ball of this.balls) {
+                ball.logic(dtt);
+                const f = 3600;
+                if (ball.vx > 0) ball.applyForce(-f, 0);
+                if (ball.vx < 0) ball.applyForce(f, 0);
+                if (ball.vy > 0) ball.applyForce(0, -f);
+                if (ball.vy < 0) ball.applyForce(0, f);
+
+            }
+            for (let ball of this.balls) {
+                if (ball.x > this.ctx.canvas.width + ball.r) ball.x = 0;
+                if (ball.x < -ball.r) ball.x = this.ctx.canvas.width - ball.r;
+                if (ball.y > this.ctx.canvas.height + ball.r) ball.y = 0;
+                if (ball.y < -ball.r) ball.y = this.ctx.canvas.height - ball.r;
+                ball.ax = 0;
+                ball.ay = 0;
+            }
+        }
+        loop() {
+            const ctx = this.ctx;
+            const dt = Date.now() - this.lastTick;
+            const dtt = dt / 1000;
+            this.render(ctx, dtt);
+            this.logic(dtt);
+            if (dt > 32) {
+                this.lastTick = Date.now();
+            }
+            requestAnimationFrame(this.loop.bind(this));
+
+        }
+    }
+    const app = new App();
+  </script>
+</body>
+</html>

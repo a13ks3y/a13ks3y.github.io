@@ -50,10 +50,10 @@
             this.r = r;
         }
         render(ctx) {
-            // ctx.fillStyle = '#000';
-            // ctx.beginPath();
-            // ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-            // ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
         }
         logic(dt) {
             const MAX_VX = 333;
@@ -81,12 +81,25 @@
         distanceTo(x, y) {
             const a = this.x - x;
             const b = this.y - y;
+            return (a**2 + b**2) / 666;
             return Math.sqrt(a**2 + b**2);
         }
     }
     class App {
         constructor() {
             this.initBlobs();
+            this.selectedBlobIndex = 0;
+            ctx.canvas.addEventListener('click', () => {
+                this.selectedBlobIndex ++;
+                if (this.selectedBlobIndex >= this.blobs.length) this.selectedBlobIndex = 0;
+            });
+            ctx.canvas.addEventListener('mousemove', e => {
+                const mx = e.offsetX;
+                const my = e.offsetY;
+                const blob = this.blobs[this.selectedBlobIndex];
+                blob.x = mx;
+                blob.y = my;
+            });
         }
         blobs = [];
         initBlobs() {
@@ -125,12 +138,12 @@
                 // const r = 1 / dSum * 10000;
                 // const g = r / dSum * 10000;
                 // const b = g / dSum * 10000;
-                //const dd = Math.floor(Math.sin(dSum) * 255);
-                //const [ r, g, b] = HSLToRGB(dSum, 255, 255);
+                const dd = Math.floor(Math.sin(dSum) * 255);
+                const [ nr, ng, nb] = HSLToRGB(dd, 255, 255);
 
-                imageData.data[i + 0] = r;
-                imageData.data[i + 1] = g;
-                imageData.data[i + 2] = b;
+                imageData.data[i + 0] = nr;
+                imageData.data[i + 1] = ng;
+                imageData.data[i + 2] = nb;
                 imageData.data[i + 3] = 255;
             }
             ctx.putImageData(imageData, 0, 0);

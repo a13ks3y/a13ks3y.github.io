@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recursive Back-Tracker Maze Generator</title>
+    <style type="text/css">
+        html, body {
+            position: absolute;
+            left: 0; top: 0; right: 0; bottom: 0;
+            margin: 0; padding: 0;
+        }
+        body {
+            display: flex;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+  <canvas id="ctx"></canvas>
+  <script type="text/javascript">
+    const ctx = document.getElementById('ctx').getContext('2d');
+    class Cell {
+        constructor(c, r, size) {
+            this.c = c;
+            this.r = r;
+            this.size = size;
+            this.walls = Array(4).fill(true);
+            this.visited = false;
+        }
+        render(ctx) {
+            const s = this.size;
+            const x = this.c * s;
+                const y = this.r * s;
+            if (this.visited) {
+                // ctx.fillStyle = 'blue';
+                // ctx.fillRect(x, y, s ,s);
+            }
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            // top
+            if (this.walls[0]) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + s, y);
+            }
+            // right
+            if (this.walls[1]) {
+                ctx.moveTo(x + s, y);
+                ctx.lineTo(x + s, y + s);
+            }
+            // bottom
+            if (this.walls[2]) {
+                ctx.moveTo(x + s, y + s);
+                ctx.lineTo(x, y + s);
+            }
+            // left
+            if (this.walls[3]) {
+                ctx.moveTo(x, y + s);
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            // ctx.font = '16px monospace';
+            // ctx.fillStyle = 'black';
+            // ctx.fillText(`${this.c}, ${this.r}`, x + 8, y + s - 20);
+        }
+    }
+    class Maze {
+        constructor(cols, rows, cellSize) {
+            this.cols = cols;
+            this.rows = rows;
+            this.cellSize = cellSize;
+            this.cells = [];
+            for (let r = 0; r < this.rows; r++) {
+                for (let c = 0; c < this.cols; c++) {
+                    this.cells.push(new Cell(c, r, cellSize));
+                }
+            }
+
+            this.stack = [];
+            this.current = this.cells[0];
+        }
+        render(ctx) {
+            for (let cell of this.cells) {
+                cell.render(ctx);
+            }
+        }
+        logic() {
+            const n = this.neighbors(this.current);
+            this.current.visited = true;
+            if (n && n.length) {
+                const next = n[Math.floor(Math.random()*n.length)];
+                const dc = next.c - this.current.c;
+                const dr = next.r - this.current.r;
+                if (dc === -1) {
+                    next.walls[1] = false;
+                    this.current.walls[3] = false;
+                } else if (dc === 1) {
+                    next.walls[3] = false;
+                    this.current.walls[1] = false;
+                }
+                if (dr === -1) {
+                    next.walls[2] = false;
+                    this.current.walls[0] = false;
+                } else if (dr === 1) {
+                    next.walls[0] = false;
+                    this.current.walls[2] = false;
+                }
+                this.stack.push(this.current);
+                this.current = next;
+            } else if (this.stack.length) {
+                this.current = this.stack.pop();
+            } else {
+                this.finished = true;
+            }
+
+        }
+        index(c, r) {
+            if (c < 0 || c > this.cols || r < 0 || r > this.rows) {
+                return [];
+            }
+            return c + r * this.cols;
+        }
+        cellAt(c, r) {
+            return this.cells[this.index(c, r)];
+        }
+        neighbors(cell) {
+            return [
+                this.cellAt(cell.c + 0, cell.r - 1), // top
+                this.cellAt(cell.c + 1, cell.r + 0), // right
+                this.cellAt(cell.c + 0, cell.r + 1), // bottom
+                this.cellAt(cell.c - 1, cell.r + 0), // left
+            ].filter(cell => !!cell && !cell.visited);
+        }
+    }
+    class App {
+      constructor(ctx) {
+        this.ctx = ctx;
+        const parentRect = ctx.canvas.parentElement.getBoundingClientRect();
+        const canvasWidth = Math.floor(parentRect.width);
+        const canvasHeight = Math.floor(parentRect.height);
+        ctx.canvas.width = canvasWidth;
+        ctx.canvas.height = canvasHeight;
+        this.setup();
+      }
+      setup() {
+          this.size = 32;
+          const cols = Math.floor(ctx.canvas.width / this.size);
+          const rows = Math.floor(ctx.canvas.height / this.size);
+          this.maze = new Maze(cols, rows, this.size);
+      }
+      render() {
+          const ctx = this.ctx;
+          ctx.fillStyle = '#f90';
+          ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+          this.maze.render(ctx);
+      }
+      logic() {
+        this.maze.logic();
+        if (this.maze.finished) {
+            this.setup();
+        }
+      }
+      loop() {
+          this.logic();
+          this.render();
+          requestAnimationFrame(this.loop.bind(this));
+      }
+    }
+    const app = new App(ctx);
+    app.loop();
+  </script>
+</body>
+</html>
