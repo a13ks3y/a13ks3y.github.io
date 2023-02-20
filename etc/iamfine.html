@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>I Am FIne.</title>
+    <style type="text/css">
+        h1 {
+            font-family: monospace;
+            font-size: 6.66rem;
+        }
+        body {
+            background-color: black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1></h1>
+    </main>
+    <script type="text/javascript">
+        const colors = [
+            '#f90',
+            '#90f',
+            '#f09',
+            '#abc',
+            '#efa',
+            '#fab'
+        ];
+        const h1El = document.getElementsByTagName('h1')[0];
+        const msg = 'Я ПОЛНОСТЬЮ ПСИХИЧЕСКИ ЗДОРОВ!';
+        const spans = msg.split('').map((v, i) => {
+            const span = document.createElement('span');
+            span.innerHTML = v;
+            span.classList.add('index_' + i);
+            h1El.appendChild(span);
+            return span;
+        });
+        function render() {
+            for(let span of spans) {
+                const color = colors[Math.floor(Math.random()*colors.length)]
+                span.style.color = color;
+            }
+        }
+        render();
+        setInterval(() => {
+            render();
+        }, 666);
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>L-Tree</title>
+  <style type="text/css">
+      * { margin: 0; padding: 0 }
+      body {
+          position: absolute;
+          left: 0; top: 0;
+          right: 0; bottom: 0;
+      }
+    #ctx {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ctx"></canvas>
+  <script type="text/javascript">
+    const ctx = document.getElementById('ctx').getContext('2d');
+    const rect = ctx.canvas.parentElement.getBoundingClientRect();
+    ctx.canvas.width = rect.width;
+    ctx.canvas.height = rect.height;
+    ctx.fillStyle = '#f90';
+    ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+
+    const axiom = 'F';
+    const rules = [
+        {
+            replace: 'F',
+            with: 'F [+F--F][-F++F]'
+        }
+    ];
+    function generate(input) {
+        let result = '';
+        for (let i = 0; i < input.length; i++) {
+            let found = false;
+            const char = input.charAt(i);
+            for (let rule of rules) {
+                if (rule.replace === char) {
+                    result += rule.with;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                result += char;
+            }
+        }
+        return result;
+    }
+    let str = generate(generate(axiom));
+    const size = 100;
+    ctx.translate(ctx.canvas.width / 2, ctx.canvas.height);
+
+    function render() {
+        ctx.fillStyle = 'black';
+        ctx.font = '18px monospace'
+        ctx.fillText(str, -300, -600);
+
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charAt(i);
+            switch(char) {
+                case "F":
+                    ctx.strokeStyle = 'black';
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(0, -size);
+                    ctx.stroke();
+                    ctx.translate(0, -size);
+                    break;
+                case "[": ctx.save(); break;
+                case "]": ctx.restore(); break;
+                case "+": ctx.rotate(-Math.PI / 6.6); break;
+                case "-": ctx.rotate(Math.PI / 3); break;
+            }
+        }
+    }
+    render();
+    ctx.canvas.addEventListener('click', () => {
+        str = generate(str);
+        //ctx.reset();
+        render();
+    });
+
+  </script>
+</body>
+</html>

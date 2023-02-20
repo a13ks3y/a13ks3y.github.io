@@ -26,11 +26,11 @@
         const side = (sqrtOfTwo % 2 === 0) ? two : Math.floor(sqrtOfTwo) + 1;
         const next = side * side;
         result.push({
-            i,
+            i: i - 1,
             side,
             next
         });
-        i < depth && recursion(next, depth);
+        i < depth && recursion(next + 1, depth);
     }(1, 100));
     const rows = result.map(item => `<tr><td>${item.i}</td><td>${item.side} x ${item.side}</td><td> = ${item.next}</td></tr>`).join('\n');
     const table = `<table>${rows}</table>`;
