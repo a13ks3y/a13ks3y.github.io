@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Программа</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+body {
+  background: linear-gradient(45deg, #ff00a9, #ff8e00, #ffcd00, #15ff4b, #00c0ff, #9e00ff, #ff00a9);
+  background-size: 1200% 1200%;
+  animation: gradientAnimation 20s ease-in-out infinite;
+}
+      html, body {
+          font-family: 'Roboto', sans-serif;
+          font-size: 18px;
+          line-height: 1.5;
+
+      }
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  animation: containerAnimation 1s ease-in-out infinite alternate;
+}
+
+@keyframes containerAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+    font-size: 1rem;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+      margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+p {
+    font-size: 0.666rem;
+  margin-bottom: 10px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // Расчет SPF
+    function calculateSPF() {
+      var spfInput = document.createElement("input");
+      spfInput.type = "number";
+      spfInput.placeholder = "Введите SPF (фактор защиты от солнца)";
+      
+      var spfButton = document.createElement("button");
+      spfButton.textContent = "Рассчитать SPF";
+      spfButton.addEventListener("click", function() {
+        var spf = parseFloat(spfInput.value);
+        processSPF(spf);
+      });
+
+      var spfContainer = document.createElement("div");
+      spfContainer.appendChild(spfInput);
+      spfContainer.appendChild(spfButton);
+
+      return spfContainer;
+    }
+
+    // Расчет общей суммы
+    function calculateSum() {
+      var num1Input = document.createElement("input");
+      num1Input.type = "number";
+      num1Input.placeholder = "Введите первое число";
+      
+      var num2Input = document.createElement("input");
+      num2Input.type = "number";
+      num2Input.placeholder = "Введите второе число";
+      
+      var sumButton = document.createElement("button");
+      sumButton.textContent = "Рассчитать сумму";
+      sumButton.addEventListener("click", function() {
+        var num1 = parseFloat(num1Input.value);
+        var num2 = parseFloat(num2Input.value);
+        processSum(num1, num2);
+      });
+
+      var sumContainer = document.createElement("div");
+      sumContainer.appendChild(num1Input);
+      sumContainer.appendChild(num2Input);
+      sumContainer.appendChild(sumButton);
+
+      return sumContainer;
+    }
+
+    // Применение крема от геморроя
+    function applyHemorrhoidCream() {
+      var creamMessage = document.createElement("p");
+      creamMessage.textContent = "Крем от геморроя нанесен.";
+      return creamMessage;
+    }
+
+    // Защита от солнца
+    function sunProtection(spf) {
+      var protectionMessage = document.createElement("p");
+      if (spf >= 30) {
+        protectionMessage.textContent = "Защита от солнца: отличная.";
+      } else {
+        protectionMessage.textContent = "Защита от солнца: недостаточная. Рекомендуется использовать крем с SPF 30 и выше.";
+      }
+      return protectionMessage;
+    }
+
+    // Обработка SPF
+    function processSPF(spf) {
+      var resultDiv = document.getElementById("result");
+
+      var spfContainer = calculateSPF();
+      var sumContainer = calculateSum();
+      var creamMessage = applyHemorrhoidCream();
+      var protectionMessage = sunProtection(spf);
+
+      resultDiv.innerHTML = "";
+      resultDiv.appendChild(spfContainer);
+      resultDiv.appendChild(sumContainer);
+      resultDiv.appendChild(creamMessage);
+      resultDiv.appendChild(protectionMessage);
+    }
+
+    // Обработка суммы
+    function processSum(num1, num2) {
+      var resultDiv = document.getElementById("result");
+
+      var spfContainer = calculateSPF();
+      var sumContainer = calculateSum();
+      var creamMessage = applyHemorrhoidCream();
+      var protectionMessage = sunProtection(0); // Передаем 0 в качестве фиктивного значения SPF
+
+      var sumMessage = document.createElement("p");
+      var sum = num1 + num2;
+      sumMessage.textContent = "Сумма: " + sum;
+
+      resultDiv.innerHTML = "";
+      resultDiv.appendChild(spfContainer);
+      resultDiv.appendChild(sumContainer);
+      resultDiv.appendChild(creamMessage);
+      resultDiv.appendChild(protectionMessage);
+      resultDiv.appendChild(sumMessage);
+    }
+
+    // Запуск программы
+    processSPF(0); // Передаем 0 в качестве фиктивного значения SPF
+  </script>
+</body>
+</html>

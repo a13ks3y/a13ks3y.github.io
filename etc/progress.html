@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="description" content="https://chat.openai.com/share/c8dbc6dc-2753-4967-8bd2-ed77d149014b">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Progress</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+  body {
+    font-family: 'Courier New', monospace;
+    background-color: #212529;
+    color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('https://source.unsplash.com/1600x900/?dishwashing');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+  }
+  .container {
+    text-align: center;
+  }
+  .activity-container, .progress-container {
+    margin: 20px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  .progress-bar {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 50px;
+    border-radius: 8px;
+    background-color: #4caf50;
+    position: absolute;
+    transition: width 0.3s ease-in-out;
+  }
+  .progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: #f8f9fa;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  select, button {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="activity-container" id="activityContainer">
+    <h2>Activity Progress</h2>
+    <label for="activity">Choose an activity:</label>
+    <select id="activity" class="form-control">
+      <option value="dishwashing">Dishwashing</option>
+      <option value="nap">Taking a Nap</option>
+      <option value="exercise">Exercise</option>
+      <option value="reading">Reading</option>
+      <!-- Add more activity options here -->
+    </select>
+    <button id="startButton" class="btn btn-primary">Start</button>
+  </div>
+  <div class="progress-container" id="progressContainer" style="display: none;">
+    <h2>Activity in Progress:</h2>
+    <p id="currentActivity" class="lead"></p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-label" id="progressLabel"></div>
+    </div>
+  </div>
+</div>
+<script>
+  const activityContainer = document.getElementById("activityContainer");
+  const progressContainer = document.getElementById("progressContainer");
+  const currentActivity = document.getElementById("currentActivity");
+  const startButton = document.getElementById("startButton");
+  const progressBar = document.getElementById("progressFill");
+  const progressLabel = document.getElementById("progressLabel");
+  const activitySelect = document.getElementById("activity");
+
+  activitySelect.addEventListener("change", () => {
+    const selectedActivity = activitySelect.value;
+    document.body.style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${selectedActivity}")`;
+  });
+  
+  startButton.addEventListener("click", () => {
+    const selectedActivity = activitySelect.value;
+    
+    currentActivity.textContent = selectedActivity;
+    activityContainer.style.display = "none";
+    progressContainer.style.display = "block";
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 5);
+      progressBar.style.width = `${progress}%`;
+      progressLabel.textContent = `${progress}% Complete`;
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        progressLabel.textContent = `${selectedActivity} Complete!`;
+      }
+    }, 6666);
+  });
+</script>
+</body>
+</html>
