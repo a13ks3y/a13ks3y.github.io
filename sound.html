@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,24 +10,108 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="icon" sizes="152x152" href="gear.png">
     <style>
-        html, body {
+        html,
+        body {
             font-size: 16px;
-        }        
+            position: absolute;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://i.stack.imgur.com/28967.png') no-repeat center center;
+            background-size: cover;
+        }
+
         button {
             font-size: 6.66rem;
-            color: purple;
-            background-color: salmon;
-            border: 0.666rem solid gold;
-        }
-        button:active {
-            color: salmon;
+            color: blue;
             background-color: gold;
-            border: 0.666rem solid purple;
+            border: none;
+            border-radius: 0.666rem;
+            box-shadow: 0.666rem 0.666rem 0.666rem blue;
+        }
+
+        button:active {
+            background-color: goldenrod;
+            box-shadow: 0.366rem 0.966rem 0.666rem blue;
+        }
+        button:disabled {
+            background-color: gray;
+        }
+        button:disabled:active {
+            background-color: gray;
+            box-shadow: 0.666rem 0.666rem 0.666rem blue;
+        }
+
+        body {
+            background-image: radial-gradient(ellipse at center, #55FF30, #00C030, #00FF7A, #00FF30, #55FF30);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        @keyframes portal-animation {
+
+            0%,
+            100% {
+                background: radial-gradient(ellipse at center, rgba(85, 255, 48, 1) 0%, rgba(0, 192, 48, 1) 45%, rgba(0, 255, 122, 1) 60%, rgba(0, 255, 48, 1) 85%);
+                transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 0deg) translate3d(0, 0, 0);
+            }
+
+            25% {
+                background: radial-gradient(ellipse at center, rgba(0, 255, 48, 1) 0%, rgba(0, 255, 122, 1) 45%, rgba(0, 192, 48, 1) 60%, rgba(85, 255, 48, 1) 85%);
+                transform: scale3d(1.1, 1.1, 1) rotate3d(0, 0, 1, 20deg) translate3d(0, 0, 0);
+            }
+
+            50% {
+                background: radial-gradient(ellipse at center, rgba(0, 192, 48, 1) 0%, rgba(85, 255, 48, 1) 45%, rgba(0, 255, 48, 1) 60%, rgba(0, 255, 122, 1) 85%);
+                transform: scale3d(0.9, 0.9, 1) rotate3d(0, 0, 1, -20deg) translate3d(0, 0, 0);
+            }
+
+            75% {
+                background: radial-gradient(ellipse at center, rgba(0, 255, 122, 1) 0%, rgba(0, 255, 48, 1) 45%, rgba(85, 255, 48, 1) 60%, rgba(0, 192, 48, 1) 85%);
+                transform: scale3d(1.1, 1.1, 1) rotate3d(0, 0, 1, 20deg) translate3d(0, 0, 0);
+            }
+        }
+
+        .portal-background {
+            animation: portal-animation 6s infinite;
+            transition: all 0.3s ease-in-out; /* Makes the change smoother */
+            will-change: transform; /* Hints to the browser that this element will be transformed */
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            width: 166%;
+            height: 166%;
+            position: fixed;
+        }
+        body {
+            overflow: hidden;
+        }
+        button {
+            position: absolute;
         }
     </style>
 </head>
+
 <body>
-    <audio id="sfx-portal-gun" src="assets/sfx-portal-gun.mp3"></audio>
-    <button onclick="document.getElementById('sfx-portal-gun').play();">🕳</button>
+    <audio id="sfx-portal-gun" src="assets/sfx-portal-gun.mp3" preload="preload"></audio>
+    <div class="portal-background"></div>
+    <button onclick="!this.disabled && document.getElementById('sfx-portal-gun').play()">🕳</button>
+    <script>
+        const sfxPortalGunEl = document.getElementById('sfx-portal-gun');
+        const sfxPortalButton = document.querySelector('button');
+        sfxPortalGunEl.addEventListener('ended', () => {
+            sfxPortalButton.removeAttribute('disabled');
+        });
+        sfxPortalGunEl.addEventListener('play', () => {
+            sfxPortalButton.setAttribute('disabled', 'disabled');
+        });
+    </script>
 </body>
+
 </html>
