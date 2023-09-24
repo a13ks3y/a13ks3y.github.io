@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Awesome Interactive Panels</title>
+    <style>
+      :root {
+            --inactive-size: 60px;
+            --active-size: 200px;
+            --transition-speed: 0.5s;
+            --bg-color: #000000;
+            --text-color: #00ff00;  /* Matrix green */
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        .panel {
+            width: var(--inactive-size);
+            height: var(--inactive-size);
+            position: absolute;
+            background-color: #1E1E1E;  /* Matrix dark gray */
+            transition: all var(--transition-speed);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+        .panel p {
+            margin: 0;
+        }
+
+        .top-left     { top: 0; left: 0; }
+        .top-right    { top: 0; right: 0; }
+        .bottom-left  { bottom: 0; left: 0; }
+        .bottom-right { bottom: 0; right: 0; }
+        .top-center   { top: 0; left: 50%; transform: translateX(-50%); }
+        .bottom-center{ bottom: 0; left: 50%; transform: translateX(-50%); }
+        .left-center  { top: 50%; left: 0; transform: translateY(-50%); }
+        .right-center { top: 50%; right: 0; transform: translateY(-50%); }
+        .active {
+            width: var(--active-size);
+            height: var(--active-size);
+        }
+    </style>
+</head>
+<body>
+    <div class="panel top-left"     id="panel1"><p>A</p></div>
+    <div class="panel top-right"    id="panel2"><p>S</p></div>
+    <div class="panel bottom-left"  id="panel3"><p>D</p></div>
+    <div class="panel bottom-right" id="panel4"><p>F</p></div>
+    <div class="panel top-center"   id="panel5"><p>G</p></div>
+    <div class="panel bottom-center"id="panel6"><p>H</p></div>
+    <div class="panel left-center"  id="panel7"><p>J</p></div>
+    <div class="panel right-center" id="panel8"><p>K</p></div>
+    <audio id="sfx" src="sfx/PremiumBeat_0046_sci_fi_device_2.wav""></audio>
+
+    <script>
+        const panelKeys = {
+            'KeyA': 'panel1',
+            'KeyS': 'panel2',
+            'KeyD': 'panel3',
+            'KeyF': 'panel4',
+            'KeyG': 'panel5',
+            'KeyH': 'panel6',
+            'KeyJ': 'panel7',
+            'KeyK': 'panel8'
+        };
+
+        const sfx = document.getElementById('sfx');
+
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            panel.classList.toggle('active');
+            sfx.play();  // Play the sound effect
+            setTimeout(() => { sfx.pause() ; sfx.currentTime = 0}, 666);
+        }
+       for (const panelId of Object.values(panelKeys)) {
+            document.getElementById(panelId).addEventListener('click', () => togglePanel(panelId));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (panelKeys.hasOwnProperty(e.code)) {
+                togglePanel(panelKeys[e.code]);
+            }
+        });
+        // Event listeners (same as before)
+    </script>
+</body>
+</html>
