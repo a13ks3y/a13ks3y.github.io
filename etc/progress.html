@@ -7,6 +7,9 @@
 <title>Activity Progress</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <style>
+  html {
+    font-size: 16px;
+  }
   body {
     font-family: 'Courier New', monospace;
     background-color: #212529;
@@ -58,14 +61,18 @@
   select, button {
     margin-top: 10px;
   }
+  .select-editable {position:relative; background-color:white; border:solid grey 1px;  width:120px; height:18px;}
+  .select-editable select {position:absolute; top:0px; left:0px; font-size:1.3rem; border:none; min-width: 8rem; margin:0;}
+  .select-editable input {position:absolute; top:0px; left:0px; min-width: 8rem; padding:1px; font-size:1rem; border:none;}
+  .select-editable select:focus, .select-editable input:focus {outline:none;}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="activity-container" id="activityContainer">
+  <div class="activity-container select-editable" id="activityContainer" onchange="this.nextElementSibling.value=this.value">
     <h2>Activity Progress</h2>
     <label for="activity">Choose an activity:</label>
-    <select id="activity" class="form-control">
+    <select id="activity" class="form-control" >
       <option value="dishwashing">Dishwashing</option>
       <option value="nap">Taking a Nap</option>
       <option value="exercise">Exercise</option>
@@ -74,8 +81,9 @@
       <option value="snack">Have a snack</option>
       <option value="play-music">Play some music</option>
       <option value="brush-teeth">Brush teeth</option>
-      <!-- Add more activity options here -->
+      <option value="watch-movie">Watch Movie</option>
     </select>
+    <input type="text" name="format" value=""/>
     <button id="startButton" class="btn btn-primary">Start</button>
   </div>
   <div class="progress-container" id="progressContainer" style="display: none;">
@@ -95,14 +103,15 @@
   const progressBar = document.getElementById("progressFill");
   const progressLabel = document.getElementById("progressLabel");
   const activitySelect = document.getElementById("activity");
-
-  activitySelect.addEventListener("change", () => {
+  /*
+  activitySelect.addEventListener("change", () => {    
     const selectedActivity = activitySelect.value;
     document.body.style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${selectedActivity}")`;
   });
-  
+  */
   startButton.addEventListener("click", () => {
     const selectedActivity = activitySelect.value;
+    document.body.style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${selectedActivity}")`;
     
     currentActivity.textContent = selectedActivity;
     activityContainer.style.display = "none";
