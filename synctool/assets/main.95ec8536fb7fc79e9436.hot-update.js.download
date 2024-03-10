@@ -1,0 +1,345 @@
+webpackHotUpdate("main",{
+
+/***/ "./src/components/menu/agency-settings/agency-settings.js":
+/*!****************************************************************!*\
+  !*** ./src/components/menu/agency-settings/agency-settings.js ***!
+  \****************************************************************/
+/*! exports provided: sleep, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sleep", function() { return sleep; });
+/* harmony import */ var _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/objectSpread */ "./node_modules/@babel/runtime/helpers/esm/objectSpread.js");
+/* harmony import */ var _var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js");
+/* harmony import */ var _var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/slicedToArray */ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../env */ "./src/env.js");
+/* harmony import */ var _poa_state__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @poa/state */ "./node_modules/@poa/state/dist/state.es.js");
+/* harmony import */ var react_spinkit__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-spinkit */ "./node_modules/react-spinkit/dist/index.js");
+/* harmony import */ var react_spinkit__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_spinkit__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _utils_fee__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../utils/fee */ "./src/utils/fee.js");
+/* harmony import */ var react_ladda__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-ladda */ "./node_modules/react-ladda/dist/index.js");
+/* harmony import */ var react_ladda__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_ladda__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var react_input_autosize__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-input-autosize */ "./node_modules/react-input-autosize/lib/AutosizeInput.js");
+/* harmony import */ var react_input_autosize__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_input_autosize__WEBPACK_IMPORTED_MODULE_10__);
+
+
+
+
+var _jsxFileName = "/var/www/frontend.synctool.team/src/components/menu/agency-settings/agency-settings.js";
+
+
+
+
+
+
+
+function sleep(ms) {
+  return new Promise(function (r) {
+    return setTimeout(r, ms);
+  });
+}
+
+function ChangableInputRow(_ref) {
+  var isInputsActive = _ref.isInputsActive,
+      label = _ref.label,
+      data = _ref.data,
+      item = _ref.item,
+      _ref$type = _ref.type,
+      type = _ref$type === void 0 ? 'number' : _ref$type;
+  return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("li", {
+    className: "account-info__item",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 22
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("div", {
+    className: "account-info__name",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 23
+    },
+    __self: this
+  }, label), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(_poa_state__WEBPACK_IMPORTED_MODULE_6__["Observer"], {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 24
+    },
+    __self: this
+  }, function () {
+    return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(react_input_autosize__WEBPACK_IMPORTED_MODULE_10___default.a, {
+      minWidth: 150,
+      disabled: isInputsActive,
+      inputClassName: "account-info__val",
+      type: type,
+      min: 0,
+      max: 100,
+      value: data[item],
+      onChange: function onChange(e) {
+        data[item] = e.target.value;
+      },
+      __source: {
+        fileName: _jsxFileName,
+        lineNumber: 26
+      },
+      __self: this
+    });
+  }));
+}
+
+var SettingAgency = function SettingAgency() {
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_4__["useState"])(null),
+      _useState2 = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__["default"])(_useState, 2),
+      data = _useState2[0],
+      setData = _useState2[1];
+
+  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_4__["useState"])(true),
+      _useState4 = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__["default"])(_useState3, 2),
+      loading = _useState4[0],
+      setLoading = _useState4[1];
+
+  var _useState5 = Object(react__WEBPACK_IMPORTED_MODULE_4__["useState"])(false),
+      _useState6 = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__["default"])(_useState5, 2),
+      error = _useState6[0],
+      setError = _useState6[1];
+
+  var _useState7 = Object(react__WEBPACK_IMPORTED_MODULE_4__["useState"])(false),
+      _useState8 = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__["default"])(_useState7, 2),
+      saving = _useState8[0],
+      setSaving = _useState8[1];
+
+  var _useState9 = Object(react__WEBPACK_IMPORTED_MODULE_4__["useState"])({}),
+      _useState10 = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_3__["default"])(_useState9, 2),
+      mappedData = _useState10[0],
+      setMappedData = _useState10[1];
+
+  Object(react__WEBPACK_IMPORTED_MODULE_4__["useEffect"])(function () {
+    function fetch() {
+      return _fetch.apply(this, arguments);
+    }
+
+    function _fetch() {
+      _fetch = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_2__["default"])(
+      /*#__PURE__*/
+      _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var _ref2, _data;
+
+        return _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                setError(false);
+                _context.next = 4;
+                return _env__WEBPACK_IMPORTED_MODULE_5__["env"].http.get('agency');
+
+              case 4:
+                _ref2 = _context.sent;
+                _data = _ref2.data;
+                setData(_data);
+                setMappedData(Object(_poa_state__WEBPACK_IMPORTED_MODULE_6__["observable"])(Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, _data.data)));
+                _context.next = 14;
+                break;
+
+              case 10:
+                _context.prev = 10;
+                _context.t0 = _context["catch"](0);
+                setError(true);
+                console.error(_context.t0);
+
+              case 14:
+                _context.prev = 14;
+                setLoading(false);
+                return _context.finish(14);
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, null, [[0, 10, 14, 17]]);
+      }));
+      return _fetch.apply(this, arguments);
+    }
+
+    fetch();
+  }, []);
+
+  function onSave() {
+    return _onSave.apply(this, arguments);
+  }
+
+  function _onSave() {
+    _onSave = Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_2__["default"])(
+    /*#__PURE__*/
+    _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+      return _var_www_frontend_synctool_team_node_modules_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!saving) {
+                _context2.next = 2;
+                break;
+              }
+
+              return _context2.abrupt("return");
+
+            case 2:
+              setSaving(true);
+              _context2.prev = 3;
+              _context2.next = 6;
+              return Promise.all([sleep(1000), _env__WEBPACK_IMPORTED_MODULE_5__["env"].http.post('agency', Object(_var_www_frontend_synctool_team_node_modules_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, mappedData))]);
+
+            case 6:
+              _env__WEBPACK_IMPORTED_MODULE_5__["env"].alert('Успех', "\u0410\u0433\u0435\u043D\u0441\u0442\u0432\u043E \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u043D\u043E!");
+              _context2.next = 13;
+              break;
+
+            case 9:
+              _context2.prev = 9;
+              _context2.t0 = _context2["catch"](3);
+              _env__WEBPACK_IMPORTED_MODULE_5__["env"].alert('Ошибка', "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0438 \u0430\u0433\u0435\u043D\u0441\u0442\u0432\u0430", 'error');
+              console.error(_context2.t0);
+
+            case 13:
+              _context2.prev = 13;
+              setSaving(false);
+              return _context2.finish(13);
+
+            case 16:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2, null, [[3, 9, 13, 16]]);
+    }));
+    return _onSave.apply(this, arguments);
+  }
+
+  if (loading) {
+    return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(react_spinkit__WEBPACK_IMPORTED_MODULE_7___default.a, {
+      name: "chasing-dots",
+      __source: {
+        fileName: _jsxFileName,
+        lineNumber: 93
+      },
+      __self: this
+    });
+  }
+
+  if (error) {
+    return 'Неудалось загрузить данние';
+  }
+
+  if (!data) {
+    return 'Нету данных для отображения';
+  }
+
+  return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("div", {
+    className: "account-info__left",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 105
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("ul", {
+    className: "account-info__list",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 106
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: "\u0421\u0430\u0439\u0442 %",
+    data: mappedData,
+    item: "fee",
+    validator: _utils_fee__WEBPACK_IMPORTED_MODULE_8__["validateFee"],
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 107
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: data.labels.manager_default_percent_verbose,
+    data: mappedData,
+    item: "manager_default_percent",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 113
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: data.labels.teamlead_default_percent_verbose // data={data.data.teamlead_default_percent}
+    ,
+    data: mappedData,
+    item: "teamlead_default_percent",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 118
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: data.labels.operator_default_percent_verbose,
+    data: mappedData,
+    item: "operator_default_percent",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 124
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: data.labels.gift_default_percent_verbose,
+    data: mappedData,
+    item: "gift_default_percent",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 129
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ChangableInputRow, {
+    label: data.labels.present_default_percent_verbose,
+    data: mappedData,
+    item: "present_default_percent",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 134
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(react_ladda__WEBPACK_IMPORTED_MODULE_9___default.a, {
+    loading: saving,
+    onClick: onSave,
+    type: "submit",
+    "data-color": "#eee",
+    style: {
+      width: 140,
+      height: 40,
+      backgroundColor: '#4cc462',
+      marginTop: 25,
+      marginRight: 25,
+      borderRadius: 4,
+      fontSize: 8
+    },
+    "data-size": react_ladda__WEBPACK_IMPORTED_MODULE_9__["XL"],
+    "data-style": react_ladda__WEBPACK_IMPORTED_MODULE_9__["SLIDE_UP"],
+    "data-spinner-size": 30,
+    "data-spinner-color": "#ddd",
+    "data-spinner-lines": 12,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 139
+    },
+    __self: this
+  }, "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C")));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (SettingAgency);
+
+/***/ })
+
+})
+//# sourceMappingURL=main.95ec8536fb7fc79e9436.hot-update.js.map
