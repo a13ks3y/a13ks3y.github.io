@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Манифест "НЕТ": Напиши Ебучие Тесты!</title>
+    <style>
+        html {
+            font-size: 16px;
+        }
+        body {
+            font-family: Roboto, monospace, sans-serif;
+            background-color: #1f1f1f;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header, footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 33vh;
+            margin-bottom: 33vh;
+        }
+        main {
+            padding: 1rem;
+        }
+        h1, h2, h3 {
+            color: #fff;
+        }
+        p {
+            color: #ccc;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 0.666rem;
+        }
+        a {
+            color: #069add;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        section.call-to-action {
+            background-color: #333;
+            padding: 1rem;
+            text-align: center;
+        }
+        section.call-to-action a {
+            background-color: #069add;
+            color: #fff;
+            padding: 0.666rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        section.call-to-action a:hover {
+            background-color: #0056b3;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1f1f1f;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header, footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        main {
+            padding: 1rem;
+        }
+
+        h1, h2, h3 {
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 2.666rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2.333rem;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.666rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #abc;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin-bottom: 0.666rem;
+        }
+
+        a {
+            color: #069add;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        section.call-to-action {
+            background-color: #333;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        section.call-to-action a {
+            background-color: #069add;
+            color: #fff;
+            padding: 0.666rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        section.call-to-action a:hover {
+            background-color: #0056b3;
+        }
+
+        section {
+            padding-bottom: 6.66rem;
+        }
+
+        section h2 {
+            font-size: 1.666rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        section ul {
+            text-align: left;
+        }
+
+        section ul li {
+            margin-bottom: 0.666rem;
+        }
+
+        section.resources ul li {
+            margin-right: 1rem;
+        }
+
+        footer {
+            background-color: #333;
+            padding: 0.666rem 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+        }
+        :root {
+            color-scheme: dark light;
+        }
+
+        /* Стили для скроллбара в светлой теме */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Стили для скроллбара в тёмной теме */
+        @media (prefers-color-scheme: dark) {
+            * {
+                scrollbar-color: #666 #333;
+                scrollbar-width: thin;
+                color: white;
+            }
+            ::-webkit-scrollbar {
+                width: 12px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #333;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: #666;
+                border-radius: 6px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #eee;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <h1>Н.Е.Т.</h1>
+    <h2>Напиши Ебучие Тесты!</h2>
+    <h3>Манифест</h3>
+</header>
+<main>
+    <section class="intro">
+        <p>Манифест "НЕТ" направлен на то, чтобы заставить разработчиков на активное написание тестов для своего кода, с целью повышения его качества и надежности.</p>
+        <p>Тестирование является неотъемлемой частью процесса разработки и должно выполняться с самого начала.</p>
+        <p>Написание и выполнение любых автоматических тестов (юнит, функциональных приемочных авто и т д) является единственно верным подходом к разработке ПО т.к. отражает саму суть научного подхода - выдвижение гипотез и их проверка экспериментальным путем.</p>
+    </section>
+    <section class="benefits">
+        <h2>Преимущества написания тестов</h2>
+        <ul>
+            <li>Повышение качества кода</li>
+            <li>Уменьшение количества ошибок</li>
+            <li>Повышение надежности и устойчивости кода</li>
+            <li>Улучшение читаемости и понятности кода</li>
+            <li>Экономия времени и средств в долгосрочной перспективе</li>
+        </ul>
+    </section>
+    <section class="methods">
+        <h2>Методологии тестирования</h2>
+        <ul>
+            <li>
+                <h3>Тест-драйв разработка (TDD)</h3>
+                <p>TDD - это методология, при которой тесты пишутся перед написанием кода. Она позволяет создавать код, который легко тестируется, и обеспечивает быстрый обратный отклик о его работоспособности.</p>
+            </li>
+            <li>
+                <h3>Разработка, ориентированная на поведение (BDD)</h3>
+                <p>BDD фокусируется на описании ожидаемого поведения программного продукта с помощью набора тестов. Это позволяет разработчикам и заказчикам иметь общее понимание требований и функциональности продукта.</p>
+            </li>
+            <li>
+                <h3>Тесты, ориентированные на приемку (ATDD)</h3>
+                <p>ATDD направлены на проверку соответствия разрабатываемого продукта требованиям заказчика. Они помогают обеспечить соответствие функционала ожиданиям клиента и улучшить процесс коммуникации между разработчиками и заказчиками.</p>
+            </li>
+        </ul>
+    </section>
+    <section class="call-to-action">
+        <h2>Скажи НЕТ долбоёбам!</h2>
+        <p>
+            Начните писать ебучие тесты для вашего кода прямо сейчас!
+            Вместе мы сможем создавать качественное программное обеспечение,
+            которое будет радовать пользователей и помогать в решении их задач.
+        </p>
+        <a href="https://t.me/RNTRC3258402914" target="_blank">Начать писать ебучие тесты!</a>
+    </section>
+    <section class="resources">
+        <h2>Ресурсы</h2>
+        <ul>
+            <li><a href="https://github.com/omergulen/awesome-tdd" target="_blank">Awesome TDD</a></li>
+            <li><a href="https://github.com/unicodeveloper/awesome-tdd" target="_blank">Another Awesome TDD</a></li>
+            <li><a href="https://github.com/omergulen/awesome-bdd" target="_blank">Awesome BDD</a></li>
+            <li><a href="https://habr.com/ru/articles/344588/" target="_blank">ATDD (rus)</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Specification_by_example#cite_ref-8" target="_blank">Specification by Example (wiki)</a></li>
+        </ul>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024. Манифест "НЕТ"</p>
+</footer>
+</body>
+</html>
