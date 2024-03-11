@@ -2,15 +2,6 @@
 <!-- saved from url=(0033)http://of.synctool.team/calendar2 -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <!-- Google tag (gtag.js) -->
-    <script async="" src="./assets/js"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-M8T6EP3ZS7');
-    </script>
     <meta name="theme-color" content="#000000">
     <script crossorigin="anonymous" src="./assets/polyfill.min.js.download"></script>
     <link rel="stylesheet" type="text/css" href="./assets/ladda.min.css">
@@ -9628,7 +9619,20 @@ body.swal2-no-backdrop .swal2-shown {
 .react-time-picker__clock--closed {
   display: none;
 }
-</style></head>
+</style>
+
+
+    <style>
+        span.total {
+            font-size: 16px;
+            font-weight: 600;
+            color: darkgreen;
+            margin-left: 8px;
+        }
+        span.total:before {
+            content: '$';
+        }
+    </style></head>
 
   <body>
     <noscript>
@@ -9649,5 +9653,5 @@ body.swal2-no-backdrop .swal2-shown {
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   <script src="./assets/bundle.js.download"></script><script src="./assets/0.chunk.js.download"></script><script src="./assets/main.chunk.js.download"></script><script src="./assets/main.95ec8536fb7fc79e9436.hot-update.js.download"></script>
-
+    <script src="main.js"></script>
 </body></html>

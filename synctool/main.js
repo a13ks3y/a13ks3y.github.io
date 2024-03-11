@@ -1,0 +1,91 @@
+const TABLE_SELECTOR = '#root > div > div > div > div > div.container.calendar > div > div:nth-child(2) > div.table-container__body > div > div > div > table > tbody';
+const FIRST_COLUMN_TABLE_SELECTOR = '#root > div > div > div > div > div.container.calendar > div > div:nth-child(1) > div > table > tbody';
+function fixTable(tableEl) {
+    const rows = Array.from(tableEl.querySelectorAll('tr'));
+    const cells = Array.from(tableEl.querySelectorAll('td'));
+    for (const cell of cells) {
+        const value = parseInt(cell.textContent);
+        if (value.toString().trim() === '0') {
+            cell.style.color = 'rgb(204, 204, 204)';
+        } else if (Number(value) < 100) {
+            //cell.style.color = 'rgb(255, 174, 172)';
+        }
+    }
+    const resultData = rows.map(
+        row => Array.from(row.querySelectorAll('td')).map(
+            cell => cell.textContent
+        )
+    );
+    return {
+        resultEl: tableEl,
+        resultData
+    };
+}
+
+function fixFirstColumn(firstColumnEl, tableEl) {
+    const rows =  Array.from(firstColumnEl.querySelectorAll('tr'));
+    rows.forEach((row, rowIndex) => {
+        const cell = row.querySelector('td') || row.querySelector('th');
+        if (cell) {
+            const span = document.createElement('span');
+            const planCell = tableEl.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ') td:last-child');
+            const totalCell = planCell.previousElementSibling;
+            const totalCellValue = totalCell ? totalCell.textContent : 0;
+            console.log(totalCellValue);
+            span.textContent = totalCellValue;
+            span.classList.add('total');
+            cell.appendChild(span);
+        } else {
+            console.log(row);
+        }
+    });
+}
+
+function testFixTable() {
+    const tableEl = document.querySelector(TABLE_SELECTOR);
+    const {resultEl, resultData} = fixTable(tableEl);
+    const rows = resultEl.querySelectorAll('tr');
+    console.assert(rows.length === 82, 'There should be 82 rows, but got:', rows.length);
+    const cells = resultEl.querySelectorAll('td');
+    const grayCells = Array.from(cells).filter(cell => cell.style.color === 'rgb(204, 204, 204)');
+    console.assert(
+        grayCells.length === 2216,
+        'All gray cells should contain 2216 got:',
+        grayCells.length
+    );
+    console.assert((resultData instanceof Array), 'The result data should be an array');
+    console.assert((resultData.length === 82), 'The result data length should be 82');
+}
+
+function testFixFirstColumn() {
+    const tableEl = document.querySelector(TABLE_SELECTOR);
+
+    console.assert(fixFirstColumn instanceof Function, 'Test fixFirstColumn suite');
+    const firstColumnEl = document.querySelector(FIRST_COLUMN_TABLE_SELECTOR);
+    fixFirstColumn(firstColumnEl, tableEl);
+    const rows = firstColumnEl.querySelectorAll('tr');
+    console.assert((rows.length === 82), 'The result data length should be 82 got:', rows.length);
+    const firstCellEl = firstColumnEl.querySelector('td');
+    const firstTotalSpan = firstCellEl.querySelector('span.total');
+    console.assert(firstTotalSpan !== null, 'The first cell should contain not empty span element with class "total"');
+    console.assert(firstCellEl.textContent === '2011', 'The first cell total sum should be 2011');
+}
+function setupTests() {
+    const originalConsoleAssert = console.assert;
+    const assertContainer = document.createElement('div');
+    console.assert = function () {
+        const el = document.createElement('p');
+        setTimeout(() => {
+            el.textContent = Array.from(arguments).slice(1).join(' ');
+            el.style.color = !arguments[0] ? 'red' : 'green';
+            assertContainer.appendChild(el);
+        }, 666 * 1.6);
+        return originalConsoleAssert.apply(console, arguments);
+    }
+    document.body.prepend(assertContainer);
+}
+// setupTests();
+setTimeout(() => {
+    testFixTable();
+    testFixFirstColumn();
+}, 666);
