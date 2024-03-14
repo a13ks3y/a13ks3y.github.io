@@ -1,0 +1,27 @@
+span.total, span.resent {
+    color: darkgreen;
+    margin-left: 8px;
+    font-size: 12px;
+    padding: 0;
+}
+span.resent {
+    font-size: 10px;
+}
+span.total:before, span.resent:before {
+    content: '$';
+}
+div.total-and-recent-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    margin: 0 8px;
+    padding: 0;
+}
+.calendar th div.total-and-recent-wrapper {
+    float: right;
+}
+.calendar th, .calendar td {
+    padding: 0;
+    height: 40px!important;
+}

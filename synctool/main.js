@@ -23,21 +23,34 @@ function fixTable(tableEl) {
 }
 
 function fixFirstColumn(firstColumnEl, tableEl) {
-    const rows =  Array.from(firstColumnEl.querySelectorAll('tr'));
-    rows.forEach((row, rowIndex) => {
-        const cell = row.querySelector('td') || row.querySelector('th');
-        if (cell) {
-            const span = document.createElement('span');
-            const planCell = tableEl.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ') td:last-child');
-            const totalCell = planCell.previousElementSibling;
-            const totalCellValue = totalCell ? totalCell.textContent : 0;
-            console.log(totalCellValue);
-            span.textContent = totalCellValue;
-            span.classList.add('total');
-            cell.appendChild(span);
-        } else {
-            console.log(row);
+    const tableRows = Array.from(tableEl.querySelectorAll('tr'));
+    const firstColumnRows = Array.from(firstColumnEl.querySelectorAll('tr > *:first-child'));
+    tableRows.forEach((row, index) => {
+        const rowCells = Array.from(row.querySelectorAll('td'));
+        let resentProfit = '0';
+        for (let i = rowCells.length - 3; i >= 0; i--) {
+            if (rowCells[i].textContent !== '0') {
+                resentProfit = rowCells[i].textContent;
+                break;
+            }
         }
+        const totalSpan = document.createElement('span');
+        const resentSpan = document.createElement('span');
+        const totalAndRecentWrapper = document.createElement('div');
+        const chartAndPoPWrapper = document.createElement('div');
+        totalSpan.className = 'total';
+        resentSpan.className = 'resent';
+        totalAndRecentWrapper.className = 'total-and-recent-wrapper';
+        chartAndPoPWrapper.className = 'chart-and-pop-wrapper';
+        totalSpan.textContent = rowCells[rowCells.length - 2].textContent;
+        resentSpan.textContent = resentProfit;
+
+        totalAndRecentWrapper.appendChild(totalSpan);
+        totalAndRecentWrapper.appendChild(resentSpan);
+
+        firstColumnRows[index].appendChild(totalAndRecentWrapper);
+        firstColumnRows[index].appendChild(chartAndPoPWrapper);
+
     });
 }
 
