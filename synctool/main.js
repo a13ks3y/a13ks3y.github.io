@@ -36,17 +36,35 @@ function fixFirstColumn(firstColumnEl, tableEl) {
         }
         const totalSpan = document.createElement('span');
         const resentSpan = document.createElement('span');
+        const PoPSpan = document.createElement('span');
         const totalAndRecentWrapper = document.createElement('div');
         const chartAndPoPWrapper = document.createElement('div');
+        const chartImg = document.createElement('img');
         totalSpan.className = 'total';
         resentSpan.className = 'resent';
+        PoPSpan.className = 'PoP';
         totalAndRecentWrapper.className = 'total-and-recent-wrapper';
         chartAndPoPWrapper.className = 'chart-and-pop-wrapper';
         totalSpan.textContent = rowCells[rowCells.length - 2].textContent;
         resentSpan.textContent = resentProfit;
+        chartImg.src = "http://placehold.it/40x16";
+        let PoP = 0;
+
+        try {
+            const total = parseInt(totalSpan.textContent);
+            const resent = parseInt(resentSpan.textContent);
+            PoP = total != 0 ? (resent / total) * 100 : 0;
+        } catch (e) {
+            console.error(e);
+        }
+        PoPSpan.textContent = PoP.toFixed(2) + '%';
 
         totalAndRecentWrapper.appendChild(totalSpan);
         totalAndRecentWrapper.appendChild(resentSpan);
+
+        chartAndPoPWrapper.appendChild(chartImg);
+        chartAndPoPWrapper.appendChild(PoPSpan);
+
 
         firstColumnRows[index].appendChild(totalAndRecentWrapper);
         firstColumnRows[index].appendChild(chartAndPoPWrapper);
