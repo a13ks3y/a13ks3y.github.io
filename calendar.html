@@ -14,10 +14,39 @@
             justify-content: center;
             height: 100%;
             flex-direction: column;
+            overflow-y: hidden;
         }
     </style>
 </head>
 <body>
-    <iframe src="https://calendar.google.com/calendar/embed?height=720&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=0&showTitle=0&showTabs=0&showCalendars=0&mode=WEEK&src=NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZjA3YmQwZTE3ZGNhOWQ1ZWI3MjQzY2I4ZDQ1ZmQ5ZTZiYTQ3MjdjMmEwN2IwNTExZjkzZDE3Mjg0YWFkZjA0N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZW4udWtyYWluaWFuI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23EF6C00&color=%23AD1457&color=%23616161&color=%230B8043" style="border-width:0" width="1280" height="720" frameborder="0" scrolling="no"></iframe>
+    <iframe style="border-width:0" width="1280" height="720" frameborder="0" scrolling="no"></iframe>
+    <script type="text/javascript">
+        function updateFrame() {
+            const iframe = document.querySelector('iframe');
+            const rect = document.body.getBoundingClientRect();
+            const screen = window.screen;
+            const GAP = 24;
+
+            const w = Math.floor(Math.min(rect.width, screen.availWidth)) - GAP;
+            const h = Math.floor(Math.min(rect.height, screen.availHeight)) - GAP;
+            const mode = w > h ? 'WEEK' : 'AGENDA';
+
+            iframe.width = w > 1280 ? 1280 : w;
+            iframe.height = h;
+
+            const googleUrl = 'https://calendar.google.com/calendar/embed';
+            const embedParams = 'src=NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZjA3YmQwZTE3ZGNhOWQ1ZWI3MjQzY2I4ZDQ1ZmQ5ZTZiYTQ3MjdjMmEwN2IwNTExZjkzZDE3Mjg0YWFkZjA0N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZW4udWtyYWluaWFuI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23EF6C00&color=%23AD1457&color=%23616161&color=%230B8043';
+            iframe.src = `${googleUrl}?height=${h}&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=0&showTitle=0&showTabs=0&showCalendars=0&mode=${mode}&${embedParams}`;
+            console.log('updateFrame', w, h, mode, iframe.src);
+        }
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            console.log('resize');
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateFrame, 666);
+        });
+        updateFrame();
+
+    </script>
 </body>
 </html>
