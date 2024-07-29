@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📅</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet" href="reset.css"/>
     <style type="text/css">
         html { font-size: 16px; }
@@ -22,11 +23,33 @@
             flex-direction: column;
             overflow-y: hidden;
         }
+        #auto-rotate {
+            position: absolute;
+            z-index: 666;
+            right: 1rem;
+            top: 1rem;
+            width: 3rem;
+            height: 3rem;
+            background-color: #666;
+            color: whitesmoke;
+        }
+        #auto-rotate {
+            display: inline-block;
+            top: 1.6rem;
+            right: 1.3rem;
+            width: 0.6rem;
+            height: 0.6rem;
+            color: whitesmoke;
+        }
     </style>
 </head>
 <body>
     <iframe style="border-width:0" width="1280" height="720" frameborder="0" scrolling="no"></iframe>
+    <!-- <span id="auto-rotate" title="Auto-Rotate" aria-checked="false" role="checkbox">
+        <i class="fa fa-recycle"></i>
+    </span> -->
     <script type="text/javascript">
+        const autoRotateEl = document.getElementById('auto-rotate');
         function updateFrame() {
             const iframe = document.querySelector('iframe');
             const rect = document.body.getBoundingClientRect();
@@ -35,19 +58,34 @@
 
             const w = Math.floor(Math.min(rect.width, screen.availWidth)) - GAP;
             const h = Math.floor(Math.min(rect.height, screen.availHeight)) - GAP;
-            const mode = w > h ? 'WEEK' : 'AGENDA';
+
+            let mode = 'WEEK';
+
+            const autoRotationIsDisabled = true;
+            if (autoRotationIsDisabled) {
+                console.info('Auto-rotation is disabled!');
+            } else {
+                mode = w > h ? 'WEEK' : 'AGENDA';
+            }
 
             iframe.width = w > 1280 ? 1280 : w;
             iframe.height = h;
 
+            const src = [
+                'MDY2NzA3NDcxNC5zbWlybm92QGdtYWlsLmNvbQ',
+                'NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
+                'NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
+                'YWRkcmVzc2Jvb2sjY29udGFjdHNAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t',
+                'aHQzamxmYWFjNWxmZDYyNjN1bGZoNHRxbDhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ',
+                'MmFuNXRlb2c1Y2NzcHU5amY2cmhyMWFuajRmMTYzMnZAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20',
+                'by5zbWlybm92QG5vZGVhcnQuaW8'
+            ].join('&src=');
             const googleUrl = 'https://calendar.google.com/calendar/embed';
-            const embedParams = 'src=NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZjA3YmQwZTE3ZGNhOWQ1ZWI3MjQzY2I4ZDQ1ZmQ5ZTZiYTQ3MjdjMmEwN2IwNTExZjkzZDE3Mjg0YWFkZjA0N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZW4udWtyYWluaWFuI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23EF6C00&color=%23AD1457&color=%23616161&color=%230B8043';
-            iframe.src = `${googleUrl}?height=${h}&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=0&showTitle=0&showTabs=0&showCalendars=0&mode=${mode}&${embedParams}`;
-            console.log('updateFrame', w, h, mode, iframe.src);
+            const embedParams = `src=${src}&color=%23EF6C00&color=%23AD1457&color=%23616161&color=%230B8043&showPrint=0`;
+            iframe.src = `${googleUrl}?height=${h}&width=${w}&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=1&showTitle=0&showTabs=0&showCalendars=1&mode=${mode}&${embedParams}`;
         }
         let resizeTimer;
         window.addEventListener('resize', () => {
-            console.log('resize');
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(updateFrame, 666);
         });
