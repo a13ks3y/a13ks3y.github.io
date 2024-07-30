@@ -70,18 +70,17 @@
 
             iframe.width = w > 1280 ? 1280 : w;
             iframe.height = h;
-
             const src = [
-                'MDY2NzA3NDcxNC5zbWlybm92QGdtYWlsLmNvbQ',
                 'NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
                 'NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
                 'YWRkcmVzc2Jvb2sjY29udGFjdHNAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t',
                 'aHQzamxmYWFjNWxmZDYyNjN1bGZoNHRxbDhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ',
                 'MmFuNXRlb2c1Y2NzcHU5amY2cmhyMWFuajRmMTYzMnZAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20',
-                'by5zbWlybm92QG5vZGVhcnQuaW8'
+                'YjgyN2Q5ODRmZTVmZTczYzg4YTBhOGJjOTVhZjUyNzJhZDBkYTY1ZDhjMzc5MGQxOGE3YzNiYjdhODdlODM4YUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t'
             ].join('&src=');
+            const colors = '%238E24AA&color=%23616161&color=%23009688&color=%23B39DDB&color=%23F6BF26&color=%230B8043';
             const googleUrl = 'https://calendar.google.com/calendar/embed';
-            const embedParams = `src=${src}&color=%23EF6C00&color=%23AD1457&color=%23616161&color=%230B8043&showPrint=0`;
+            const embedParams = `src=${src}&color=${colors}&showPrint=0`;
             iframe.src = `${googleUrl}?height=${h}&width=${w}&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=1&showTitle=0&showTabs=0&showCalendars=1&mode=${mode}&${embedParams}`;
         }
         let resizeTimer;
