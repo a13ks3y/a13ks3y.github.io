@@ -23,6 +23,12 @@
             flex-direction: column;
             overflow-y: hidden;
         }
+        iframe {
+            min-height: calc(100vh - 1rem);
+            min-width: 100vw;
+            width: auto;
+        }
+
         #auto-rotate {
             position: absolute;
             z-index: 666;
@@ -44,7 +50,7 @@
     </style>
 </head>
 <body>
-    <iframe width="1280" height="720" frameborder="0" scrolling="no" style="border-width:0"></iframe>
+    <iframe frameborder="0" scrolling="no" style="border-width:0"></iframe>
     <!-- <span id="auto-rotate" title="Auto-Rotate" aria-checked="false" role="checkbox">
         <i class="fa fa-recycle"></i>
     </span> -->
