@@ -70,6 +70,10 @@
 
             iframe.width = w > 1280 ? 1280 : w;
             iframe.height = h;
+            if (h > w) {
+                iframe.width = '100%';
+                iframe.height = '100%';
+            }
             const src = [
                 'NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
                 'NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
