@@ -67,13 +67,11 @@
             } else {
                 mode = w > h ? 'WEEK' : 'AGENDA';
             }
-
-            iframe.width = w > 1280 ? 1280 : w;
+            // todo: fix and refactor everthing!
+            //iframe.width = w > 1920 ? 1920 : w;
+            //iframe.height = h;
+            iframe.width = w;
             iframe.height = h;
-            if (h > w) {
-                iframe.width = '100%';
-                iframe.height = '100%';
-            }
             const src = [
                 'NTMyYmNmN2ExOGQyMzJhMDc4MzQ3MTgwODc1MWI1MDg5ZmI1NmMyYjYwN2M2ODRkNTQyYTE0Y2E1NDJlMDAwMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
                 'NTE3ODBmYzgzZDJmZTU5NGU1MzZiMDNkZDY4Mjc0YmQxZmM4MzdiOTZjOTU0YmMzOTM2Y2E5ODg4YjJmM2YyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
@@ -88,15 +86,19 @@
             iframe.src = `${googleUrl}?height=${h}&width=${w}&wkst=2&ctz=Europe%2FKiev&bgcolor=%23666666&showNav=1&showTitle=0&showTabs=0&showCalendars=1&mode=${mode}&${embedParams}`;
         }
         let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(updateFrame, 666);
-        });
+        // window.addEventListener('resize', () => {
+        //     clearTimeout(resizeTimer);
+        //     resizeTimer = setTimeout(updateFrame, 666);
+        // });
         window.addEventListener('load', () => {
             if (document.readyState === "complete") {
                 updateFrame();
             }
-        })
+        });
+        window.addEventListener('orientationchange', () => {
+            iframe.width = '100%';
+            iframe.height = '100%';
+        });
     </script>
 </body>
 </html>
