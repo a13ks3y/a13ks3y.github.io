@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📅</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet" href="reset.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <style type="text/css">
         html { font-size: 16px; }
         html, body {
             position: absolute;
             left: 0; top: 0;
-            width: 100%; height: 100%;
+            width: 100vw; height: 100vh;
         }
         body {
             background-color: #666;
@@ -44,14 +44,14 @@
     </style>
 </head>
 <body>
-    <iframe style="border-width:0" width="1280" height="720" frameborder="0" scrolling="no"></iframe>
+    <iframe width="1280" height="720" frameborder="0" scrolling="no" style="border-width:0"></iframe>
     <!-- <span id="auto-rotate" title="Auto-Rotate" aria-checked="false" role="checkbox">
         <i class="fa fa-recycle"></i>
     </span> -->
     <script type="text/javascript">
         const autoRotateEl = document.getElementById('auto-rotate');
+        const iframe = document.querySelector('iframe');
         function updateFrame() {
-            const iframe = document.querySelector('iframe');
             const rect = document.body.getBoundingClientRect();
             const screen = window.screen;
             const GAP = 24;
@@ -76,7 +76,7 @@
                 'YWRkcmVzc2Jvb2sjY29udGFjdHNAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t',
                 'aHQzamxmYWFjNWxmZDYyNjN1bGZoNHRxbDhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ',
                 'MmFuNXRlb2c1Y2NzcHU5amY2cmhyMWFuajRmMTYzMnZAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20',
-                'YjgyN2Q5ODRmZTVmZTczYzg4YTBhOGJjOTVhZjUyNzJhZDBkYTY1ZDhjMzc5MGQxOGE3YzNiYjdhODdlODM4YUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t'
+                'YjgyN2Q5ODRmZTVmZTczYzg4YTBhOGJjOTVhZjUyNzJhZDBkYTY1ZDhjMzc5MGQxOGE3YzNiYjdhODdlODM4YUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t',
             ].join('&src=');
             const colors = '%238E24AA&color=%23616161&color=%23009688&color=%23B39DDB&color=%23F6BF26&color=%230B8043';
             const googleUrl = 'https://calendar.google.com/calendar/embed';
@@ -88,8 +88,11 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(updateFrame, 666);
         });
-        updateFrame();
-
+        window.addEventListener('load', () => {
+            if (document.readyState === "complete") {
+                updateFrame();
+            }
+        })
     </script>
 </body>
 </html>
