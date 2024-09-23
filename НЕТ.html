@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Манифест "НЕТ": Напиши Ебучие Тесты!</title>
     <style>
-        html {
+        html {            
             font-size: 16px;
+            scroll-behavior: smooth;
         }
         body {
             font-family: Roboto, monospace, sans-serif;
@@ -52,7 +53,7 @@
             padding: 1rem;
             text-align: center;
         }
-        section.call-to-action a {
+        a.call-to-action {
             background-color: #069add;
             color: #fff;
             padding: 0.666rem 1rem;
@@ -64,7 +65,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: monospace;
             background-color: #1f1f1f;
             color: #fff;
             margin: 0;
@@ -130,7 +131,7 @@
             text-align: center;
         }
 
-        section.call-to-action a {
+        a.call-to-action {
             background-color: #069add;
             color: #fff;
             padding: 0.666rem 1rem;
@@ -138,18 +139,25 @@
             text-decoration: none;
         }
 
-        section.call-to-action a:hover {
+        a.call-to-action:hover {
             background-color: #0056b3;
         }
 
         section {
             padding-bottom: 6.66rem;
+            min-height: 100vh;
         }
 
         section h2 {
             font-size: 1.666rem;
             margin-bottom: 1rem;
             text-transform: uppercase;
+            padding-left: 0.333rem;
+            background-color: rgba(33, 63, 63, 0.69);
+        }
+        section h3 {
+            background-color: rgba(33, 33, 33, 0.69);
+            text-align: right;
         }
 
         section ul {
@@ -158,6 +166,7 @@
 
         section ul li {
             margin-bottom: 0.666rem;
+            padding-left: 0.666rem;
         }
 
         section.resources ul li {
@@ -219,6 +228,45 @@
                 background: #eee;
             }
         }
+        section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-repeat: no-repeat;
+            background-size: contain;
+
+        }
+        section p {
+            padding-left: 1.666rem;
+            background-color: rgba(36, 69, 96, 0.666);
+            padding-right: 0.0666rem;
+        }
+        section.benefits {
+            background-image: url("https://s3.awkwardfamilyphotos.com/wp-content/uploads/2019/06/13151621/Screen-Shot-2019-06-13-at-3.15.28-PM.jpg");
+        }
+        section.intro {
+            background-image: url("https://s3.awkwardfamilyphotos.com/wp-content/uploads/2018/02/22115653/packaging.jpg");           
+        }
+        section.methods {
+            background-image: url("https://s3.awkwardfamilyphotos.com/wp-content/uploads/2017/07/22132352/snow.jpg");
+        }
+        section.call-to-action {
+            background-image: url("https://s3.awkwardfamilyphotos.com/wp-content/uploads/2016/09/22160118/blind-spots.jpg");
+        }
+        section.resources {
+            background-image: url("https://s3.awkwardfamilyphotos.com/wp-content/uploads/2017/03/22140127/billboard-1024x768.jpg");
+        }
+        .read-more {
+            display: inline-block;
+            margin: 0.666rem 0.333rem;
+            padding: 0.666rem 1.666rem;
+            background-color: #013666;
+            color: #990000;
+            text-decoration: none;
+            border-radius: 1.666rem; 
+            font-weight: bold
+        }
 
     </style>
 </head>
@@ -227,14 +275,20 @@
     <h1>Н.Е.Т.</h1>
     <h2>Напиши Ебучие Тесты!</h2>
     <h3>Манифест</h3>
+
+    <a href="#intro" class="read-more">Read more:</a>
 </header>
 <main>
-    <section class="intro">
+    <section id="intro" class="intro">
         <p>Манифест "НЕТ" направлен на то, чтобы заставить разработчиков на активное написание тестов для своего кода, с целью повышения его качества и надежности.</p>
         <p>Тестирование является неотъемлемой частью процесса разработки и должно выполняться с самого начала.</p>
         <p>Написание и выполнение любых автоматических тестов (юнит, функциональных приемочных авто и т д) является единственно верным подходом к разработке ПО т.к. отражает саму суть научного подхода - выдвижение гипотез и их проверка экспериментальным путем.</p>
+        
+        <p>
+            <a href="#benefits" class="read-more">Преимущества:</a>
+        </p>
     </section>
-    <section class="benefits">
+    <section id="benefits" class="benefits">
         <h2>Преимущества написания тестов</h2>
         <ul>
             <li>Повышение качества кода</li>
@@ -243,8 +297,11 @@
             <li>Улучшение читаемости и понятности кода</li>
             <li>Экономия времени и средств в долгосрочной перспективе</li>
         </ul>
+        <div>
+             <a href="#methods" class="read-more">Как?</a>
+        </dvi>
     </section>
-    <section class="methods">
+    <section id="methods" class="methods">
         <h2>Методологии тестирования</h2>
         <ul>
             <li>
@@ -260,17 +317,23 @@
                 <p>ATDD направлены на проверку соответствия разрабатываемого продукта требованиям заказчика. Они помогают обеспечить соответствие функционала ожиданиям клиента и улучшить процесс коммуникации между разработчиками и заказчиками.</p>
             </li>
         </ul>
+        <div>
+          <a href="#call-to-action" class="read-more">НЕ ТУПИ!</a>          
+        </div>
     </section>
-    <section class="call-to-action">
+    <section id="call-to-action" class="call-to-action">
         <h2>Скажи НЕТ долбоёбам!</h2>
         <p>
             Начните писать ебучие тесты для вашего кода прямо сейчас!
             Вместе мы сможем создавать качественное программное обеспечение,
             которое будет радовать пользователей и помогать в решении их задач.
         </p>
-        <a href="https://t.me/RNTRC3258402914" target="_blank">Начать писать ебучие тесты!</a>
+        <a class="call-to-action" href="https://www.youtube.com/watch?v=Jv2uxzhPFl4" target="_blank">Начать писать ебучие тесты!</a>    
+        <div>
+            <a href="#resources" class="read-more">Какие-то ссылки</a>
+        </div>
     </section>
-    <section class="resources">
+    <section id="resources" class="resources">
         <h2>Ресурсы</h2>
         <ul>
             <li><a href="https://github.com/omergulen/awesome-tdd" target="_blank">Awesome TDD</a></li>
