@@ -16,6 +16,10 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            width: 66.6%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
         header, footer {
             background-color: #333;
@@ -235,7 +239,7 @@
             justify-content: space-between;
             background-repeat: no-repeat;
             background-size: contain;
-
+            background-position: center;
         }
         section p {
             padding-left: 1.666rem;
@@ -276,19 +280,19 @@
     <h2>Напиши Ебучие Тесты!</h2>
     <h3>Манифест</h3>
 
-    <a href="/НЕТ.html#intro" class="read-more">Read more:</a>
+    <a href="#intro" class="read-more">Read more:</a>
 </header>
 <main>
-    <section class="intro">
+    <section id="intro" class="intro">
         <p>Манифест "НЕТ" направлен на то, чтобы донести простую мысль: тесты ценнее чем код.</p>
         <p>Тестирование является неотъемлемой частью процесса разработки и должно выполняться с самого начала.</p>
         <p>Написание и выполнение любых автоматических тестов (юнит, функциональных приемочных авто и т д) является единственно верным подходом к разработке ПО т.к. отражает саму суть научного подхода - выдвижение гипотез и их проверка экспериментальным путем.</p>
         
         <p>
-            <a href="/НЕТ.html#benefits" class="read-more">Преимущества:</a>
+            <a href="#benefits" class="read-more">Преимущества:</a>
         </p>
     </section>
-    <section class="benefits">
+    <section id="benefits" class="benefits">
         <h2>Требования = тесты (и набоборот)</h2>
         <ul>
             <li>Если тебе кажется что тут можно обойтись без тестов - пиши тесты.</li>
@@ -298,7 +302,7 @@
             <li>Тесты - это способ проверить что ты не сломал ничего в процессе рефакторинга.</li>
         </ul>
         <div>
-             <a href="/НЕТ.html#methods" class="read-more">Как?</a>
+             <a href="#methods" class="read-more">Как?</a>
         </dvi>
     </section>
     <section id="methods" class="methods">
@@ -318,7 +322,7 @@
             </li>
         </ul>
         <div>
-          <a href="/НЕТ.html#call-to-action" class="read-more">НЕ ТУПИ!</a>          
+          <a href="#call-to-action" class="read-more">НЕ ТУПИ!</a>          
         </div>
     </section>
     <section id="call-to-action" class="call-to-action">
@@ -328,7 +332,7 @@
         </p>
         <a class="call-to-action" href="https://www.youtube.com/watch?v=Jv2uxzhPFl4" target="_blank">Начать писать ебучие тесты!</a>    
         <div>
-            <a href="/НЕТ.html#resources" class="read-more">Какие-то ссылки</a>
+            <a href="#resources" class="read-more">Какие-то ссылки</a>
         </div>
     </section>
     <section id="resources" class="resources">
