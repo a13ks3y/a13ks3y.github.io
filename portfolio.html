@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oleksii Smirnov - Portfolio</title>
+    <link rel="icon" sizes="192x192" href="gear.png">
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none!important;
+        }
+        html {
+            font-size: 16px;
+        }
+        body {
+            /* font-family: 'Roboto', sans-serif; */
+            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+            font-family: 'Helvetica', 'Comic Sans MS', monospace;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #0ec666, #1f1f1f);
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        .header-title {
+            font-size: 3rem;
+            margin: 0;
+            color: #ffffff;
+        }
+        .sub-header {
+            font-size: 1.5rem;
+            margin-top: 0.5rem;
+            color: #d4d4d4;
+        }
+        .content {
+            padding: 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 2.3rem;
+            margin-bottom: 1.3rem;
+            color: #0ee666;
+            border-bottom: 1px solid #eee666;
+            padding-bottom: 0.6rem;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        .project-card {
+            background: #1f1f1f;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #3c3c3c;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 255, 106, 0.7);
+        }
+        .project-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            color: #c0e666;
+        }
+        .project-description {
+            font-size: 1.1rem;
+            color: #d0d0d0;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #1f1f1f;
+            color: #b0b0b0;
+            margin-top: 4rem;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .cv-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.6rem;
+            margin-top: 1.6rem;
+        }
+        .cv-link {
+            color: #c0e666;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-bottom 0.6s, color 0.3s;
+        }
+        .cv-link:hover {
+            border-bottom: 2px solid #c0e666;
+            color: #0ec666;
+        }
+        .project-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.6);
+        }
+        .pet-projects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 2rem 0;
+            justify-content: center;
+        }
+        .pet-project-link {
+            background-color: #1f1f1f;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            color: #c0e666;
+            text-decoration: none;
+            transition: background-color 0.6s, transform 0.6s;
+        }
+        .pet-project-link:hover {
+            background-color: #0ec666;
+            transform: translateY(-6px);
+            color: #ffffff;
+        }
+
+                /* Scrollbar Styles */
+                body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: darkgreen;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: lime;
+            border-radius: 0;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: greenyellow;
+        }
+
+    </style>
+    
+</head>
+<body>
+    <header>
+        <h1 class="header-title">Oleksii Smirnov</h1>
+        <p class="sub-header">Senior Full-Stack Developer Seeking Remote Full-Time Opportunities</p>
+    </header>
+
+    <div class="content">
+        <section>
+            <h2 class="section-title">Portfolio 💼</h2>
+            <div class="projects">
+                <div class="hidden project-card">
+                    <img style="display: none;" src="https://e-tender.ua/img/logo.png" alt="Government Tender Platform" class="project-image">
+                    <h3 class="project-title">E-Tender Platform</h3>
+                    <p class="project-description">Led the development of a government tender platform, transitioning from AngularJS to modern Angular versions. Managed a small team, delivered features on time, and focused on optimization for better user experience.</p>
+                    <a class="cv-link" href="https://e-tender.ua" target="_blank">E-Tender</a>
+                </div>
+                <div class="project-card">
+                    <img src="https://list-games.ru/sites/default/files/wyswyg/era13-2.jpg" alt="Era13 Game Development" class="project-image">
+                    <h3 class="project-title">Era 13 MMORPG</h3>
+                    <p class="project-description">Led front-end game development, managing a team responsible for new features and architecture design. Contributed significantly to the overall design and implementation.</p>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=v8B2s44RNyo" target="_blank">Gameplay</a>
+                    <span class="separator"> | </span>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=wqIIiEn-J_g" target="_blank">Trailer</a>
+                </div>
+                <div class="hidden project-card">
+                    <img style="display: none;" src="https://via.placeholder.com/400x200" alt="Various Projects" class="project-image">
+                    <h3 class="project-title">SoftServe - Various Projects</h3>
+                    <p class="project-description">Worked on multiple projects across healthcare and e-commerce sectors, focusing on usability and performance improvements. Actively participated in code reviews and collaborated with team members to refactor and optimize the codebase.</p>
+                    <a class="cv-link" href="https://www.softserveinc.com/en-us" target="_blank">Soft Serve</a>
+                </div>
+                <div class="project-card">
+                    <img src="https://lh3.googleusercontent.com/GEBNyde8hkfE0pe6XkcxdYTrTvlpj4i2Gr8VJQJY797OaPiATfApcUop1HC9aLvfHmNDLft7lFktvUwNCfhsuBCT-mY=s800-w800-h500" alt="aTab Extension" class="project-image">
+                    <h3 class="project-title">ATab - Chrome Extension</h3>
+                    <p class="project-description">ATab is a Chrome extension developed to simplify tab management in full-screen mode. It's lightweight, efficient, and perfect for organizing research and browsing sessions seamlessly.</p>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=grTJxE9j8oI" target="_blank">Demo (YouTube)</a>
+                    <span class="separator">&nbsp;|&nbsp;</span>
+                    <a class="cv-link" href="https://chromewebstore.google.com/detail/atab/hffgbimhegfljiohccdgeneejdcpdgid" target="_blank">Chrome Web Store</a>                    
+                </div>
+            </div>
+        </section>
+
+
+        <section>
+            <h2 class="section-title">Curriculum Vitae</h2>
+            <div class="cv-links">
+                <a class="cv-link" href="https://a13ks3y.github.io/CV_Front-End_Oleksii_Smirnov.pdf" target="_blank">Front-End CV</a>
+                <a class="cv-link" href="https://a13ks3y.github.io/CV_FullStack_Oleksii_Smirnov.pdf" target="_blank">Full-Stack CV</a>
+            </div>
+        </section>
+
+
+        
+        <section>
+            <h2 class="section-title">Pet Projects</h2>
+            <p class="sub-header">
+                Just for fun 😉
+            </p>
+            <div class="pet-projects">
+                <a href="https://a13ks3y.github.io/netwalk/" target="_blank" class="pet-project-link">NetWalk</a>
+                <a href="https://a13ks3y.github.io/tetris/" target="_blank" class="pet-project-link">Tetris</a>
+                <a href="https://a13ks3y.github.io/revertris/" target="_blank" class="pet-project-link">REVERTris</a>
+                <a href="https://a13ks3y.github.io/story-qubes.html" target="_blank" class="pet-project-link">Story Qubes</a>
+                <a href="https://a13ks3y.github.io/mtg/" target="_blank" class="pet-project-link">Match 3</a>
+                <a href="https://a13ks3y.github.io/flood-it/" target="_blank" class="pet-project-link">Flood-it</a>
+                <a href="https://a13ks3y.github.io/wire-world/" target="_blank" class="pet-project-link">Wire-World</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Oleksii Smirnov | Kyiv, Ukraine</p>
+        <p>Contact: <a href="mailto:0667074714.smirnov@gmail.com" class="cv-link">0667074714.smirnov@gmail.com</a></p>
+        <p>
+            <a href="tg://resolve?domain=a13ks3y" title="@a13ks3y" class="cv-link">Telegram</a>            
+            <span class="separator">&nbsp;|&nbsp;</span>
+            <a href="https://www.instagram.com/o_omwmo_o/" title="@o_omwmo_o" class="cv-link">Instagram</a>            
+            <span class="separator">&nbsp;|&nbsp;</span>
+            <a href="https://github.com/a13ks3y" title="a13ks3y" class="cv-link">GitHub</a>            
+            <span class="separator">&nbsp;|&nbsp;</span>
+            <a href="https://www.linkedin.com/in/a13ks3y" class="cv-link" target="_blank">LinkedIn</a>
+        </p>
+    </footer>
+</body>
+</html>
