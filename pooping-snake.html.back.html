@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oleksii Smirnov - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            font-size: 16px;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        header {
+            background: #1f1f1f;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .header-title {
+            font-size: 2.8rem;
+            margin: 0;
+            color: #c0e666;
+        }
+        .sub-header {
+            font-size: 1.3rem;
+            margin-top: 0.5rem;
+            color: #b0b0b0;
+        }
+        .content {
+            padding: 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: #0ec666;
+            border-bottom: 2px solid #c0e666;
+            padding-bottom: 0.5rem;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 2.5rem;
+        }
+        .project-card {
+            background: #2a2a2a;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #3c3c3c;
+        }
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 25px rgba(255, 152, 0, 0.6);
+        }
+        .project-title {
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+            color: #0ec666;
+        }
+        .project-description {
+            font-size: 1rem;
+            color: #c0c0c0;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #1f1f1f;
+            color: #b0b0b0;
+            margin-top: 3rem;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .cv-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .cv-link {
+            color: #c0e666;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-bottom 0.3s, color 0.3s;
+        }
+        .cv-link:hover {
+            border-bottom: 2px solid #c0e666;
+            color: #0ec666;
+        }
+        .project-image {
+            display: none;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        /* Scrollbar Styles */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: darkgreen;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: lime;
+            border-radius: 0;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: greenyellow;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="header-title">Oleksii Smirnov</h1>
+        <p class="sub-header">Senior Full-Stack Developer</p>
+    </header>
+
+    <div class="content">
+        <section style="display: none;">
+            <h2 class="section-title">About Me</h2>
+            <p>
+                Hello! I'm <span class="about-me-highlight">Oleksii Smirnov</span>, a dedicated full-stack developer with over 13 years of experience. 
+            </p><p>
+                My passion lies in building high-quality software that is not only functional but also delivers an outstanding user experience. I focus on modern JavaScript technologies and always aim to create elegant solutions for complex challenges.
+            </p><p>
+                Whether working independently or as part of a dynamic team, I strive to bring creativity and precision to every project. Let's make something amazing together!
+            </p>
+        </section>
+        <section>
+            <h2 class="section-title">Projects</h2>
+            <div class="projects">
+                <div class="project-card">
+                    <div class="useless-wrapper project-image" style="background-color: #666; padding: 1.666rem;">
+                        <img src="https://e-tender.ua/img/logo.png" alt="Government Tender Platform" style="display: block; margin: auto;">
+                    </div>
+                    <h3 class="project-title">E-Tender Platform</h3>
+                    <p class="project-description">Led the front-end development for government platforms transitioning from AngularJS to modern Angular versions. Managed a team and ensured timely delivery of features and optimizations.</p>
+                    <a class="cv-link" href="https://e-tender.ua" target="_blank">E-Tender</a>
+                </div>
+                <div class="project-card">
+                    <img src="https://list-games.ru/sites/default/files/wyswyg/era13-2.jpg" alt="Era13 Game Development" class="project-image">
+                    <h3 class="project-title">Era 13 MMORPG</h3>
+                    <p class="project-description">Led front-end game development, managing a team responsible for new features and architecture design. Contributed significantly to the overall design and implementation.</p>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=v8B2s44RNyo" target="_blank">Gameplay</a>
+                    <span class="separator">&nbsp;|&nbsp;</span>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=wqIIiEn-J_g" target="_blank">Trailer</a>
+                    <span class="separator">&nbsp;|&nbsp;</span>
+                    <a class="cv-link" href="https://www.youtube.com/watch?v=ITpPf4va99A" target="_blank">Introduction</a>
+                </div>
+                <div class="project-card">
+                    <img src="https://res.cloudinary.com/kalispel/image/upload/f_auto,q_auto/v1714690433/Craft%20Images/Roulette_header_2750x1600_jsg1ap.jpg" alt="Social Casino Platform" class="project-image">
+                    <h3 class="project-title">Social Casino Platform</h3>
+                    <p class="project-description">Developed custom features like Telegram authentication and suspicious user detection, integrated email functionality using Mailgun, and spearheaded an injected blog solution for seamless white-label integration.</p>
+                    <a class="cv-link" href="https://nodeart.io" target="_blank">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Curriculum Vitae</h2>
+            <div class="cv-links">
+                <a class="cv-link" href="https://a13ks3y.github.io/CV_Front-End_Oleksii_Smirnov.pdf" target="_blank">Front-End CV</a>
+                <a class="cv-link" href="https://a13ks3y.github.io/CV_FullStack_Oleksii_Smirnov.pdf" target="_blank">Full-Stack CV</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Oleksii Smirnov | Kyiv, Ukraine</p>
+        <p>Contact: <a href="mailto:0667074714.smirnov@gmail.com" class="cv-link">0667074714.smirnov@gmail.com</a></p>
+    </footer>
+</body>
+</html>
