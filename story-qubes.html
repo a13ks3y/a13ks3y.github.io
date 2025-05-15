@@ -135,8 +135,10 @@
         function shuffle() {
             for (let i = 1; i <= ROUNDS; i++) {
                 setTimeout(() => {
-                    $qubes.forEach($qube => {
-                        $qube.innerHTML = VALUES[Math.floor(Math.random() * VALUES.length)];
+                    const shuffledValues = [...VALUES].sort(() => Math.random() - 0.5);
+ 
+                    $qubes.forEach(($qube, index) => {
+                        $qube.innerHTML = shuffledValues[index];
                     });
                 }, i * 666);
             }
