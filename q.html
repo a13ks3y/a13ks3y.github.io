@@ -15,7 +15,6 @@
   <div class="hud" id="hud">Apples: 0</div>
 
   <script id="code" type="text/javascript">
-(() => {
 // Use arrow keys (left and right) to move, up to jump.
 // Astrix characteres are apples, you need to collect them.
 // "=" characters are moving platforms.
@@ -28,7 +27,7 @@
                                     
 
 
-  const canvas                  =              document.getElementById('ctx');
+  const canvas                  =              document.getElementById('ctx');        let totalApples = 0; 
 
 
 
@@ -40,9 +39,9 @@
 
 
 
-            const SIZE = 24; // tile size
+            const SIZE = 24; //tile_size
 
-
+    let gameEnded = false;
 
 
   // --- // parse THIS SCRIPT as level ---
@@ -67,6 +66,9 @@
       const next     =      line[x+1];
 
       if(c!==' '){
+        if (c === '*') {
+            totalApples ++;
+        }
         const tile      =   {x:x*SIZE,y:y*SIZE,c,w:SIZE,h:SIZE,active:true};
         
         
@@ -158,7 +160,10 @@
         break;
       case '*': // apple
         t.active=false;apples++;
-        document.getElementById('hud').textContent="Apples: "+apples;
+        document.getElementById('hud').textContent="Apples: "+apples+" out of "+totalApples;
+        if (apples >= totalApples) {
+            gameEnded = true;
+        }
         break;
       case '+': // hazard
         restart();
@@ -175,7 +180,7 @@
 
             function colorForChar(t){
                 if (t.direction) {
-                    return '#f9a';
+                    return '#AA5A54';
                 }
                 switch(t.c){
                 case '{': case '}': return '#AA3A34';
@@ -242,6 +247,19 @@
     // --- draw ---
     ctx.clearRect(0,0,W,H);
 
+    if (gameEnded) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0,0,W,H);
+        ctx.fillStyle = '#0f0';
+        ctx.font = "48px monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("ALL APPLES COLLECTED!", W/2, H/2 - 30);
+        ctx.fillText("YOU ESCAPED THE CODE", W/2, H/2 + 30);
+        return; // stop game updates
+    }
+
+
     for(const t of tiles){
 
       if(!t.active)continue;
@@ -265,12 +283,17 @@
     }
     ctx.fillStyle='#fff';
     ctx.fillText('🤔', player.x+camera.x,player.y+camera.y+player.w / 16 * 8);
+
+
     
 
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
-})();
+
+
+                                                                                                                                    document.getElementById('hud').textContent="Apples: "+apples+" out of "+totalApples;
+
   </script>
 </body>
 </html>
