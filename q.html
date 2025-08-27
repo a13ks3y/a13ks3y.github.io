@@ -11,36 +11,81 @@
   </style>
 </head>
 <body>
-  <canvas id="ctx" width="800" height="600"></canvas>
+  <canvas id="ctx" width="1400" height="600"></canvas>
   <div class="hud" id="hud">Apples: 0</div>
 
   <script id="code" type="text/javascript">
 (() => {
 
 
-  const canvas = document.getElementById('ctx');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+    
+    
+/* Test_of_the_one_way_platform___________________any of _ tiles are one-way direction */
+
+                                    
+
+
+  const canvas                  =              document.getElementById('ctx');
 
 
 
-  const SIZE = 16; // tile size
+  const ctx          =           canvas.getContext('2d');
+
+
+
+                              const W           =       canvas.width, H         =       canvas.height; /* radnodm revord */
+
+
+
+            const SIZE = 24; // tile size
 
 
 
 
-  // --- parse THIS SCRIPT as level ---
-  const src = document.getElementById('code').textContent.split('\n');
-  let tiles = [];
-  src.forEach((line,y)=>{
+  // --- // parse THIS SCRIPT as level ---
+  const src     =        document.getElementById('code').textContent.split('\n');
+                                let tiles   =        [];
+
+
+    src.forEach((line,y)=>{
   
   
-    for(let x=0;x<line.length;x++){
-      const c=line[x];
-  
-  
+    for(let x       =       0;x<line.length;x++){
+
+
+    const c     =       line[x];
+
+
+    const prev    =      line[x-1];
+
+
+      const next     =      line[x+1];
+
       if(c!==' '){
-        tiles.push({x:x*SIZE,y:y*SIZE,c,w:SIZE,h:SIZE,active:true});
+        const tile      =   {x:x*SIZE,y:y*SIZE,c,w:SIZE,h:SIZE,active:true};
+        
+        
+        if (c === '=' && prev === ' ' && next === ' ' && x < line.length - 1) {
+            tile.direction = 'right';
+
+
+
+            for (let i           =          x+1; i<line.length; i++) {
+                if (line[i] !== ' ') {
+                    tile.rightStop = i - 1;
+                    break;
+                }
+            }
+            tile.leftStop = 0;
+            for (let j            =      x-1; j>0; j--) {
+                if (line[j] !== ' ') {
+                    tile.leftStop = j + 1;
+                    break;
+                }
+            }
+        }
+
+        tiles.push(tile);
       }
     }
   });
@@ -85,15 +130,21 @@
     const dy=(p.y+p.h/2)-(t.y+t.h/2);
     const ox=(p.w/2+t.w/2)-Math.abs(dx);
     const oy=(p.h/2+t.h/2)-Math.abs(dy);
-    if(ox<oy){ if(dx>0)p.x+=ox; else p.x-=ox; player.vx=0; }
-    else{ if(dy>0)p.y+=oy; else{p.y-=oy;player.onGround=true;} player.vy=0; }
+    if(ox<oy){
+        if(dx>0)p.x+=ox; else p.x-=ox; player.vx=0;
+    }else{
+        if(dy>0)p.y+=oy; else{p.y-=oy;player.onGround=true;} player.vy=0; 
+    }
   }
 
   function tileBehavior(t,pret){
+    if (t.direction && player.y >= t.y) { // moving platform
+        player.vx = t.direction === 'right' ? SPEED : -SPEED;
+    }
     switch(t.c){
-      case '{': case '/': // springboard
+      case '{': case '/': case '}': // springboard
         resolveSolid(pret,t);
-        if(player.vy>=0){player.vy=JUMP*10;player.onGround=false;}
+        if(player.vy>=0){player.vy=JUMP*2;player.onGround=false;}
         break;
       case '*': // apple
         t.active=false;apples++;
@@ -102,16 +153,24 @@
       case '+': // hazard
         restart();
         break;
+      case '_': // one way platform
+        if (player.y >= t.y) {
+            resolveSolid(pret, t);
+        }
+        break;
       default: // solid
         resolveSolid(pret,t);
     }
   }
 
-  function colorForChar(c){
-    switch(c){
-      case '{': case '/': return '#0f0';
-      case '*': return '#ff0';
-      case '+': return '#f00';
+  function colorForChar(t){
+    if (t.direction) {
+        return '#f9a';
+    }
+    switch(t.c){
+      case '{': case '/': case '}': return '#AA3A34';
+      case '*': return '#f00';
+      case '+': return '#f66';
       default: return '#AA4A44';
     }
   }
@@ -122,7 +181,7 @@
   let last=performance.now();
   function loop(now){
     const dt=Math.min(0.05,(now-last)/1000); last=now;
-    player.vx=0;
+    //player.vx=0;
     if(keys.left)player.vx=-SPEED;
     if(keys.right)player.vx=SPEED;
     if(keys.up&&player.onGround){player.vy=JUMP;player.onGround=false;}
@@ -132,6 +191,19 @@
     player.onGround=false;
     for(const t of tiles){
       if(!t.active)continue;
+      if (t.direction === 'right') {
+        if (t.x < t.rightStop * SIZE) {
+            t.x += SPEED*dt;
+        } else {
+            t.direction = 'left';
+        }
+      } else if (t.direction === 'left') {
+        if (t.x > t.leftStop * SIZE) {
+            t.x -= SPEED*dt;
+        } else {
+            t.direction = 'right';
+        }
+      }
       if(rectsOverlap(pret,t)) tileBehavior(t,pret);
     }
     player.x=pret.x;player.y=pret.y;
@@ -160,7 +232,7 @@
 
 
       let sx=t.x+camera.x, sy=t.y+camera.y;
-      ctx.fillStyle=colorForChar(t.c);
+      ctx.fillStyle=colorForChar(t);
       ctx.fillRect(sx,sy,t.w,t.h);
       ctx.fillStyle='#222';
 
@@ -174,8 +246,9 @@
 
       ctx.fillText(t.c,sx+t.w/2,sy+t.h/2);      
     }
-    ctx.fillStyle='#f0f';
-    ctx.fillRect(player.x+camera.x,player.y+camera.y,player.w,player.h);
+    ctx.fillStyle='#fff';
+    ctx.fillText('🤔', player.x+camera.x,player.y+camera.y+player.w / 16 * 8);
+    
 
     requestAnimationFrame(loop);
   }
