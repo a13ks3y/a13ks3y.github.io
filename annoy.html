@@ -111,10 +111,14 @@
       }
     }
   }
+  const notSoRandomColor = () => {
+    Math.random() > 0.666 ? randomColor() : COLORS[0];
+  }
   const destroyCells = () => {
     const allCells = Object.values(cells);
     allCells.filter(cell => cell.selected).forEach(cell => {
-      cell.color = cell.color === '#0f0' ? randomColor() : '#0f0'; //'#0f0'//= randomColor();
+      cell.color = cell.color === '#0f0' ? notSoRandomColor() : '#0f0';
+      //cell.color = cell.color === '#0f0' ? randomColor() : '#0f0'; //'#0f0'//= randomColor();
       cell.selected = false;
     });
     const firstCell = allCells[0];
@@ -141,6 +145,13 @@
         cellClick(cell);
       }
     })
+
+    setInterval(() => {
+      const c = ~~(Math.random() * COLS_COUNT);
+      const r = ~~(Math.random() * ROWS_COUNT);
+      const cell = cells[crToHash(c, r)];
+      cell && cellClick(cell);
+    }, 1666);
   }
   const render = (dt) => {
     let needToDestroy = false;
