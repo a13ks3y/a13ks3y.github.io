@@ -16,12 +16,15 @@
 
   <script id="code" type="text/javascript">
 (() => {
-
-
+// Use arrow keys (left and right) to move, up to jump.
+// Astrix characteres are apples, you need to collect them.
+// "=" characters are moving platforms.
+// Curly brakets are springboards.
+// Everything else you will learn from the code (and expirience).
+// The Goal is to collect all apples and rich the bottom.
     
     
-/* Test_of_the_one_way_platform___________________any of _ tiles are one-way direction */
-
+// Test_of_the_one_way_platform___________________any of _ tiles are one-way direction
                                     
 
 
@@ -44,7 +47,9 @@
 
   // --- // parse THIS SCRIPT as level ---
   const src     =        document.getElementById('code').textContent.split('\n');
-                                let tiles   =        [];
+
+
+                                          let tiles   =        []; // todo: make [] a protal to somewhere
 
 
     src.forEach((line,y)=>{
@@ -91,11 +96,14 @@
   });
 
   // level bounds (so we can clamp camera)
-  const levelWidth = Math.max(...tiles.map(t=>t.x+t.w), W);
-  const levelHeight = Math.max(...tiles.map(t=>t.y+t.h), H);
+  const levelWidth      =       Math.max(...tiles.map(t=>t.x+t.w), W);
+  
+                                                // another reward *
+  
+  const levelHeight      =      Math.max(...tiles.map(t=>t.y+t.h), H);
 
   // player
-  const player={x:SIZE*4,y:SIZE*4,w:SIZE*0.9,h:SIZE*0.9,vx:0,vy:0,onGround:false};
+  const player={x:SIZE*21,y:SIZE*8,w:SIZE*0.9,h:SIZE*0.9,vx:0,vy:0,onGround:false};
   
   
   let spawn={x:player.x,y:player.y};
@@ -106,13 +114,15 @@
 
 
 
-  const keys={left:false,right:false,up:false};
+  const keys    =           {left:false,right:false,up:false};
 
-  window.addEventListener('keydown',e=>{
-    if(e.code==='ArrowLeft')keys.left=true;
-    if(e.code==='ArrowRight')keys.right=true;
-    if(e.code==='ArrowUp')keys.up=true;
-  });
+
+
+                        window.addEventListener('keydown',e=>{
+                            if(e.code==='ArrowLeft')keys.left=true;
+                            if(e.code==='ArrowRight')keys.right=true;
+                            if(e.code==='ArrowUp')keys.up=true;
+                        });
   window.addEventListener('keyup',e=>{
     if(e.code==='ArrowLeft')keys.left=false;
     if(e.code==='ArrowRight')keys.right=false;
@@ -142,7 +152,7 @@
         player.vx = t.direction === 'right' ? SPEED : -SPEED;
     }
     switch(t.c){
-      case '{': case '/': case '}': // springboard
+      case '{': case '}': // springboard
         resolveSolid(pret,t);
         if(player.vy>=0){player.vy=JUMP*2;player.onGround=false;}
         break;
@@ -163,25 +173,32 @@
     }
   }
 
-  function colorForChar(t){
-    if (t.direction) {
-        return '#f9a';
-    }
-    switch(t.c){
-      case '{': case '/': case '}': return '#AA3A34';
-      case '*': return '#f00';
-      case '+': return '#f66';
-      default: return '#AA4A44';
-    }
+            function colorForChar(t){
+                if (t.direction) {
+                    return '#f9a';
+                }
+                switch(t.c){
+                case '{': case '}': return '#AA3A34';
+                case '*': return '#222';
+                case '+': return '#f66';
+                default: return '#AA4A44';
+                }
+            }
+  
+  
+    function textColorForChar(t) {
+        switch(t.c) {
+            case '*': return '#f00'; break;
+            default: return '#222';
+        }
   }
 
   // camera
-  const camera={x:0,y:0};
+  const camera  =           {x:0,y:0};
 
-  let last=performance.now();
+  let last      =       performance.now();
   function loop(now){
     const dt=Math.min(0.05,(now-last)/1000); last=now;
-    //player.vx=0;
     if(keys.left)player.vx=-SPEED;
     if(keys.right)player.vx=SPEED;
     if(keys.up&&player.onGround){player.vy=JUMP;player.onGround=false;}
@@ -234,7 +251,7 @@
       let sx=t.x+camera.x, sy=t.y+camera.y;
       ctx.fillStyle=colorForChar(t);
       ctx.fillRect(sx,sy,t.w,t.h);
-      ctx.fillStyle='#222';
+      ctx.fillStyle=textColorForChar(t);
 
 
 
