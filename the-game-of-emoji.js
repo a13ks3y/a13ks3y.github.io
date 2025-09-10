@@ -111,10 +111,16 @@ const itemTypes = ITEM_TYPES_LIST.map(itemType => new ItemType(ITEM_TYPES[itemTy
 const rootEl = document.getElementsByTagName('main')[0];
 class App {
     items = []
-    width = 24
+    width = 16
     height = 13
     constructor(rootEl) {
         this.rootEl = rootEl;
+        const rootRect = document.body.getBoundingClientRect();
+        if (rootRect.height > rootRect.width) {
+            const width = this.width;
+            this.height = this.width;
+            this.width = this.height;
+        }
         this.items = Array(this.width * this.height).fill(' ').map(randomizeItemType).map((type, index) => new Item(itemTypes[type], this.indexToPoint(index), index));
         this.rootEl.style.gridTemplateRows = `repeat(${this.width}, 3.333rem)`;
         this.rootEl.style.gridTemplateColumns = `repeat(${this.height}, 3.333rem)`;
@@ -220,7 +226,7 @@ class App {
             if (x < 0) x = this.width + x; else x = x - this.width - 1;
         }
         if ((y < 0) || (y >= this.height)) {
-            if (y < 0) y = this.height + x; else y = y - this.height - 1;
+            if (y < 0) y = this.height + y; else y = y - this.height - 1;
         }
         const index = this.pointToIndex({
            x: Math.abs(x), y: Math.abs(y)
