@@ -164,7 +164,7 @@ class App {
                if (ns.length === 8) {
                    if (producers.some(prds => {
                         if (prds.every((p, i) => {
-                            return p === ns[i].type;
+                            return ns[i] ? p === ns[i].type : false;
                         })) {
                             return true;
                         }    
@@ -188,7 +188,7 @@ class App {
             } 
             if (item.itemType.movable) {
                 const ns = this.getNeighbors(prevItems, item);
-                const freeItem = ns.find(n => n.type === ' ');
+                const freeItem = ns.find(n => n && n.type === ' ');
                 if (freeItem) {
                     this.items[freeItem.index].type = item.type;
                     this.items[freeItem.index].itemType = itemTypes[item.type];
