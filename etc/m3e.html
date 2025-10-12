@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Match 3 Emoji</title>
+    <style type="text/css">
+        html, body {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0; padding: 0;
+        }
+        #ctx {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <canvas id="ctx" width="600" height="800"></canvas>
@@ -97,8 +110,41 @@ let fall = () => {
 };
 
 let isValidMove = (from, to) => {
-    //from.color = to.color;
-    return true; // todo
+    if (!from || !to) return false;
+    // must be adjacent
+    if (Math.abs(from.rx - to.rx) + Math.abs(from.ry - to.ry) !== 1) return false;
+    // swapping identical items does nothing
+    if (from.c === to.c) return false;
+
+    const inBounds = (x, y) => x >= 0 && y >= 0 && x < FIELD_WIDTH && y < FIELD_HEIGHT;
+
+    // color getter that simulates the swap without mutating state
+    const colorAt = (x, y) => {
+        if (x === from.rx && y === from.ry) return to.c;
+        if (x === to.rx && y === to.ry) return from.c;
+        return items[x] && items[x][y] ? items[x][y].c : undefined;
+        };
+
+    const hasLineAt = (x, y) => {
+        const color = colorAt(x, y);
+        if (!color) return false;
+
+        // horizontal count
+        let count = 1, i = x - 1;
+        while (inBounds(i, y) && colorAt(i, y) === color) { count++; i--; }
+        i = x + 1;
+        while (inBounds(i, y) && colorAt(i, y) === color) { count++; i++; }
+        if (count >= 3) return true;
+
+        // vertical count
+        count = 1; i = y - 1;
+        while (inBounds(x, i) && colorAt(x, i) === color) { count++; i--; }
+        i = y + 1;
+        while (inBounds(x, i) && colorAt(x, i) === color) { count++; i++; }
+        return count >= 3;
+    };
+
+    return hasLineAt(from.rx, from.ry) || hasLineAt(to.rx, to.ry);
 };
 let move = (from, to) => {
     items[to.rx][to.ry] = from;
@@ -114,28 +160,34 @@ let move = (from, to) => {
     to.y = to.ry * ITEM_SIZE;
     check();
 };
-
+let renderItem = (item) => {
+    ctx.font = ITEM_SIZE / 2 + 'px monospace';
+    ctx.fillText(item.c, item.x + ITEM_SIZE / 8, item.y + ITEM_SIZE / 1.6);
+}
 let render = () => {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     for (let x = 0; x < FIELD_WIDTH; x++) {
         for (let y = 0; y < FIELD_HEIGHT; y++) {
-            ctx.strokeStyle = selectedItem  && selectedItem.rx === x && selectedItem.ry === y ? 'red' : '#abc';
-            ctx.strokeRect(x * ITEM_SIZE, y * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
-
+            //ctx.strokeStyle = selectedItem  && selectedItem.rx === x && selectedItem.ry === y ? 'red' : '#abc';
+            //ctx.strokeRect(x * ITEM_SIZE, y * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
+            if (selectedItem && ~~(selectedItem.x / ITEM_SIZE) == x && ~~(selectedItem.y / ITEM_SIZE) == y) {
+                ctx.beginPath();
+                ctx.strokeStyle = "green";
+                ctx.arc(x * ITEM_SIZE + ITEM_SIZE / 2, y * ITEM_SIZE + ITEM_SIZE / 2, ITEM_SIZE / 2, 0, Math.PI * 2, true);
+                ctx.stroke();
+            }
             let item = items[x][y];
             if (!item) continue;
             if (item.d) {
                 if (deadAlpha < 1 && deadAlpha > 0) {
                     ctx.save();
                     ctx.globalAlpha = deadAlpha;
-                    ctx.font = ITEM_SIZE / 2 + 'px monospace';
-                    ctx.fillText(item.c, item.x + ITEM_SIZE / 4, item.y + ITEM_SIZE / 1.5);
+                    renderItem(item);
                     ctx.restore();
                 }
             } else {
-                ctx.font = ITEM_SIZE / 2 + 'px monospace';
-                ctx.fillText(item.c, item.x + ITEM_SIZE / 4, item.y + ITEM_SIZE / 1.5);
+                renderItem(item);
             }
             /* debug
             ctx.font = '10px monospace';
@@ -153,7 +205,7 @@ check();
 let lastTick = Date.now();
 requestAnimationFrame(function loop() {
     let dt = Date.now() - lastTick;
-    if (dt > 1000 / 120) {
+    if (dt > 1000 / 60) {
 
         for (let x = 0; x < FIELD_WIDTH; x++) {
             for (let y = 0; y < FIELD_HEIGHT; y++) {
@@ -161,20 +213,21 @@ requestAnimationFrame(function loop() {
                 if (item && !isNaN(item.dry)) {
                     if (item.y >= item.dry * ITEM_SIZE) {
                         item.ry = ~~(item.y / ITEM_SIZE);
+                        item.y = item.ry * ITEM_SIZE;
                         item.dry = null;
                     } else {
-                        item.y += 8;
+                        item.y += 14;
                     }
                 }
             }
         }
 
         if (deadAlpha > 0 && deadAlpha < 1) {
-            deadAlpha -= 0.02;
+            deadAlpha -= 0.0666;
         } else if (deadAlpha <= 0) {
             fall();
             deadAlpha = 1;
-            setTimeout(check, 1000);
+            setTimeout(check, 666 / 3);
         }
         lastTick = Date.now();
     }
