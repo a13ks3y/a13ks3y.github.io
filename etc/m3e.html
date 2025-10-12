@@ -26,6 +26,13 @@ let ITEM_SIZE = 64;
 let ITEM_COLORS = ['🍕', '🍌', '🥥', '🍄', '🍒'];
 let FIELD_WIDTH = 11;
 let FIELD_HEIGHT = 20;
+
+if (window.screen.availWidth < 720) {
+    ITEM_SIZE = 72;
+    FIELD_WIDTH = 8;
+    FIELD_HEIGHT = 16;
+}
+
 let ctx = document.getElementById('ctx').getContext('2d');
 ctx.canvas.width = FIELD_WIDTH * ITEM_SIZE;
 ctx.canvas.height = FIELD_HEIGHT * ITEM_SIZE;
@@ -162,7 +169,8 @@ let move = (from, to) => {
 };
 let renderItem = (item) => {
     ctx.font = ITEM_SIZE / 2 + 'px monospace';
-    ctx.fillText(item.c, item.x + ITEM_SIZE / 8, item.y + ITEM_SIZE / 1.6);
+    const m = ITEM_SIZE / 6;
+    ctx.fillText(item.c, item.x + m, item.y + ITEM_SIZE / 1.5);
 }
 let render = () => {
     ctx.fillStyle = 'black';
