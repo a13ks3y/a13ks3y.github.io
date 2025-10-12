@@ -13,6 +13,12 @@
             width: 100%;
             height: 100%;
             margin: 0; padding: 0;
+            background-color: black;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #ctx {
             margin: 0;
@@ -29,8 +35,8 @@ let FIELD_HEIGHT = 20;
 
 if (window.screen.availWidth < 720) {
     ITEM_SIZE = 72;
-    FIELD_WIDTH = 8;
-    FIELD_HEIGHT = 16;
+    FIELD_WIDTH = ~~(window.screen.availWidth / ITEM_SIZE);
+    FIELD_HEIGHT = ~~(window.screen.availHeight / ITEM_SIZE);
 }
 
 let ctx = document.getElementById('ctx').getContext('2d');
@@ -181,9 +187,29 @@ let render = () => {
             //ctx.strokeRect(x * ITEM_SIZE, y * ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
             if (selectedItem && ~~(selectedItem.x / ITEM_SIZE) == x && ~~(selectedItem.y / ITEM_SIZE) == y) {
                 ctx.beginPath();
-                ctx.strokeStyle = "green";
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = 'green';
+                
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                ctx.fillStyle = "green";
                 ctx.arc(x * ITEM_SIZE + ITEM_SIZE / 2, y * ITEM_SIZE + ITEM_SIZE / 2, ITEM_SIZE / 2, 0, Math.PI * 2, true);
-                ctx.stroke();
+                ctx.fill();
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+                ctx.beginPath();
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'black';
+                ctx.fillStyle = "black";
+                ctx.arc(x * ITEM_SIZE + ITEM_SIZE / 2, y * ITEM_SIZE + ITEM_SIZE / 2, ITEM_SIZE / 2 - 3, 0, Math.PI * 2, true);
+                ctx.fill();
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+
+
             }
             let item = items[x][y];
             if (!item) continue;
