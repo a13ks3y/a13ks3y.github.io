@@ -36,7 +36,7 @@ let FIELD_HEIGHT = 20;
 if (window.screen.availWidth < 720) {
     ITEM_SIZE = 72;
     FIELD_WIDTH = ~~(window.screen.availWidth / ITEM_SIZE);
-    FIELD_HEIGHT = ~~(window.screen.availHeight / ITEM_SIZE);
+    FIELD_HEIGHT = ~~(window.screen.availHeight / ITEM_SIZE) - 1;
 }
 
 let ctx = document.getElementById('ctx').getContext('2d');
