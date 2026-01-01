@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wave Pump — Single Pipe (p5.js)</title>
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0b1020; color: #e5e7eb; font-family: system-ui, sans-serif; }
+    #ui { position: fixed; left: 12px; top: 10px; background: rgba(0,0,0,0.45); padding: 12px; border-radius: 10px; backdrop-filter: blur(2px); max-width: 380px; }
+    #ui h2 { margin: 8px 0 6px; font-size: 14px; font-weight: 700; }
+    .row { display: grid; grid-template-columns: 120px 1fr 62px; gap: 8px; align-items: center; margin: 6px 0; }
+    .row label { font-size: 12px; color: #cbd5e1; }
+    .row input[type="range"] { width: 100%; }
+    .row input[type="number"] { width: 100%; padding: 3px 6px; background: #0b1228; border: 1px solid #334155; color: #e5e7eb; border-radius: 6px; }
+    .btns { display: flex; gap: 8px; margin-top: 8px; }
+    button { background: #1f2937; color: #dbeafe; border: 1px solid #334155; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+    button:hover { background: #0f172a; }
+    .panel { margin-top: 8px; padding: 8px; border: 1px solid #334155; border-radius: 8px; background: rgba(0,0,0,0.35); }
+    .readout { font-size: 12px; color: #e5e7eb; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <div><strong>Wave Pump — Single Pipe</strong></div>
+    <div class="readout">Ideal-gas + hydrostatic coupling. Space: pause.</div>
+
+    <h2>Geometry</h2>
+    <div class="row">
+      <label for="scalePxPerM">Scale (px/m)</label>
+      <input id="scalePxPerM" type="range" min="40" max="200" step="5" value="100" />
+      <input id="scalePxPerM_num" type="number" value="100" />
+    </div>
+    <div class="row">
+      <label for="pipeIDmm">Pipe ID (mm)</label>
+      <input id="pipeIDmm" type="range" min="10" max="800" step="1" value="100" />
+      <input id="pipeIDmm_num" type="number" value="100" />
+    </div>
+    <div class="row">
+      <label for="waterline">Waterline (%)</label>
+      <input id="waterline" type="range" min="40" max="85" step="1" value="62" />
+      <input id="waterline_num" type="number" value="62" />
+    </div>
+
+    <h2>Visuals</h2>
+    <div class="row">
+      <label for="pistonPct">Piston Thick (%)</label>
+      <input id="pistonPct" type="range" min="5" max="90" step="1" value="50" />
+      <input id="pistonPct_num" type="number" value="50" />
+    </div>
+
+    <h2>Wave</h2>
+    <div class="row">
+      <label for="amp1">Amplitude 1 (px)</label>
+      <input id="amp1" type="range" min="0" max="60" step="1" value="22" />
+      <input id="amp1_num" type="number" value="22" />
+    </div>
+    <div class="row">
+      <label for="amp2">Amplitude 2 (px)</label>
+      <input id="amp2" type="range" min="0" max="40" step="1" value="10" />
+      <input id="amp2_num" type="number" value="10" />
+    </div>
+    <div class="row">
+      <label for="lambda1">λ1 Factor</label>
+      <input id="lambda1" type="range" min="0.4" max="2.5" step="0.1" value="0.8" />
+      <input id="lambda1_num" type="number" value="0.8" />
+    </div>
+    <div class="row">
+      <label for="lambda2">λ2 Factor</label>
+      <input id="lambda2" type="range" min="0.3" max="1.5" step="0.1" value="0.5" />
+      <input id="lambda2_num" type="number" value="0.5" />
+    </div>
+    <div class="row">
+      <label for="speed1">Speed 1</label>
+      <input id="speed1" type="range" min="0" max="3" step="0.05" value="1.0" />
+      <input id="speed1_num" type="number" value="1.0" />
+    </div>
+    <div class="row">
+      <label for="speed2">Speed 2</label>
+      <input id="speed2" type="range" min="0" max="3" step="0.05" value="1.6" />
+      <input id="speed2_num" type="number" value="1.6" />
+    </div>
+
+    <h2>Physics</h2>
+    <div class="row">
+      <label for="manifoldVolL">Manifold Vol (L)</label>
+      <input id="manifoldVolL" type="range" min="2" max="200" step="1" value="20" />
+      <input id="manifoldVolL_num" type="number" value="20" />
+    </div>
+    <div class="row">
+      <label for="tempC">Temperature (°C)</label>
+      <input id="tempC" type="range" min="0" max="40" step="1" value="20" />
+      <input id="tempC_num" type="number" value="20" />
+    </div>
+    <div class="row">
+      <label for="ambientAtm">Ambient (atm)</label>
+      <input id="ambientAtm" type="range" min="0.5" max="1.2" step="0.01" value="1.00" />
+      <input id="ambientAtm_num" type="number" value="1.00" />
+    </div>
+    <div class="row">
+      <label for="rhoWater">Water ρ (kg/m³)</label>
+      <input id="rhoWater" type="range" min="900" max="1100" step="1" value="1000" />
+      <input id="rhoWater_num" type="number" value="1000" />
+    </div>
+    <div class="row">
+      <label for="buoyK">Buoyancy K (m/s²/m)</label>
+      <input id="buoyK" type="range" min="0" max="4" step="0.05" value="1.2" />
+      <input id="buoyK_num" type="number" value="1.2" />
+    </div>
+    <div class="row">
+      <label for="pistonK">Piston K (m/s/MPa)</label>
+      <input id="pistonK" type="range" min="0" max="2" step="0.01" value="0.20" />
+      <input id="pistonK_num" type="number" value="0.20" />
+    </div>
+    <div class="row">
+      <label for="damping">Damping</label>
+      <input id="damping" type="range" min="0" max="4" step="0.05" value="0.8" />
+      <input id="damping_num" type="number" value="0.8" />
+    </div>
+    <div class="row">
+      <label for="condOut">Cond Out</label>
+      <input id="condOut" type="range" min="0" max="8" step="0.1" value="2.0" />
+      <input id="condOut_num" type="number" value="2.0" />
+    </div>
+    <div class="row">
+      <label for="condIn">Cond In</label>
+      <input id="condIn" type="range" min="0" max="8" step="0.1" value="2.0" />
+      <input id="condIn_num" type="number" value="2.0" />
+    </div>
+
+    <div class="btns">
+      <button id="reset" type="button">Reset</button>
+      <button id="randomize" type="button">Randomize Wave</button>
+    </div>
+
+    <div id="readout" class="panel readout">
+      <div>Pipe P: — Pa (— atm)</div>
+      <div>Manifold P: — Pa (— atm)</div>
+      <div>n_out: — mol/s, n_in: — mol/s</div>
+      <div>Total pumped: — L (ambient)</div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="wave-pump-item.js"></script>
+</body>
+</html>
