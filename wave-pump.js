@@ -10,6 +10,8 @@ let manifold = { volume_m3: 0.02, n: 0, pressurePa: 101325 };
 let totalPumpedMoles = 0; // cumulative moles delivered to manifold
 let instPowerW = 0; // instantaneous power
 let avgPowerW = 0;  // EMA of power
+let instFlowLph = 0; // instantaneous pumped flow (L/h)
+let avgFlowLph = 0;  // EMA of pumped flow (L/h)
 
 const cfg = {
   numPipes: 9,      // Will be calculated dynamically
@@ -149,6 +151,9 @@ class Pipe {
     this.pressurePa = atmToPa(cfg.physics.ambientAtm);
     this.initGas();
     this.lastPowerW = 0;
+    this.lastOutFlow_m3ps = 0;
+    this.lastInFlow_m3ps = 0;
+    this.lastPressureAtm = cfg.physics.ambientAtm;
   }
 
   update(dtOverride) {
@@ -176,6 +181,7 @@ class Pipe {
     
     // Ideal Gas Law: P = nRT/V
     this.pressurePa = (this.n > 0 && V > 1e-9) ? (this.n * GAS_R * T) / V : atmToPa(cfg.physics.ambientAtm);
+    this.lastPressureAtm = this.pressurePa / 101325;
 
     const Pamb = atmToPa(cfg.physics.ambientAtm);
     const Pman = manifold.pressurePa;
@@ -199,13 +205,16 @@ class Pipe {
         totalPumpedMoles += nOut;
 
         // Power Calculation: Power = ΔP * FlowRate
-        const flowRate = (nOut / dt) * GAS_R * T / this.pressurePa;
-        this.lastPowerW = dp * flowRate;
+        const flowRate_m3ps = (nOut / dt) * GAS_R * T / this.pressurePa;
+        this.lastPowerW = dp * flowRate_m3ps;
+        this.lastOutFlow_m3ps = flowRate_m3ps;
       } else {
         this.lastPowerW = 0;
+        this.lastOutFlow_m3ps = 0;
       }
     } else {
       this.lastPowerW = 0;
+      this.lastOutFlow_m3ps = 0;
     }
 
     // Inlet flow occurs only when intake valve is open; use positive ΔP
@@ -216,7 +225,11 @@ class Pipe {
         const cond = cfg.physics.condIn;
         nIn = (cond * dp * dt) / (GAS_R * T);
         this.n += nIn;
+        const inFlow_m3ps = (nIn / dt) * GAS_R * T / max(this.pressurePa, 1);
+        this.lastInFlow_m3ps = inFlow_m3ps;
       }
+    } else {
+      this.lastInFlow_m3ps = 0;
     }
     this.prevY = this.pistonY;
   }
@@ -443,10 +456,28 @@ function drawReadout() {
   for (const p of pipes) instPowerW += p.lastPowerW || 0;
   const a = 0.05; 
   avgPowerW = avgPowerW * (1 - a) + instPowerW * a;
+
+  // Flow (L/h): sum of outlet volumetric flow across pipes
+  instFlowLph = 0;
+  for (const p of pipes) instFlowLph += (p.lastOutFlow_m3ps || 0) * 1000 * 3600;
+  avgFlowLph = avgFlowLph * (1 - a) + instFlowLph * a;
+
+  // Per-pipe compact readout
+  let perPipe = '';
+  for (let i = 0; i < pipes.length; i++) {
+    const p = pipes[i];
+    const pAtm = p.lastPressureAtm || (p.pressurePa / 101325);
+    const outLph = (p.lastOutFlow_m3ps || 0) * 1000 * 3600;
+    perPipe += `<div>#${i+1}: P ${nf(pAtm,1,2)} atm · Out ${nf(outLph,1,1)} L/h</div>`;
+  }
   
   read.innerHTML = `<div style="display:flex; justify-content:space-between"><span>Manifold: ${nf(atm,1,2)} atm</span> <span>Active Pipes: ${cfg.numPipes}</span></div>`+
                    `<div>Total Volume: ${nf(pumped_L,1,1)} L</div>`+
+                   `<div>Current Flow: ${nf(instFlowLph,1,1)} L/h</div>`+
+                   `<div>Avg Flow: ${nf(avgFlowLph,1,1)} L/h</div>`+
                    `<div>Avg Power: ${nf(avgPowerW,1,1)} W</div>`;
+                   `<div style="margin-top:6px; color:#93c5fd">Per Pipe:</div>`+
+                   perPipe;
 }
 
 function atmToPa(atm) { return atm * 101325; }
