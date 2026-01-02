@@ -5,51 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wave Air Pump Optimizer</title>
   <style>
-    html, body { position: absolute; left: 0; top:0; height: 100%; height: 100%; padding: 0; margin:0; }
+    html, body { position: absolute; left: 0; top: 0; width: 100%; height: 100%; padding: 0; margin: 0; }
     body { margin: 0; background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
     #ui { 
-        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
-        position: fixed; left: 12px; top: 10px; bottom: 10px;
-        background: rgba(0,0,0,0.65); padding: 15px; border-radius: 8px; 
-        backdrop-filter: blur(5px); width: 340px; overflow-y: auto;
-        border: 1px solid #333;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; 
+      position: fixed; left: 12px; top: 56px; bottom: 12px;
+      background: rgba(0,0,0,0.75); padding: 20px; border-radius: 8px; 
+      backdrop-filter: blur(8px); overflow-y: auto;
+      border: 1px solid #333;
     }
-    #ui h2 { grid-column: span 2; margin: 12px 0 6px; font-size: 14px; font-weight: 700; color: #fff; border-bottom: 1px solid #444; padding-bottom: 4px; }
-    #ui h2:first-child { margin-top: 0; }
-    .row { grid-column: span 2; display: flex; align-items: center; gap: 8px; margin: 2px 0; }
-    .row label { flex: 0 0 100px; font-size: 12px; color: #b0bec5; }
-    .row input[type="range"] { flex: 1 1 auto; cursor: pointer; }
+    #ui > div:first-child { grid-column: span 2; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    #ui h2 { grid-column: span 1; margin: 16px 0 8px; font-size: 14px; font-weight: 700; color: #fff; border-bottom: 1px solid #444; padding-bottom: 4px; }
+    #ui h2:first-of-type { margin-top: 0; }
     
-    .btns { grid-column: span 2; display: flex; gap: 8px; margin-top: 8px; }
-    button { flex: 1; background: #2563eb; color: #fff; border: none; border-radius: 4px; padding: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s;}
+    .row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+    .row label { flex: 0 0 110px; font-size: 12px; color: #b0bec5; }
+    .row input[type="range"] { flex: 1 1 auto; cursor: pointer; }
+
+    .btns { display: flex; gap: 8px; margin-top: 8px; }
+    button { flex: 1; background: #2563eb; color: #fff; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
     button:hover { background: #1d4ed8; }
     button:disabled { background: #475569; cursor: wait; }
-    
-    .panel { grid-column: span 2; margin-top: 8px; padding: 10px; border: 1px solid #475569; border-radius: 6px; background: rgba(0,0,0,0.4); }
-    .readout { font-family: monospace; font-size: 12px; color: #86efac; line-height: 1.5; }
-    .desc { grid-column: span 2; font-size: 11px; color: #94a3b8; margin-bottom: 10px; }
-    
+
+    .panel { margin-top: 8px; padding: 12px; border: 1px solid #475569; border-radius: 6px; background: rgba(0,0,0,0.5); font-family: monospace; font-size: 12px; line-height: 1.6; }
+    .readout { color: #86efac; }
+    .desc { font-size: 11px; color: #94a3b8; margin-bottom: 10px; line-height: 1.4; }
+
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #1e293b; }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+      /* Utility and layout classes */
+      .title { grid-column: span 2; font-weight: 700; color: #fff; }
+      h2.section { grid-column: span 2; margin: 12px 0 6px; font-size: 14px; font-weight: 700; color: #fff; border-bottom: 1px solid #444; padding-bottom: 4px; }
+      .row.align-end { justify-content: flex-end; }
+      .meta { font-size: 11px; color: #aaa; }
+      .panel.col-2 { grid-column: 2; }
+      .readout.warn { color: #fbbf24; }
+      .readout.info { color: #93c5fd; }
+      .numPipesDisplay { margin-left: 5px; color: #fff; }
+      .button { flex: 1; background: #2563eb; color: #fff; border: none; border-radius: 4px; padding: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+      .button:hover { background: #1d4ed8; }
+      .button:disabled { background: #475569; cursor: wait; }
+      .button.secondary { background: #475569; }
+      .toggle-btn { position: fixed; left: 12px; top: 12px; z-index: 1000; width: 36px; height: 32px; border-radius: 6px; border: 1px solid #333; background: #111; color: #eee; cursor: pointer; }
+
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        #ui {
+          grid-template-columns: 1fr; gap: 12px;
+          left: 8px; right: 0; top: 60px; bottom: auto;
+          width: auto; max-height: calc(100vh - 76px);
+          max-width: 100vw;
+        }
+        .row { grid-column: span 2; }
+        .row label { flex: 0 0 100px; max-width: 80vw; }
+        .btns { flex-direction: column; }
+        .panel.col-2 { grid-column: span 2; }
+        .toggle-btn { width: 44px; height: 36px; }
+        #ui h2 { grid-column: span 2; }
+      }
   </style>
 </head>
 <body>
+  <button id="toggleUI" title="Toggle Controls" class="toggle-btn">☰</button>
   <div id="ui">
-    <div style="grid-column: span 2"><strong>Wave Pump Optimizer</strong></div>
+    <div class="title"><strong>Wave Pump Optimizer</strong></div>
     <div class="desc">
         Physics simulation of wave energy conversion. <br>
         Optimize <strong>Spacing</strong> (affects pipe count) and <strong>Diameter</strong> (affects flow).
     </div>
 
-    <h2>Configuration</h2>
+    <h2 class="section">Configuration</h2>
     <div class="row">
-      <label for="pipeSpacing">Spacing (px)</label>
-      <input id="pipeSpacing" type="range" min="30" max="200" step="5" value="80" />
+      <label for="pipeSpacing">Spacing (m)</label>
+      <input id="pipeSpacing" type="range" min="0.3" max="2.0" step="0.05" value="0.8" />
     </div>
-    <div class="row" style="justify-content: flex-end; font-size: 11px; color: #aaa;">
-       Active Pipes: <span id="numPipesDisplay" style="margin-left:5px; color:#fff">9</span>
+     <div class="row align-end meta">
+       Active Pipes: <span id="numPipesDisplay" class="numPipesDisplay">9</span>
     </div>
 
     <div class="row">
@@ -57,39 +90,42 @@
       <input id="pipeIDmm" type="range" min="20" max="300" step="5" value="50" />
     </div>
 
-    <h2>Wave Parameters</h2>
-    <div class="row"><label>Amplitude 1</label><input id="amp1" type="range" min="0" max="60" value="22" /></div>
-    <div class="row"><label>Amplitude 2</label><input id="amp2" type="range" min="0" max="40" value="10" /></div>
+    <h2 class="section">Wave Parameters</h2>
+    <div class="row"><label>Amplitude 1 (m)</label><input id="amp1" type="range" min="0" max="1.0" step="0.01" value="0.22" /></div>
+    <div class="row"><label>Amplitude 2 (m)</label><input id="amp2" type="range" min="0" max="1.0" step="0.01" value="0.10" /></div>
     <div class="row"><label>Speed 1</label><input id="speed1" type="range" min="0.1" max="3" step="0.1" value="1.0" /></div>
     <div class="row"><label>Speed 2</label><input id="speed2" type="range" min="0.1" max="3" step="0.1" value="1.6" /></div>
     <div class="row"><label>λ Factor 1</label><input id="lambda1" type="range" min="0.5" max="2.0" step="0.1" value="0.7" /></div>
     <div class="row"><label>λ Factor 2</label><input id="lambda2" type="range" min="0.3" max="1.5" step="0.1" value="0.4" /></div>
     
     <div class="btns">
-      <button id="randomize" type="button" style="background:#475569">Random Wave</button>
-      <button id="reset" type="button" style="background:#475569">Reset Defaults</button>
+      <button id="randomize" type="button" class="button secondary">Random Wave</button>
+      <button id="reset" type="button" class="button secondary">Reset Defaults</button>
     </div>
 
-    <h2>Environment</h2>
+    <h2 class="section">Environment</h2>
     <div class="row"><label>Waterline %</label><input id="waterline" type="range" min="40" max="80" value="62" /></div>
-    <div class="row"><label>Manifold Vol</label><input id="manifoldVolL" type="range" min="5" max="100" value="20" /></div>
+    <div class="row"><label>Manifold Vol (L)</label><input id="manifoldVolL" type="range" min="5" max="100" value="20" /></div>
     <div class="row"><label>Ambient Atm</label><input id="ambientAtm" type="range" min="0.8" max="1.2" step="0.01" value="1.0" /></div>
 
-    <div class="panel readout" id="readout">Loading...</div>
-
-    <h2>Optimization Tool</h2>
+    <h2 class="section">Optimization Tool</h2>
     <div class="desc">Finds best Pipe Diameter and Spacing for max Power.</div>
-    <div class="row"><label>Min Spacing</label><input id="optSpMin" type="range" min="30" max="100" value="40" /></div>
-    <div class="row"><label>Max Spacing</label><input id="optSpMax" type="range" min="100" max="300" value="180" /></div>
+    <div class="row"><label>Min Spacing (m)</label><input id="optSpMin" type="range" min="0.3" max="1.0" step="0.05" value="0.4" /></div>
+    <div class="row"><label>Max Spacing (m)</label><input id="optSpMax" type="range" min="1.0" max="3.0" step="0.05" value="1.8" /></div>
     <div class="row"><label>Min Pipe ID</label><input id="optIdMin" type="range" min="20" max="100" value="30" /></div>
     <div class="row"><label>Max Pipe ID</label><input id="optIdMax" type="range" min="100" max="400" value="250" /></div>
     <div class="row"><label>Seconds/Run</label><input id="optSeconds" type="range" min="2" max="10" value="4" /></div>
     <div class="row"><label>Scenarios</label><input id="optScenarios" type="range" min="1" max="5" value="2" /></div>
-    
+    <div class="panel readout warn col-2" id="optResult">Ready to optimize.</div>
+
     <div class="btns">
-      <button id="runOpt" type="button">Run Optimization</button>
+      <div class="row">
+        <button id="runOpt" type="button" class="button">Run Optimization</button>
+      </div>
     </div>
-    <div class="panel readout" id="optResult" style="color:#fbbf24">Ready to optimize.</div>
+    <div id="pipePressuresPanel" class="panel readout info col-2">Pipe Pressures will appear here</div>
+    <div class="panel readout col-2" id="readout">Loading...</div>
+
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>

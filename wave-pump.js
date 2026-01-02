@@ -10,13 +10,13 @@ let manifold = { volume_m3: 0.02, n: 0, pressurePa: 101325 };
 let totalPumpedMoles = 0; // cumulative moles delivered to manifold
 let instPowerW = 0; // instantaneous power
 let avgPowerW = 0;  // EMA of power
-let instFlowLph = 0; // instantaneous pumped flow (L/h)
-let avgFlowLph = 0;  // EMA of pumped flow (L/h)
+let instFlowLpm = 0; // instantaneous pumped flow (L/min)
+let avgFlowLpm = 0;  // EMA of pumped flow (L/min)
 
 const cfg = {
   numPipes: 9,      // Will be calculated dynamically
   pipeWidth: 60,    // Visual width
-  spacing: 80,      // Spacing between pipe centers
+  spacing_m: 0.8,   // Spacing between pipe centers (meters)
   marginRatio: 0.08,
   waterlinePercent: 62,
   physics: {
@@ -26,11 +26,12 @@ const cfg = {
     tempC: 20,              // ambient temperature
     ambientAtm: 1.0,        // ambient pressure
     condOut: 2.0,           // valve conductance
-    condIn: 2.0
+    condIn: 2.0,
+    manifoldMaxAtm: 5.0     // threshold to auto-empty manifold
   },
   wave: {
-    A1: 22,
-    A2: 10,
+    A1: 0.22,
+    A2: 0.10,
     lambda1Factor: 0.7, 
     lambda2Factor: 0.4,
     speed1: 1.0,
@@ -84,7 +85,8 @@ function getWaveY(x, phaseOffset = 0) {
   const w1 = cfg.wave.speed1;
   const w2 = cfg.wave.speed2;
   const ph = wavePhase + phaseOffset;
-  return waterlineY + A1 * sin(k1 * x - ph * w1) + A2 * sin(k2 * x + ph * w2);
+  const scale = cfg.physics.scalePxPerM;
+  return waterlineY + (A1 * scale) * sin(k1 * x - ph * w1) + (A2 * scale) * sin(k2 * x + ph * w2);
 }
 
 function drawWater() {
@@ -133,7 +135,8 @@ function drawManifold() {
   fill(200);
   textAlign(LEFT, CENTER);
   textSize(12);
-  text('P: ' + nf(manifold.pressurePa, 0, 0) + ' Pa', gX, gY + gH + 14);
+  const atmVal = manifold.pressurePa / 101325;
+  text('P: ' + nf(manifold.pressurePa, 0, 0) + ' Pa (' + nf(atmVal,1,2) + ' atm)', gX, gY + gH + 14);
 }
 
 class Pipe {
@@ -201,7 +204,8 @@ class Pipe {
         nOut = (cond * dp * dt) / (GAS_R * T);
         nOut = constrain(nOut, 0, max(0, this.n));
         this.n -= nOut;
-        // Manifold acts as an ambient sink; do not accumulate moles
+        // Accumulate delivered moles into manifold storage
+        manifold.n += nOut;
         totalPumpedMoles += nOut;
 
         // Power Calculation: Power = ΔP * FlowRate
@@ -308,15 +312,15 @@ function buildPipes() {
   
   // Calculate how many pipes fit with current spacing
   // Ensure spacing is at least pipeWidth + padding
-  const safeSpacing = max(cfg.spacing, widthPx + 10);
-  const count = floor(availableW / safeSpacing);
+  const safeSpacingPx = max(cfg.spacing_m * cfg.physics.scalePxPerM, widthPx + 10);
+  const count = floor(availableW / safeSpacingPx);
   
   // Center the block of pipes
-  const totalSpan = (count - 1) * safeSpacing;
+  const totalSpan = (count - 1) * safeSpacingPx;
   const startX = (width - totalSpan) / 2;
 
   for (let i = 0; i < count; i++) {
-    const x = startX + i * safeSpacing;
+    const x = startX + i * safeSpacingPx;
     pipes.push(new Pipe(x, widthPx, cfg.physics.pipeID_mm));
   }
   
@@ -359,7 +363,7 @@ function bindUI() {
   const rebuild = () => { computeLayout(); buildPipes(); initManifold(); };
 
   pipeSpacingEl.addEventListener('input', () => {
-    cfg.spacing = int(pipeSpacingEl.value);
+    cfg.spacing_m = float(pipeSpacingEl.value);
     rebuild();
   });
   
@@ -386,16 +390,16 @@ function bindUI() {
   ambEl.addEventListener('input', () => { cfg.physics.ambientAtm = float(ambEl.value); initManifold(); for (const p of pipes) p.initGas(); });
 
   resetBtn.addEventListener('click', () => {
-    cfg.spacing = 80; pipeSpacingEl.value = 80;
-    cfg.wave.A1 = 22; amp1El.value = 22;
-    cfg.wave.A2 = 10; amp2El.value = 10;
+    cfg.spacing_m = 0.8; pipeSpacingEl.value = 0.8;
+    cfg.wave.A1 = 0.22; amp1El.value = 0.22;
+    cfg.wave.A2 = 0.10; amp2El.value = 0.10;
     cfg.physics.pipeID_mm = 50; idEl.value = 50;
     rebuild();
   });
 
   randomBtn.addEventListener('click', () => {
-    cfg.wave.A1 = round(random(10, 40)); amp1El.value = cfg.wave.A1;
-    cfg.wave.A2 = round(random(5, 25)); amp2El.value = cfg.wave.A2;
+    cfg.wave.A1 = round(random(0.05, 0.6), 2); amp1El.value = cfg.wave.A1;
+    cfg.wave.A2 = round(random(0.03, 0.4), 2); amp2El.value = cfg.wave.A2;
     cfg.wave.lambda1Factor = round(random(0.5, 2.0), 1); lambda1El.value = cfg.wave.lambda1Factor;
     cfg.wave.lambda2Factor = round(random(0.3, 1.2), 1); lambda2El.value = cfg.wave.lambda2Factor;
     cfg.wave.speed1 = round(random(0.4, 2.2), 2); speed1El.value = cfg.wave.speed1;
@@ -423,6 +427,17 @@ function bindUI() {
       }, 50);
     });
   }
+
+  // Hamburger toggle
+  const toggleBtn = byId('toggleUI');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const ui = byId('ui');
+      if (!ui) return;
+      const isHidden = ui.style.display === 'none';
+      ui.style.display = isHidden ? 'grid' : 'none';
+    });
+  }
 }
 
 function initManifold() {
@@ -434,12 +449,17 @@ function initManifold() {
 }
 
 function updateManifoldPressure() {
-  // Manifold is an infinite consumer at ambient pressure; no accumulation
-  const Pamb = atmToPa(cfg.physics.ambientAtm);
   const T = cfg.physics.tempC + 273.15;
-  manifold.pressurePa = Pamb;
-  // Keep n consistent with ambient for display-only purposes
-  manifold.n = (Pamb * manifold.volume_m3) / (GAS_R * T);
+  const V = max(manifold.volume_m3, 1e-9);
+  manifold.pressurePa = (manifold.n * GAS_R * T) / V;
+  // Auto-empty when "full": if exceeds max atm threshold, vent to ambient
+  const Pamb = atmToPa(cfg.physics.ambientAtm);
+  const maxPa = Pamb * (cfg.physics.manifoldMaxAtm || 5.0);
+  if (manifold.pressurePa > maxPa) {
+    // Reset manifold moles to ambient
+    manifold.n = (Pamb * V) / (GAS_R * T);
+    manifold.pressurePa = Pamb;
+  }
 }
 
 function drawReadout() {
@@ -457,27 +477,39 @@ function drawReadout() {
   const a = 0.05; 
   avgPowerW = avgPowerW * (1 - a) + instPowerW * a;
 
-  // Flow (L/h): sum of outlet volumetric flow across pipes
-  instFlowLph = 0;
-  for (const p of pipes) instFlowLph += (p.lastOutFlow_m3ps || 0) * 1000 * 3600;
-  avgFlowLph = avgFlowLph * (1 - a) + instFlowLph * a;
+  // Flow (L/min): sum of outlet volumetric flow across pipes
+  instFlowLpm = 0;
+  for (const p of pipes) instFlowLpm += (p.lastOutFlow_m3ps || 0) * 1000 * 60;
+  avgFlowLpm = avgFlowLpm * (1 - a) + instFlowLpm * a;
 
   // Per-pipe compact readout
   let perPipe = '';
   for (let i = 0; i < pipes.length; i++) {
     const p = pipes[i];
     const pAtm = p.lastPressureAtm || (p.pressurePa / 101325);
-    const outLph = (p.lastOutFlow_m3ps || 0) * 1000 * 3600;
-    perPipe += `<div>#${i+1}: P ${nf(pAtm,1,2)} atm · Out ${nf(outLph,1,1)} L/h</div>`;
+    const outLpm = (p.lastOutFlow_m3ps || 0) * 1000 * 60;
+    perPipe += `<div>#${i+1}: P ${nf(pAtm,1,2)} atm · Out ${nf(outLpm,1,1)} L/m</div>`;
   }
+  // Total pipe volumes and gas equivalent at ambient
+  let totalPipeVol_m3 = 0;
+  let totalPipeMoles = 0;
+  for (const p of pipes) { totalPipeVol_m3 += p.currentVolumeM3(); totalPipeMoles += p.n; }
+  const totalPipeVol_L = totalPipeVol_m3 * 1000;
+  const totalPipeEqAmb_m3 = (totalPipeMoles * GAS_R * T) / Pamb;
+  const totalPipeEqAmb_L = totalPipeEqAmb_m3 * 1000;
   
   read.innerHTML = `<div style="display:flex; justify-content:space-between"><span>Manifold: ${nf(atm,1,2)} atm</span> <span>Active Pipes: ${cfg.numPipes}</span></div>`+
-                   `<div>Total Volume: ${nf(pumped_L,1,1)} L</div>`+
-                   `<div>Current Flow: ${nf(instFlowLph,1,1)} L/h</div>`+
-                   `<div>Avg Flow: ${nf(avgFlowLph,1,1)} L/h</div>`+
-                   `<div>Avg Power: ${nf(avgPowerW,1,1)} W</div>`;
+                   `<div>Total Pumped: ${nf(pumped_L,1,1)} L (to manifold)</div>`+
+                   `<div>Pipes Volume: ${nf(totalPipeVol_L,1,1)} L (geom)</div>`+
+                   `<div>Pipes Gas @amb: ${nf(totalPipeEqAmb_L,1,1)} L</div>`+
+                   `<div>Current Flow: ${nf(instFlowLpm,1,1)} L/m</div>`+
+                   `<div>Avg Flow: ${nf(avgFlowLpm,1,1)} L/m</div>`+
+                   `<div>Avg Power: ${nf(avgPowerW,1,1)} W</div>`+
                    `<div style="margin-top:6px; color:#93c5fd">Per Pipe:</div>`+
                    perPipe;
+
+  const pipePanel = document.getElementById('pipePressuresPanel');
+  if (pipePanel) pipePanel.innerHTML = perPipe;
 }
 
 function atmToPa(atm) { return atm * 101325; }
@@ -492,11 +524,11 @@ function computePipeVisualWidthPx(id_mm, scalePxPerM) {
 // --- Optimization Logic ---
 
 function runOptimization({ idMin, idMax, spacingMin, spacingMax, scenarios, seconds }) {
-  let best = { score: -Infinity, pipeID_mm: 50, spacing: 80 };
+  let best = { score: -Infinity, pipeID_mm: 50, spacing: 0.8 };
   
   // Save current state to restore later
-  const savedState = { 
-      spacing: cfg.spacing, 
+    const savedState = { 
+      spacing_m: cfg.spacing_m, 
       id: cfg.physics.pipeID_mm,
       wave: {...cfg.wave}
   };
@@ -519,12 +551,12 @@ function runOptimization({ idMin, idMax, spacingMin, spacingMax, scenarios, seco
       let scenarioScoreSum = 0;
       
       for (let s = 0; s < scenarios; s++) {
-        // Randomize wave slightly for robustness
-        cfg.wave.A1 = round(random(15, 30));
+        // Randomize wave slightly for robustness (meters)
+        cfg.wave.A1 = round(random(0.15, 0.30), 2);
         cfg.wave.speed1 = random(0.8, 1.2);
         
         // --- SETUP SCENARIO ---
-        cfg.spacing = testSpacing;
+        cfg.spacing_m = testSpacing;
         // Visual width derives from physics ID and scale; do not override
         cfg.physics.pipeID_mm = testID;
         
@@ -569,11 +601,11 @@ function runOptimization({ idMin, idMax, spacingMin, spacingMax, scenarios, seco
   Object.assign(cfg.wave, savedState.wave);
   
   // Apply Best Found
-  cfg.spacing = best.spacing;
+  cfg.spacing_m = best.spacing;
   cfg.physics.pipeID_mm = best.pipeID_mm;
   
   // Re-run setup
-  document.getElementById('pipeSpacing').value = int(best.spacing);
+  document.getElementById('pipeSpacing').value = float(best.spacing);
   document.getElementById('pipeIDmm').value = int(best.pipeID_mm);
   
   buildPipes();
@@ -583,7 +615,7 @@ function runOptimization({ idMin, idMax, spacingMin, spacingMax, scenarios, seco
   if (panel) {
     panel.innerHTML = `<strong>Best Config Found:</strong><br>
     Pipe ID: ${nf(best.pipeID_mm,1,1)} mm<br>
-    Spacing: ${nf(best.spacing,1,0)} px<br>
+    Spacing: ${nf(best.spacing,1,2)} m<br>
     Avg Power: ${nf(best.score,1,1)} W`;
   }
 }
