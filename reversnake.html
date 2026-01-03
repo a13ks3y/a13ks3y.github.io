@@ -17,6 +17,47 @@
         }
         #ctx {
         }
+        dialog {
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            background: #fff;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #222;
+        }
+        dialog::backdrop {
+            background: rgba(0,0,0,0.4);
+        }
+        dialog form {
+            display: grid;
+            gap: 10px;
+        }
+        dialog p:first-child {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        dialog menu {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0;
+            margin: 0;
+        }
+        dialog button {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            background: #f90;
+            color: #000;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        dialog button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -62,7 +103,7 @@
                 switch (this.state) {
                     case 'snake': return '#f90';
                     case 'empty': return `rgb(${range(this.distanceToHead, MAX_DISTANCE, 0, 255)}, 0, 0)`;
-                    default: return '#abc';
+                    default: return 'black';
                 }
             }
             render(ctx) {
@@ -77,7 +118,7 @@
                     );
                 }
                 if (this.state === 'snake') {
-                    // ctx.fillStyle = '#000';
+                    ctx.fillStyle = '#000';
                     // ctx.fillText(
                     //     this.index,
                     //     this.x + this.size / 3,
@@ -289,11 +330,12 @@
                 });
             }
             render() {
-                ctx.fillStyle = '#abc';
+                ctx.fillStyle = 'black';
                 ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
                 this.grid.render(ctx);
             }
             step() {
+                
                 this.grid.apples = this.grid.apples.filter(apple => apple.state === APPLE);
                 this.snake.step(this.grid);
 
@@ -308,6 +350,21 @@
         const app = new App();
         app.start();
         app.grid.createApple(12, 0);
+    </script>
+    <dialog id="game-info">
+        <form method="dialog">
+            <p><strong>Revers Snake</strong></p>
+            <p>Click anywhere on the board to drop an apple. The snake auto-navigates toward the closest apple, grows when it eats, and wraps around edges. If it’s about to hit itself, it turns.</p>
+            <menu>
+                <button value="close">Got it</button>
+            </menu>
+        </form>
+    </dialog>
+    <script>
+        const infoDialog = document.getElementById('game-info');
+        if (infoDialog && typeof infoDialog.showModal === 'function') {
+            infoDialog.showModal();
+        }
     </script>
 </body>
 </html>
