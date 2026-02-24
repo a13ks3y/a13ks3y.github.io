@@ -1,0 +1,133 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>BreakOut</title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="800" height="600" id="ctx"></canvas>
+    <script type="text/javascript">
+        (function () {
+            const ctx = document.getElementById('ctx').getContext('2d');
+            const W = ctx.canvas.width;
+            const H = ctx.canvas.height;
+            const PADDLE_HEIGHT = 16;
+            const BALL_SIZE = 8;
+            const BR = BALL_SIZE / 2;
+            const BRICK_WIDTH = 64;
+            const BRICK_HEIGHT = 24;
+            const COLORS = ['#ff0', '#0ff', '#a0a', '#0a0'];
+            let paddle, ball, bricks;
+            const init = () => {
+                paddle = { x: W / 2, w: PADDLE_HEIGHT * 8, dx: 0, speed: 16 };
+                ball = { x: paddle.x + paddle.w / 2, y: H - PADDLE_HEIGHT - BALL_SIZE, dx: 0, dy: 0, speed: 16, state: 'idle' };
+                bricks = [];
+                let rowCount = ~~((H - 3 * BRICK_WIDTH) / BRICK_WIDTH);
+                let offsetX = (BRICK_WIDTH * rowCount / 2), offsetY = BRICK_HEIGHT;
+                for (let y = 0; y < 4; y++) {
+                    offsetX = y % 2 ? offsetX - BRICK_WIDTH / 2 : offsetX + BRICK_WIDTH / 2;
+                    rowCount = y % 2 ? rowCount + 1 : rowCount - 1;
+                    for (let x = 0; x < rowCount; x++) {
+                        bricks.push({
+                            x: x * BRICK_WIDTH + offsetX,
+                            y: y * BRICK_HEIGHT + offsetY,
+                            c: COLORS[y % 2 ? (x % 2 ? 0 : 1) : (x % 2 ? 2 : 3)]
+                        });
+                    }
+                }
+            };
+            init();
+
+            let lastTick = Date.now();
+            requestAnimationFrame(function loop() {
+                const dt = Date.now() - lastTick;
+                const dtt = dt / 1000 * 60;
+                // logic
+                paddle.x += paddle.dx * dtt;
+                if (paddle.x < 0) {
+                    if (paddle.dx < 0) {
+                        paddle.dx = 0;
+                    }
+                    paddle.x = 0;
+                }
+                if (paddle.x + paddle.w > W) {
+                    if (paddle.dx > 0) {
+                        paddle.dx = 0;
+                    }
+                    paddle.x = W - paddle.w;
+                }
+                if (ball.state === 'idle') {
+                    ball.x = paddle.x + paddle.w / 2
+                } else {
+                    ball.x += ball.dx * dtt;
+                    ball.y += ball.dy * dtt;
+
+                    if (ball.x <= BR) ball.dx *= -1;
+                    if (ball.x >= W - BR) ball.dx *= -1;
+                    if (ball.y <= BR) ball.dy *= -1;
+                    if (ball.y >= H - BR) init();
+
+                    if (ball.x >= paddle.x && ball.x <= paddle.x + paddle.w) {
+                        if (ball.y + BALL_SIZE / 2 >= H - PADDLE_HEIGHT) {
+                            ball.dy *= -1;
+                        }
+                    }
+
+                    bricks.forEach(brick => {
+                        if (ball.x + BR >= brick.x && ball.x + BR <= brick.x + BRICK_WIDTH) {
+                            if (ball.y + BR >= brick.y && ball.y <= brick.y + BRICK_HEIGHT) {
+                                ball.dx *= -1;
+                                ball.dy *= -1;
+                                if (brick.c !== 'black') {
+                                    brick.c = 'black';
+                                } else {
+                                    brick.toRemove = true;
+                                }
+                            }
+                        }
+                    });
+                }
+                // render
+                ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = '#f90';
+                ctx.fillRect(paddle.x, H - PADDLE_HEIGHT, paddle.w, PADDLE_HEIGHT);
+
+                ctx.fillStyle = '#f00';
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, BALL_SIZE, 0, 2 * Math.PI);
+                ctx.fill();
+
+                bricks.forEach(brick => {
+                    ctx.fillStyle = brick.c;
+                    ctx.fillRect(brick.x, brick.y, BRICK_WIDTH, BRICK_HEIGHT);
+                });
+                bricks = bricks.filter(brick => !brick.toRemove);
+                lastTick = Date.now();
+                requestAnimationFrame(loop);
+            });
+            document.body.addEventListener('keydown', e => {
+                switch (e.code) {
+                    case 'ArrowLeft':
+                        paddle.dx = -paddle.speed;
+                        break;
+                    case 'ArrowRight':
+                        paddle.dx = paddle.speed;
+                        break;
+                }
+            });
+            document.body.addEventListener('keyup', e => {
+                if ((e.code === 'ArrowLeft' && paddle.dx < 0) || (e.code === 'ArrowRight' && paddle.dx > 0)) {
+                    paddle.dx = 0;
+                } else if (e.code === 'Space') {
+                    ball.state = 'fly';
+                    ball.dx = ~~(Math.random() * ball.speed);
+                    ball.dy = ~~(Math.random() * ball.speed) * -1;
+                }
+            });
+        }());        
+    </script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+        }
+        .controls {
+            margin: 2rem auto;
+            background: #f90;
+            padding: 2rem;
+            user-select: none;
+            min-height: 7vw;
+        }
+        .control {
+            float: left;
+            cursor: pointer;
+            width: 7vw;
+            height: 7vw;
+            font-size: 32px;
+            font-weight: bold;
+            font-family: monospace;
+            background: #f90;
+            text-align: center;
+            line-height: 7vw;
+            border: 1px solid black;
+        }
+        
+        .control:hover {
+            
+        }
+        .control:active {
+            
+        }
+        input[type=range] {
+            width: 100%;
+        }
+        .control.tone {
+            background: white;
+            color: black;
+        }
+        .control.half-tone {
+            background: black;
+            color: white;
+        }
+        .controls.chords {
+            background-color: white;
+        }
+        #chords {
+            flex-direction: column;
+        }
+        @media (orientation: portrait) {
+            .control {
+                max-width: 24px;
+                max-height: 28px;
+                font-size: 18px;
+                line-height: 28px;
+                margin: 0 4px;
+            }
+            .control.tone {
+                max-width: 18px;
+            }
+            .controls {
+                padding: 1rem 0;
+                min-height: 40px;
+            }
+            .controls-7 .control {
+                max-width: 24px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <input type="range" name="detune" id="detune" value="1500" min="100" step="100" max="3000" />
+    <input type="range" name="gain" id="gain" value="2" min="0.1" step="0.25" max="5" />
+    <input type="range" id="octave" name="octave" value="3" min="1" max="7" />
+    <select id="waveType">
+        <option value="square" selected="selected">square</option>
+        <option value="sine">sine</option>
+        <option value="sawtooth">sawtooth</option>
+        <option value="triangle">triangle</option>        
+    </select>
+    <div class="controls" id="notes">
+        <div class="control tone noteC" data-note="C">C</div>
+        <div class="control half-tone noteC" data-note="C#">C#</div>
+        <div class="control tone" data-note="D">D</div>
+        <div class="control half-tone" data-note="Eb">Eb</div>
+        <div class="control tone" data-note="E">E</div>
+        <div class="control tone" data-note="F">F</div>
+        <div class="control half-tone" data-note="F#">F#</div>
+        <div class="control tone" data-note="G">G</div>
+        <div class="control half-tone" data-note="G#">G#</div>
+        <div class="control tone" data-note="A">A</div>
+        <div class="control half-tone" data-note="Bb">Bb</div>
+        <div class="control tone" data-note="B">B</div>
+    </div>
+
+    <div class="controls chords" id="chords">       
+        <div class="controls">
+            <div class="control tone noteC" data-chord="C">C</div>
+            <div class="control half-tone noteCSharp" data-chord="C#">C#</div>
+            <div class="control tone noteD" data-chord="D">D</div>
+            <div class="control half-tone noteEb" data-chord="Eb">Eb</div>
+            <div class="control tone noteE" data-chord="E">E</div>
+            <div class="control tone noteF" data-chord="F">F</div>
+            <div class="control half-tone noteFSharp" data-chord="F#">F#</div>
+            <div class="control tone noteG" data-chord="G">G</div>
+            <div class="control half-tone noteGSharp" data-chord="G#">G#</div>
+            <div class="control tone noteA" data-chord="A">A</div>
+            <div class="control half-tone noteBb" data-chord="Bb">Bb</div>
+            <div class="control tone noteB" data-chord="B">B</div>    
+        </div>
+        <div class="controls controls-7">
+            <div class="control tone" data-chord="C7">C7</div>
+            <div class="control tone" data-chord="D7">D7</div>
+            <div class="control tone" data-chord="E7">E7</div>
+            <div class="control tone" data-chord="F7">F7</div>
+            <div class="control tone" data-chord="G7">G7</div>
+            <div class="control tone" data-chord="A7">A7</div>
+            <div class="control tone" data-chord="B7">B7</div>    
+        </div>
+    </div>
+
+    <div class="loops-wrapper">
+        <button onclick="app.toggleRecordLoop()">New Loop (Space)</button>
+        <ul id="loops"></ul>
+    </div>
+
+    <label for="bit">
+        Bit
+        <input type="checkbox" name="bit" id="bit" />
+        <input type="number" name="bpm" id="bpm" value="120" step="8" min="8" max="512"  />
+    </label>
+
+    <script type="text/javascript">
+        class App {
+            keys = {}
+            keyNotes = {}
+            chordLocks = {}
+            keysToNotes = {
+                'q': 'C',
+                'w': 'C#',
+                'e': 'D',
+                'r': 'Eb',
+                't': 'E',
+                'y': 'F',
+                'u': 'F#',
+                'i': 'G',
+                'o': 'G#',
+                'p': 'A',
+                '[': 'Bb',
+                ']': 'B',
+
+                'Q': 'C+1',
+                'W': 'C#+1',
+                'E': 'D+1',
+                'R': 'Eb+1',
+                'T': 'E+1',
+                'Y': 'F+1',
+                'U': 'F#+1',
+                'I': 'G+1',
+                'O': 'G#+1',
+                'P': 'A+1',
+                '{': 'Bb+1',
+                '}': 'B+1',
+
+                'Shift+Q': 'C-1',
+                'Shift+W': 'C#-1',
+                'Shift+E': 'D-1',
+                'Shift+R': 'Eb-1',
+                'Shift+T': 'E-1',
+                'Shift+Y': 'F-1',
+                'Shift+U': 'F#-1',
+                'Shift+I': 'G-1',
+                'Shift+O': 'G#-1',
+                'Shift+P': 'A-1',
+                'Shift+{': 'Bb-1',
+                'Shift+}': 'B-1',
+            }
+            keysToChords = {
+                'a': 'C',
+                's': 'C#',
+                'd': 'D',
+                'f': 'Eb',
+                'g': 'E',
+                'h': 'F',
+                'j': 'F#',
+                'k': 'G',
+                'l': 'G#',
+                ';': 'A',
+                '\'': 'Bb',
+                '\\': 'B',
+                'z': 'C7',
+                'x': 'D7',
+                'c': 'E7',
+                'v': 'F7',
+                'b': 'G7',
+                'n': 'A7',
+                'm': 'B7',
+
+                'A': 'C+1',
+                'S': 'C#+1',
+                'D': 'D+1',
+                'F': 'Eb+1',
+                'G': 'E+1',
+                'H': 'F+1',
+                'J': 'F#+1',
+                'K': 'G+1',
+                'L': 'G#+1',
+                ':': 'A+1',
+                '"': 'Bb+1',
+                '|': 'B+1',
+                'Z': 'C7+1',
+                'X': 'D7+1',
+                'C': 'E7+1',
+                'V': 'F7+1',
+                'B': 'G7+1',
+                'N': 'A7+1',
+                'M': 'B7+1',
+
+                'Shift+A': 'C-1',
+                'Shift+S': 'C#-1',
+                'Shift+D': 'D-1',
+                'Shift+F': 'Eb-1',
+                'Shift+G': 'E-1',
+                'Shift+H': 'F-1',
+                'Shift+J': 'F#-1',
+                'Shift+K': 'G-1',
+                'Shift+L': 'G#-1',
+                'Shift+:': 'A-1',
+                'Shift+"': 'Bb-1',
+                'Shift+|': 'B-1',
+                'Shift+Z': 'C7-1',
+                'Shift+X': 'D7-1',
+                'Shift+C': 'E7-1',
+                'Shift+V': 'F7-1',
+                'Shift+B': 'G7-1',
+                'Shift+N': 'A7-1',
+                'Shift+M': 'B7-1',
+            }
+            _loop = []
+            loops = []
+            detune = 1500
+            gain = 2
+            octave = 3
+            bpm = 120
+            waveType = 'square'
+            chordes = {
+                'C': ['C', 'E', 'G'],
+                'C#': ['C#', 'G#', 'F'],
+                'D': ['D', 'F#', 'A'],
+                'Eb': ['G', 'Bb', 'Eb'],
+                'E': ['E', 'G#', 'B'],
+                'F': ['F', 'A', 'C'], // K
+                'F#': ['F#', 'Bb', 'C#'],
+                'G': ['G', 'B', 'D'],
+                'G#': ['G#', 'E', 'B'],
+                'A': ['A', 'F', 'C'],
+                'Bb': ['Bb', 'D', 'F'],
+                'B':  ['B', 'Eb', 'F#'],
+
+                'C7': ['Bb', 'C', 'E', 'G'],
+                'D7': ['F#', 'A', 'C', 'D'],
+                'E7': ['E', 'G#', 'B', 'D'],
+                'F7': ['F', 'A', 'C', 'Eb'],
+                'G7': ['G', 'B', 'D', 'F'],
+                'A7': ['A', 'C#', 'E', 'G'],
+                'B7': ['B', 'Eb', 'F#', 'A']
+
+            }
+            notes = {
+                'C': [16.35, 32.70, 65.41, 130.8, 261.6, 523.3, 1047, 2093, 4186],
+                'C#': [17.32, 34.65, 69.30, 138.6, 277.2, 554.4, 1109, 2217, 4435],
+                'D': [18.35, 36.71, 73.42, 146.8, 293.7, 587.3, 1175, 2349, 4699],
+                'Eb': [19.45, 38.89, 77.78, 155.6, 311.1, 622.3, 1245, 2489, 4978],
+                'E': [20.60, 41.20, 82.41, 164.8, 329.6, 659.3, 1319, 2637, 5274],
+                'F': [21.83, 43.65, 87.31, 174.6, 349.2, 698.5, 1397, 2794, 5588],
+                'F#': [23.12, 46.25, 92.50, 185.0, 370.0, 740.0, 1480, 2960, 5920],
+                'G': [24.50, 49.00, 98.00, 196.0, 392.0, 784.0, 1568, 3136, 6272],
+                'G#': [25.96, 51.91, 103.8, 207.7, 415.3, 830.6, 1661, 3322, 6645],
+                'A': [27.50, 55.00, 110.0, 220.0, 440.0, 880.0, 1760, 3520, 7040],
+                'Bb': [29.14, 58.27, 116.5, 233.1, 466.2, 932.3, 1865, 3729, 7459],
+                'B': [30.87, 61.74, 123.5, 246.9, 493.9, 987.8, 1976, 3951, 7902]
+            }
+            constructor() {                    
+                const octave = document.getElementById('octave');
+                const gain = document.getElementById('gain');
+                const detune = document.getElementById('detune');
+                const waveType = document.getElementById('waveType');
+                const bit = document.getElementById('bit');
+                const bpm = document.getElementById('bpm');
+
+                const chords = document.getElementById('chords');
+                const notes = document.getElementById('notes');
+
+                const distance = (srcX, srcY, dstX, dstY) => {
+                    const x = srcX > dstX ? srcX - dstX : dstX - srcX;
+                    const y = srcY > dstY ? srcY - dstY : dstY - srcY;
+                    return Math.sqrt(x ** 2 + y ** 2);
+                };
+
+                document.body.addEventListener('keydown', this.keydown.bind(this));
+                document.body.addEventListener('keyup', this.keyup.bind(this));
+
+                notes.addEventListener('click', e => {
+                    if (e.srcElement) {
+                        const note = e.srcElement.getAttribute('data-note');
+                        if (note) {
+                            const mx = e.offsetX;
+                            const my = e.offsetY;
+                            const rect = notes.children[0].getBoundingClientRect();
+                            const d = distance(mx, my, rect.width / 2, rect.height / 2);
+                            this.note(note, d / 100);
+                        }
+                    }
+                });
+
+                chords.addEventListener('click', e => {
+                    if (e.srcElement) {
+                        const chord = e.srcElement.getAttribute('data-chord');
+                        if (chord) {
+                            const mx = e.offsetX;
+                            const my = e.offsetY;
+                            const rect = notes.children[0].getBoundingClientRect();
+                            const d = distance(mx, my, rect.width / 2, rect.height / 2);
+                            this.chord(chord, d / 100 );
+                        }
+                    }
+                });
+
+                octave.addEventListener('change', () => {
+                    this.octave = parseInt(octave.value);
+                });
+                gain.addEventListener('change', () => {
+                    this.gain = parseFloat(gain.value);
+                });
+                detune.addEventListener('change', () => {
+                    this.detune = parseFloat(detune.value);
+                });
+                waveType.addEventListener('change', () => {
+                    this.waveType = waveType.value;
+                });
+                bit.addEventListener('change', () => {
+                    this.toggleBit();
+                });
+                bpm.addEventListener('change', () => {
+                    this.bpm = parseFloat(bpm.value);
+                });
+            }
+
+            isLoopRecord = false
+
+            toggleRecordLoop() {
+                this.isLoopRecord = !this.isLoopRecord;
+                if (this.isLoopRecord) {
+                    this.startRecordLoop();
+                } else {
+                    this.endLoop();
+                }
+            }
+
+            startRecordLoop() {                
+                this._loop = [];
+                this.isLoopRecord = true;
+            }
+
+            endLoop() {
+                this.isLoopRecord = false;
+                const loop = JSON.parse(JSON.stringify(this._loop));
+                this.loops.push(loop);
+            }
+
+            removeLoop(index) {
+                this.loops.splice(index, 1);
+                this.updateLoops();
+            }
+
+            updateLoops() {
+                this.loopUl = this.loopUl || document.getElementById('loops');
+                this.loopUl = this.loops.map((loop, index) => {
+                    return `\t\t\t\t<li>Loop #${index + 1}</li>`;
+                }).join('\n');
+            }
+
+            context() {
+                return this._context || (this._context = new AudioContext());
+            }
+            notesContext() {
+                return this._notesContext || (this._notesContext = new AudioContext());                
+            }
+            lastShift = 'left'
+            
+            keydown(e) {
+                let key = e.key;
+                if (this.lastShift == 'right') {
+                    key = 'Shift+' + key;
+                }
+                console.log('keydown', e, key, this.keysToNotes[key]);
+                const context = this.notesContext();
+                this.keys[key] = true;
+
+                //this.lastShift = e.code == 'ShiftRight' ? 'right' : 'left';
+
+                if (e.code == 'ShiftRight') {
+                    this.lastShift = 'right';
+                } else if (this.lastShift == 'right' && (e.key.toUpperCase() != e.key)) {
+                    this.lastShift = 'left';
+                }
+
+                if (!this.keyNotes[key]) {                    
+                    let note = this.keysToNotes[key];
+                    let isPlusOne = false;
+                    let isMinusOne = false;
+
+                    if (note) {
+                        if (note.indexOf('+1') !== -1) {
+                            isPlusOne = true;
+                            note = note.replace('+1', '');
+                        }
+                        if (note.indexOf('-1')) {
+                            isMinusOne = true;
+                            note = note.replace('-1', '');
+                        }
+                        const o = this.keyNotes[key] = context.createOscillator();
+                        o.type = this.waveType;
+                        const octave = isPlusOne ? this.octave + 1 : (isMinusOne ? this.octave - 1 : this.octave);
+                        o.frequency.value = this.notes[note][octave];                        
+                        o.detune.value = this.detune;
+                        const g = context.createGain();
+                        o.connect(g);
+                        o.g = g; // @hack! @todo refactor to strore objects in this.keyNotes instead of oscillators.
+                        o.startTime = context.currentTime;
+                        g.connect(context.destination);
+                        o.start(0);
+                    }
+                }
+                if (this.keysToChords[key] && !this.chordLocks[key]) {                            
+                    this.chordLocks[key] = true;
+                    this.chord(this.keysToChords[key]);
+                    setTimeout(() => this.chordLocks[key] = false, 66.6);
+                }
+            }
+
+            keyup(e) {
+                const key = e.key;
+                const context = this.notesContext();
+
+                this.keys[key] = false;                
+                console.log('keyup', e, key, this.keysToNotes[key]);
+
+                if (e.code == 'Space') {
+                    this.toggleRecordLoop();
+                }
+
+                if (this.keyNotes[key] || this.keyNotes['Shift+' + key]) {
+                    const o = this.keyNotes[key] || this.keyNotes['Shift+' + key];
+                    
+
+                    const g = o.g;
+                    const delay = 60 / this.bpm;
+                    g.gain.exponentialRampToValueAtTime(0.00000000000000000000001, context.currentTime + delay);
+
+                    if (this.isLoopRecord) {                        
+                        const note = this.keysToNotes[key] || this.keysToNotes['Shift+' + key];
+                        this._loop.push(note + ':' + (context.currentTime - o.startTime + delay));
+                    }
+
+
+                    setTimeout(() => {                        
+                        o.stop();                                       
+                    }, delay * 1000);
+                    this.keyNotes[key] = null;
+
+                }         
+            }
+
+            toggleBit() {
+                this.bit = !this.bit;
+                if (this.bit) {
+                    this.bitInterval = setInterval(() => {
+                        this.bitNote();
+                        /*
+                        Object.keys(this.keys).forEach(key => {
+                            if (this.keysToNotes[key]) {
+                                const context = this.context();
+                                const note = this.keysToNotes[key];
+                                if (this.keys[key] && !this.keyNotes[key]) {
+                                    const o = this.keyNotes[key] = context.createOscillator();
+                                    o.type = this.waveType;
+                                    o.frequency.value = this.notes[note][this.octave] || 0;
+                                    o.detune.value = this.detune;
+                                    o.connect(context.destination);
+                                    o.start(0);
+                                } else  {
+                                    if (this.keyNotes[key]) {
+                                        this.keyNotes[key].stop();   
+                                        this.keyNotes[key] = null;
+                                    }                                    
+                                }
+                            }
+                        });
+                        //*/
+
+                    }, 60000 / this.bpm);
+                } else {
+                    clearInterval(this.bitInterval);
+                }
+            }
+            bitNote() {
+                const context = this.context();
+                const o = context.createOscillator();
+                o.type = this.waveType;
+                o.frequency.value = this.notes['A'][3];
+                o.detune.value = 250;
+                const g = context.createGain();
+                o.connect(g);
+                g.connect(context.destination)
+                o.start(0);
+                g.gain.exponentialRampToValueAtTime(0.000000000001, context.currentTime + this.bpm / 1000);
+                setTimeout(() => {
+                    o.stop();
+                }, this.bpm);
+            }
+            note(note, duration = 0) {
+                const context = this.context();
+                const noteClassName = 'note' + note;
+                //document.body.classList.add(noteClassName);
+
+                if (this.isLoopRecord) {
+                    this._loop.push('@' + chord + ':' + duration);
+                }
+
+                const o = context.createOscillator();
+                o.type = this.waveType;
+                o.frequency.value = this.notes[note][this.octave] || 0;
+                o.detune.value = this.detune;
+                const g = context.createGain();
+                const gain = this.gain + this.gain + duration;
+                o.connect(g);
+                g.connect(context.destination)
+                o.start(0);
+                setTimeout(() => {
+                    // 0.00001 * 1 / this.gain "vibratto" ???
+                    g.gain.exponentialRampToValueAtTime(0.000000001, context.currentTime + gain);
+                    setTimeout(() => {
+                        //document.body.classList.remove(noteClassName);
+                        o.stop();                        
+                    }, gain > 1 ? gain * 1000 : 1000);
+                }, duration);
+            }
+            chord(chord, duration = 0) {
+                let isPlusOne = false;
+                let isMinusOne = false;
+
+                if (chord.indexOf('+1') != -1) {
+                    chord = chord.replace('+1', '');
+                    isPlusOne = true;
+                }
+                if (chord.indexOf('-1') != -1) {
+                    chord = chord.replace('-1', '');
+                    isMinusOne = true;
+                }
+
+                chord = this.chordes[chord];
+                if (chord) {
+                    let _savedOctave;
+                    if (isPlusOne) {
+                        _savedOctave = this.octave;
+                        this.octave += 1;                        
+                    }
+                    if (isMinusOne) {
+                        _savedOctave = this.octave;
+                        this.octave -= 1;
+                    }
+                    chord.forEach((note, i) => { this.note(note, duration) });
+                    if (isPlusOne || isMinusOne) {
+                        this.octave = _savedOctave;
+                    }
+                }
+            }
+        }
+        const app = new App();
+    </script>
+</body>
+</html>

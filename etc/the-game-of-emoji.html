@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="gear.png" type="image/x-icon">
+    <title>The Game Of Emoji</title>
+    <style type="text/css">
+        html, body {
+            text-align: center;
+            font-size: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            html, body {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            html, body {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            html, body {
+                font-size: 8px;
+            }
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header, main, h1, h3, p {
+            padding: 0.666rem;
+        }
+
+        main {
+            user-select: none;
+            display: grid;       
+            margin: auto;            
+        }
+
+        main span {
+            border: 1px solid black;
+            background-color: #f90;
+            width: 3.666rem;
+            height: 3.666rem;
+            display: block;
+            font-size: 1.666rem;
+        }
+
+        h1 {
+            font-size: 2.666rem;
+        }
+
+        h3 {
+            font-size: 1.666rem;
+        }
+
+        p {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>The Game of Emoji</h1>
+    <h3>Rules:</h3>
+    <p>
+        Rules are too complicated to describe. Please see the code for more details.
+    </p>
+    <h3>Controls:</h3>
+    <p>
+        Press "R" key (or reload the page) to reset game-field with random values.
+        Press "S" to go one step forward.
+        Press "P" or tap/click anywhere, to toggle playing (1 step per 666 milliseconds).
+    </p>
+</header>
+<!-- "root" element to render the game -->
+<main></main>
+<footer>
+    <h3>ToBeDone:</h3>
+    <p>
+        This should be <s>refactored, and</s> moved to a separate repository (or at least in a separate folder).
+        The hole concept should be reviewed.
+        Should be configurable (field sizes, rules etc.)
+        Rules could be configurate in a tool-box (like in minecraft)
+    </p>
+</footer>
+<script src="the-game-of-emoji.js"></script>
+</body>
+</html>
