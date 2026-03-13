@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Code Rain - Focal Point</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+
+    <script>
+        // --- System Initializing ---
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Flatten the source into one long string ---
+        const sourceCode = document.querySelector('script').textContent;
+        const sourceCodeLines = sourceCode.split('\n');
+        const FONT_SIZE = 16;
+        const columns = Math.floor(canvas.width / FONT_SIZE);
+        const rows = Math.floor(canvas.height / FONT_SIZE);
+
+        // --- Focal point for readability ---
+        const FOCAL_POINT_Y = canvas.height / 2;
+        const FOCAL_RANGE = FONT_SIZE * 1.5;
+
+        // Each column has its own vertical "drop"
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = {
+                index: Math.floor(Math.random() * rows),
+                yShift: Math.floor(Math.random() * FONT_SIZE)
+            };
+        }
+
+        // --- Render Loop ---
+        function draw() {
+            //ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = FONT_SIZE + 'px monospace';
+            
+            const BASE_ALPHA = 0.1;
+            for (let c = 0; c < columns; c++) {
+                let alpha = BASE_ALPHA;            
+                const drop = drops[c];
+                drop.yShift += 1;
+                if (drop.yShift >= FONT_SIZE) {
+                    drop.yShift = 0;
+                }
+                for (let r = 0; r < rows; r++) {
+                    const line = sourceCodeLines[r] || '';
+                    const char = line.charAt(c) || ' ';
+
+                    const x = c * (FONT_SIZE / 1);
+                    const y = r * FONT_SIZE + drop.yShift;
+                    if (drop.index < r) {
+                        alpha += (0.6 - BASE_ALPHA) / drop.index;
+                    } else if (drop.index === r) {
+                        alpha = BASE_ALPHA;
+                    } else {
+                        alpha += (0.6 - BASE_ALPHA) / (rows - drop.index);                    
+                    }
+                    if (alpha >= 1) {
+                        alpha = BASE_ALPHA;
+                    }
+                    const cr = 0;// drop.index === r ? 255 : 0;
+                    ctx.fillStyle = `rgba(${cr}, 255, 0, ${alpha})`;
+
+                    ctx.fillText(char, x, y);
+                    //ctx.fillRect(x, y, FONT_SIZE, FONT_SIZE);
+                }
+            }
+            for (let drop of drops) {
+                drop.index = drop.index < rows ? drop.index + 1 : 1;
+            }
+        }
+
+        // --- User Input Interface (Scrolling) ---
+        let sourceOffset = 0;
+        function handleScroll(event) {
+            const scrollAmount = Math.sign(event.deltaY);
+            sourceOffset += scrollAmount;
+            drops.forEach(d => d.index += scrollAmount * columns);
+            event.preventDefault();
+        }
+
+        window.addEventListener('wheel', handleScroll, { passive: false });
+
+        // --- System Online ---
+        console.log("I know kung fu.");
+        setInterval(draw, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
