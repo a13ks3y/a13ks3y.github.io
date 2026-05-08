@@ -19,7 +19,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('https://source.unsplash.com/1600x900/?dishwashing');
+    background-image: url('https://loremflickr.com/1600/900/dishwashing');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
@@ -104,11 +104,11 @@
   const activitySelect = document.getElementById("activity");
   activitySelect.addEventListener("change", () => {    
     const selectedActivity = activitySelect.value;
-    document.body.style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${selectedActivity}")`;
+    document.body.style.backgroundImage = `url("https://loremflickr.com/1600/900/${selectedActivity}")`;
   });
   startButton.addEventListener("click", () => {
     const selectedActivity = activitySelect.value;
-    document.body.style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${selectedActivity}")`;
+    document.body.style.backgroundImage = `url("https://loremflickr.com/1600/900/${selectedActivity}")`;
     
     currentActivity.textContent = selectedActivity;
     activityContainer.style.display = "none";
