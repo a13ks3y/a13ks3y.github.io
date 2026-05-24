@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../reset.css">
     <title>Tor Pool</title>
     <style>
         html, body {
             position: absolute;
             left: 0; top: 0;
             bottom: 0; right: 0;
+            margin: 0; /* Ensures no scrollbars */
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
         }
     </style>
 </head>
@@ -22,8 +26,6 @@
             this.y = y;
             this.vx = 0;
             this.vy = 0;
-            this.ax = 0;
-            this.ay = 0;
             this.r = 16;
             this.color = color;
         }
@@ -34,14 +36,8 @@
             ctx.fill();
         }
         logic(dtt) {
-            this.vx += this.ax * dtt;
-            this.vy += this.ay * dtt;
             this.x += this.vx * dtt;
             this.y += this.vy * dtt;
-        }
-        applyForce(fx, fy) {
-            this.ax += fx;
-            this.ay += fy;
         }
         intersects(x, y, r) {
             const dx = x - this.x;
@@ -50,31 +46,87 @@
             return dist <= r;
         }
     }
+
+    class Pocket {
+        constructor(x, y, color, radius = 20) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.r = radius;
+        }
+        render(ctx) {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        intersects(x, y) {
+            const dx = x - this.x;
+            const dy = y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            return dist <= this.r;
+        }
+    }
+
     class App {
         constructor() {
             this.ctx = document.getElementById('ctx').getContext('2d');
             this.updateCanvasSize();
 
-            this.balls = [new Ball(100,100, 'red')];
+            this.balls = [
+                new Ball(400, 300, '#FF9900'),
+                new Ball(600, 300, '#FFD700'),
+                new Ball(620, 285, '#0000CD'),
+                new Ball(620, 315, '#FFD700'),
+                new Ball(640, 270, '#FF0000'),
+                new Ball(640, 300, '#0000CD'),
+                new Ball(640, 330, '#FF0000'),
+                new Ball(660, 255, '#FFD700'),
+                new Ball(660, 315, '#0000CD'),
+                new Ball(660, 345, '#FF0000'),
+                new Ball(680, 270, '#FF0000'),
+                new Ball(680, 300, '#FFD700'),
+                new Ball(680, 330, '#0000CD'),
+                new Ball(700, 285, '#0000CD'),
+                new Ball(700, 315, '#FFD700')
+            ];
+            this.selectedBall = null;
+            this.mx = 0;
+            this.my = 0;
+
+            this.pockets = [];
+            this.whitePocket = null;
+            this.initPockets();
 
             this.ctx.canvas.addEventListener('mousedown', this.mousedown.bind(this));
             this.ctx.canvas.addEventListener('mouseup', this.mouseup.bind(this));
             this.ctx.canvas.addEventListener('mousemove', this.mousemove.bind(this));
+            window.addEventListener('resize', this.updateCanvasSize.bind(this));
 
-            this.lastTick = Date.now();
-            this.loop();
+            this.lastTick = performance.now();
+            requestAnimationFrame(this.loop.bind(this));
         }
+
         mouseup() {
-            const dx = this.selectedBall.x - this.mx;
-            const dy = this.selectedBall.y - this.my;
-            this.selectedBall.applyForce(dx * 10, dy * 10);
-            this.selectedBall = null;
+            if (this.selectedBall) {
+                const dx = this.selectedBall.x - this.mx;
+                const dy = this.selectedBall.y - this.my;
+                
+                // Apply the drag as a direct velocity impulse
+                this.selectedBall.vx += dx * 5; 
+                this.selectedBall.vy += dy * 5;
+                this.selectedBall = null;
+            }
         }
+
         mousedown(e) {
             const mx = e.offsetX;
             const my = e.offsetY;
             this.selectedBall = this.balls.find(ball => ball.intersects(mx, my, ball.r));
+            this.mx = mx;
+            this.my = my;
         }
+
         mousemove(e) {
             this.mx = e.offsetX;
             this.my = e.offsetY;
@@ -85,58 +137,142 @@
             const parentRect = parentEl.getBoundingClientRect();
             this.ctx.canvas.width = parentRect.width;
             this.ctx.canvas.height = parentRect.height;
+            this.initPockets();
         }
+
+        initPockets() {
+            const w = this.ctx.canvas.width;
+            const h = this.ctx.canvas.height;
+            const edgeX = w * 3 / 4;
+            const edgeY = h * 3 / 4;
+
+            this.pockets = [
+                new Pocket(edgeX, edgeY, 'black', 15),
+                new Pocket(w - edgeX, edgeY, 'black', 15),
+                new Pocket(edgeX, h - edgeY, 'black', 15),
+                new Pocket(w - edgeX, h - edgeY, 'black', 15)
+            ];
+            this.whitePocket = new Pocket(w / 2, h / 2, 'white', 15);
+        }
+
         render(ctx, dtt) {
             ctx.fillStyle = '#316031';
-            ctx.fillRect(0,0,this.ctx.canvas.width, this.ctx.canvas.height);
-            // ctx.fillStyle = 'black';
-            // ctx.font = '42px monospace';
-            // ctx.fillText(`dtt: ${dtt}`, 32, 64);
+            ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+            for (let pocket of this.pockets) {
+                pocket.render(ctx);
+            }
+            if (this.whitePocket) {
+                this.whitePocket.render(ctx);
+            }
+
             for (let ball of this.balls) {
                 ball.render(ctx);
             }
+
             const sb = this.selectedBall;
             if (sb) {
                 ctx.beginPath();
-                ctx.strokeStyle = 'blue';
-                ctx.strokeWidth = 2;
+                ctx.strokeStyle = 'lightblue';
+                ctx.lineWidth = 3;
                 ctx.moveTo(sb.x, sb.y);
                 ctx.lineTo(this.mx, this.my);
                 ctx.stroke();
             }
         }
+
         logic(dtt) {
             for (let ball of this.balls) {
                 ball.logic(dtt);
-                const f = 3600;
-                if (ball.vx > 0) ball.applyForce(-f, 0);
-                if (ball.vx < 0) ball.applyForce(f, 0);
-                if (ball.vy > 0) ball.applyForce(0, -f);
-                if (ball.vy < 0) ball.applyForce(0, f);
 
+                // Check black pocket collisions
+                for (let pocket of this.pockets) {
+                    if (pocket.intersects(ball.x, ball.y)) {
+                        // Teleport to white pocket
+                        if (this.whitePocket) {
+                            ball.x = this.whitePocket.x;
+                            ball.y = this.whitePocket.y;
+                            // preserve momentum
+                            //ball.vx = 0;
+                            //ball.vy = 0;
+                        }
+                        break;
+                    }
+                }
+
+                // Smooth friction damping
+                ball.vx *= 0.98;
+                ball.vy *= 0.98;
+
+                // Stop the ball completely if moving very slowly to prevent micro-jitters
+                if (Math.abs(ball.vx) < 1) ball.vx = 0;
+                if (Math.abs(ball.vy) < 1) ball.vy = 0;
+
+                // Smooth screen wrapping
+                if (ball.x > this.ctx.canvas.width + ball.r) ball.x = -ball.r;
+                if (ball.x < -ball.r) ball.x = this.ctx.canvas.width + ball.r;
+                if (ball.y > this.ctx.canvas.height + ball.r) ball.y = -ball.r;
+                if (ball.y < -ball.r) ball.y = this.ctx.canvas.height + ball.r;
             }
-            for (let ball of this.balls) {
-                if (ball.x > this.ctx.canvas.width + ball.r) ball.x = 0;
-                if (ball.x < -ball.r) ball.x = this.ctx.canvas.width - ball.r;
-                if (ball.y > this.ctx.canvas.height + ball.r) ball.y = 0;
-                if (ball.y < -ball.r) ball.y = this.ctx.canvas.height - ball.r;
-                ball.ax = 0;
-                ball.ay = 0;
+
+            // Collision detection and bouncing
+            for (let i = 0; i < this.balls.length; i++) {
+                for (let j = i + 1; j < this.balls.length; j++) {
+                    const b1 = this.balls[i];
+                    const b2 = this.balls[j];
+                    const dx = b2.x - b1.x;
+                    const dy = b2.y - b1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const minDist = b1.r + b2.r;
+
+                    if (dist < minDist) {
+                        // Normalize collision vector
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        // Relative velocity
+                        const dvx = b2.vx - b1.vx;
+                        const dvy = b2.vy - b1.vy;
+                        const dotProduct = dvx * nx + dvy * ny;
+
+                        // Only bounce if balls are moving towards each other
+                        if (dotProduct < 0) {
+                            // Simple elastic collision (equal mass)
+                            b1.vx += nx * dotProduct;
+                            b1.vy += ny * dotProduct;
+                            b2.vx -= nx * dotProduct;
+                            b2.vy -= ny * dotProduct;
+                        }
+
+                        // Separate overlapping balls
+                        const overlap = minDist - dist;
+                        const separationX = (nx * overlap) / 2;
+                        const separationY = (ny * overlap) / 2;
+                        b1.x -= separationX;
+                        b1.y -= separationY;
+                        b2.x += separationX;
+                        b2.y += separationY;
+                    }
+                }
             }
         }
-        loop() {
-            const ctx = this.ctx;
-            const dt = Date.now() - this.lastTick;
-            const dtt = dt / 1000;
-            this.render(ctx, dtt);
-            this.logic(dtt);
-            if (dt > 32) {
-                this.lastTick = Date.now();
-            }
-            requestAnimationFrame(this.loop.bind(this));
 
+        loop(timestamp) {
+            // Calculate accurate delta time
+            const dt = timestamp - this.lastTick;
+            const dtt = dt / 1000;
+            this.lastTick = timestamp;
+
+            // Cap the max dtt so physics don't break if you switch browser tabs
+            if (dtt < 0.1) {
+                this.render(this.ctx, dtt);
+                this.logic(dtt);
+            }
+
+            requestAnimationFrame(this.loop.bind(this));
         }
     }
+
     const app = new App();
   </script>
 </body>
