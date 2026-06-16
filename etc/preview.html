@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>AI Strudel Jukebox</title>
+  <script src="https://cdn.jsdelivr.net/npm/@strudel/web@latest/dist/index.js"></script>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem;
+    }
+
+    h1 {
+      font-weight: normal;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: opacity 0.2s;
+    }
+
+    button#stopBtn {
+      background: #f44336;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    select {
+      appearance: none;
+      font-size: 1.1rem;
+      background-color: #333;
+      border-radius: 6px;
+      color: paleturquoise;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+
+    #status-bar {
+      margin-bottom: 2rem;
+      color: #888;
+      font-size: 0.9rem;
+      min-height: 1.2rem;
+    }
+
+    #display {
+      background: #000;
+      padding: 24px;
+      border-radius: 8px;
+      max-width: 800px;
+      min-height: 150px;
+      font-size: 1.1rem;
+      color: #0f0;
+      text-align: left;
+      border: 1px solid #333;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 10px 20px;
+    }
+
+    .track-label {
+      color: #888;
+      font-weight: bold;
+      text-align: right;
+    }
+  </style>
+
+  <script>
+    let running = false;
+    let history = []; // Now stores flat strings instead of JSON objects
+    let nextPattern = null;
+    let isComposing = false;
+    let playbackTimer = null;
+
+    const fallbackTrack = {
+      chords: "<[c4,eb4,g4,bb4] [eb4,g4,bb4,c5]> ~ ~ ~",
+      melody: "~ g5*2 eb5 c5",
+      bass: "c2 ~ ~ <bb1 g1>",
+      drums: "bd [~ hh] sn [hh bd]"
+    };
+
+    function updateStatus(msg) {
+      document.getElementById('status-bar').innerText = msg;
+    }
+
+    async function askAI() {
+      const genre = document.getElementById('genreSelect').value;
+
+      const prompt = `
+You are a live-coding composer writing a ${genre} loop.
+
+Generate a multi-layered arrangement. You can output as many parallel layers as you want (minimum 3, maximum 12), separated by the pipe character "|".
+
+Each layer can either be:
+- A note pattern using mini-notation scale degrees or frequencies (e.g., "e5*2 [g5 a5]?") or chord brackets (e.g., "[c4,e4,g4]")
+- A drum/sample pattern using tokens like bd, sn, hh, cp
+
+The snare (sn) or clap (cp) MUST land on the backbeat (the 2nd and 4th beats). The kick (bd) should anchor the 1st beat.
+Example solid groove: bd [hh hh] sn [hh bd]
+
+Return ONLY the plain text string. No markdown blocks, no track labels, no JSON.
+
+Example:
+[c4,eb4,g4] ~ [g3,bb3,d4] ~ | c5 ~ eb5*2 [g5 f5]? | c2 ~ g1 ~ | bd [hh hh] sn <hh bd>
+`;
+
+      if (window.LanguageModel) {
+        try {
+          const availability = await LanguageModel.availability();
+
+          if (availability === 'available') {
+            //alert('Model is ready to use immediately.');
+          } else if (availability === 'downloading' || availability === 'after-download') {
+            alert('Model needs to download first. Listen to progress events...');
+            return fallbackTrack;
+          } else {
+            alert('Model is unavailable on this device.');
+            return fallbackTrack;
+          }
+
+          console.time('promptAI');
+          const model = await LanguageModel.create(['en']);
+          const res = await model.prompt(prompt);
+
+          return new Promise((resolve, reject) => {
+            setTimeout(async () => {
+              try {
+                // Aggressive cleaning: strip markdown, newlines, and quotes
+                const cleanStr = res.replace(/```/g, '').replace(/\n/g, '').replace(/"/g, '').trim();
+
+                const parsed = cleanStr;
+
+                // Store the raw pipe string for context efficiency
+                history.push(cleanStr);
+                if (history.length > 2) history.shift();
+
+                console.timeEnd('promptAI');
+                resolve(parsed);
+              } catch (e) {
+                console.warn("Parsing failed:", e);
+                reject(e);
+              }
+            }, 3000); // Artificial buffer, adjust if model is faster
+          });
+        } catch (e) {
+          console.warn("AI logic failed. Using fallback.", e);
+        }
+      }
+
+      return fallbackTrack;
+    }
+
+    async function composeBackground() {
+      if (isComposing || !running) return;
+
+      isComposing = true;
+      updateStatus("AI Composing next sequence... ⏳");
+
+      try {
+        nextPattern = await askAI();
+        updateStatus("Next sequence buffered. 🎵 Waiting for playback window...");
+      } catch (e) {
+        updateStatus("AI hallucinated syntax. Retrying... 🔄");
+        setTimeout(composeBackground, 2000);
+      } finally {
+        isComposing = false;
+      }
+    }
+    // A simple heuristic to separate synth notes from sample playbacks
+    function softDetectPatternType(trackString) {
+      const sampleKeywords = ['bd', 'sn', 'hh', 'cp', 'cl', 'oh', 'sd', 'cr', 'muffled', 'rim'];
+      const samleNotes = [
+        "a0",
+        "a0~",
+        "a#0",
+        "a#0~",
+        "b0",
+        "b0~",
+        "c1",
+        "c1~",
+        "c#1",
+        "c#1~",
+        "d1",
+        "d1~",
+        "d#1",
+        "d#1~",
+        "e1",
+        "e1~",
+        "f1",
+        "f1~",
+        "f#1",
+        "f#1~",
+        "g1",
+        "g1~",
+        "g#1",
+        "g#1~",
+        "a1",
+        "a1~",
+        "a#1",
+        "a#1~",
+        "b1",
+        "b1~",
+        "c2",
+        "c2~",
+        "c#2",
+        "c#2~",
+        "d2",
+        "d2~",
+        "d#2",
+        "d#2~",
+        "e2",
+        "e2~",
+        "f2",
+        "f2~",
+        "f#2",
+        "f#2~",
+        "g2",
+        "g2~",
+        "g#2",
+        "g#2~",
+        "a2",
+        "a2~",
+        "a#2",
+        "a#2~",
+        "b2",
+        "b2~",
+        "c3",
+        "c3~",
+        "c#3",
+        "c#3~",
+        "d3",
+        "d3~",
+        "d#3",
+        "d#3~",
+        "e3",
+        "e3~",
+        "f3",
+        "f3~",
+        "f#3",
+        "f#3~",
+        "g3",
+        "g3~",
+        "g#3",
+        "g#3~",
+        "a3",
+        "a3~",
+        "a#3",
+        "a#3~",
+        "b3",
+        "b3~",
+        "c4",
+        "c4~",
+        "c#4",
+        "c#4~",
+        "d4",
+        "d4~",
+        "d#4",
+        "d#4~",
+        "e4",
+        "e4~",
+        "f4",
+        "f4~",
+        "f#4",
+        "f#4~",
+        "g4",
+        "g4~",
+        "g#4",
+        "g#4~",
+        "a4",
+        "a4~",
+        "a#4",
+        "a#4~",
+        "b4",
+        "b4~",
+        "c5",
+        "c5~",
+        "c#5",
+        "c#5~",
+        "d5",
+        "d5~",
+        "d#5",
+        "d#5~",
+        "e5",
+        "e5~",
+        "f5",
+        "f5~",
+        "f#5",
+        "f#5~",
+        "g5",
+        "g5~",
+        "g#5",
+        "g#5~",
+        "a5",
+        "a5~",
+        "a#5",
+        "a#5~",
+        "b5",
+        "b5~",
+        "c6",
+        "c6~",
+        "c#6",
+        "c#6~",
+        "d6",
+        "d6~",
+        "d#6",
+        "d#6~",
+        "e6",
+        "e6~",
+        "f6",
+        "f6~",
+        "f#6",
+        "f#6~",
+        "g6",
+        "g6~",
+        "g#6",
+        "g#6~",
+        "a6",
+        "a6~",
+        "a#6",
+        "a#6~",
+        "b6",
+        "b6~",
+        "c7",
+        "c7~",
+        "c#7",
+        "c#7~",
+        "d7",
+        "d7~",
+        "d#7",
+        "d#7~",
+        "e7",
+        "e7~",
+        "f7",
+        "f7~",
+        "f#7",
+        "f#7~",
+        "g7",
+        "g7~",
+        "g#7",
+        "g#7~",
+        "a7",
+        "a7~",
+        "a#7",
+        "a#7~",
+        "b7",
+        "b7~",
+        "c8",
+        "c8~"
+      ];
+      const words = trackString.toLowerCase().split(/[\s*\[\]<>?]+/);
+
+      const isSound = words.some(word => sampleKeywords.includes(word));
+      const isNote = words.some(word => samleNotes.includes(word));
+      if (isNote && isSound) {
+        console.log('Bullshit:', trackString);
+        return 'gibberish';
+      }
+      return isSound ? 'sound' : 'note';
+    }
+    function applyDynamicPattern(rawPipeString) {
+      const display = document.getElementById('display');
+      strudel.hush();
+
+      // Split into arbitrary number of sections
+      const layers = rawPipeString.split('|')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      if (layers.length === 0) return;
+      if (layers.length >= 4) {
+        return applyPattern({
+          chords: layers.find(l => softDetectPatternType(l) === 'note' && Math.random() > 0.5) || fallbackTrack.chords,
+          melody: layers.find(l => softDetectPatternType(l) === 'note' && Math.random() > 0.5) || fallbackTrack.melody,
+          bass: layers.find(l => softDetectPatternType(l) === 'note' && Math.random() > 0.5) || fallbackTrack.bass,
+          drums: layers.find(l => softDetectPatternType(l) === 'sound' && Math.random() > 0.5) || fallbackTrack.drums
+        });
+      }
+
+      // Clear and rebuild display dynamically
+      display.innerHTML = '';
+      display.style.gridTemplateColumns = '80px 1fr';
+
+      const strudelPatterns = layers.map((layerText, index) => {
+        const type = softDetectPatternType(layerText);
+
+        // Update UI
+        const label = document.createElement('div');
+        label.className = 'track-label';
+        label.innerText = `layer ${index + 1} (${type}):`;
+
+        const content = document.createElement('div');
+        content.innerText = layerText;
+
+        display.appendChild(label);
+        display.appendChild(content);
+
+        // Instantiate correct Strudel pattern type
+        return type === 'sound' ? strudel.sound(layerText) : strudel.note(layerText);
+      });
+
+      // Spread the dynamic array straight into stack
+      strudel.stack(...strudelPatterns).lpf(2500).room(0.6).size(0.8).play();
+    }
+
+    function applyPattern(result) {
+      const display = document.getElementById('display');
+      strudel.hush();
+
+      display.innerHTML = `
+        <div class="track-label">chords:</div><div>${result.chords}</div>
+        <div class="track-label">melody:</div><div>${result.melody}</div>
+        <div class="track-label">bass:</div><div>${result.bass}</div>
+        <div class="track-label">drums:</div><div>${result.drums}</div>
+      `;
+
+      // THE PRODUCER MIX: Assigning synths, FX, and volumes
+      strudel.stack(
+        strudel.note(result.chords)
+          .s('superpiano') // Lush piano synth
+          .room(0.8) // Big reverb
+          .gain(0.8), // Lower the volume slightly so it sits in the back
+
+        strudel.note(result.melody)
+          .s('sine') // Sweet, soft sine wave
+          .delay(0.5).delayt(0.25) // Add a nice echo
+          .gain(0.9),
+
+        strudel.note(result.bass)
+          .s('sawtooth') // Gritty synth bass
+          .lpf(300) // Cuts off the high buzz, leaving only deep sub-bass
+          .gain(1.2), // Boost the bass
+
+        strudel.sound(result.drums)
+          .room(0.2) // Subtle drum room reverb
+      )
+        .lpf(4000) // Master filter to remove ear-piercing digital highs
+        .play();
+    }
+    function playbackLoop() {
+      if (!running) return;
+
+      if (nextPattern) {
+        applyDynamicPattern(nextPattern);
+        nextPattern = null;
+        composeBackground();
+      }
+
+      playbackTimer = setTimeout(playbackLoop, 16000); // Back to 16 seconds for longer musical arcs
+    }
+
+    window.start = async function () {
+      if (running) return;
+
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      document.getElementById('display').innerHTML = `<div style="grid-column: span 2; text-align:center;">Booting Polyphonic Engine...</div>`;
+
+      await strudel.initStrudel({
+        prebake: () => strudel.samples('github:tidalcycles/dirt-samples')
+      });
+
+      document.getElementById('genreSelect').addEventListener('change', () => {
+        history = [];
+        nextPattern = null;
+        if (running) composeBackground(); // immediately start fetching the new genre
+      });
+
+      running = true;
+      applyPattern(fallbackTrack);
+      composeBackground();
+      playbackLoop();
+    };
+
+    window.stop = function () {
+      running = false;
+      clearTimeout(playbackTimer);
+      strudel.hush();
+      history = [];
+      nextPattern = null;
+      isComposing = false;
+
+      updateStatus("Stopped");
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('display').innerHTML = `<div style="grid-column: span 2; text-align:center;">Hushed.</div>`;
+    };
+  </script>
+</head>
+
+<body>
+  <h1>Infinite Polyphonic Jukebox</h1>
+
+  <div class="controls">
+    <button id="startBtn" onclick="start()">Start</button>
+    <button id="stopBtn" onclick="stop()" disabled>Stop</button>
+    <select id="genreSelect">
+      <option value="Boogie Woogie">Boogie Woogie</option>
+      <option value="Pop">Pop</option>
+      <option value="Rock">Rock</option>
+      <option value="Electronic Dance Music (EDM)">EDM</option>
+      <option value="Metal">Metal</option>
+      <option value="Jazz">Jazz</option>
+      <option value="Classical">Classical</option>
+      <option value="Ambient">Ambient</option>
+    </select>
+  </div>
+
+  <div id="status-bar">Waiting to start...</div>
+
+  <div id="display">
+    <div style="grid-column: span 2; text-align:center;">Press Start to begin.</div>
+  </div>
+</body>
+
+</html>
