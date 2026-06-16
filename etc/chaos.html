@@ -3,7 +3,9 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8">
-    <title>Умная кнопка ПЫШЬ! (Ультра-Хаос)</title>
+    <title>ПЫШЬ!</title>
+    <link rel="icon" sizes="192x192" href="/banana-favicon.png">
+
     <style>
         html, body {
             position: absolute;
@@ -79,24 +81,21 @@
                 behavior: "smooth"
             });
             
-            // Исправлено: ID от 1 до 8 (раньше могло выпасть 0 и выдать ошибку)
             const fartId = Math.floor(Math.random() * 8) + 1;
             const fart = document.getElementById('fart-' + fartId);
             if (fart) {
-                fart.currentTime = 0; // Сбрасываем время, чтобы можно было спамить
+                fart.currentTime = 0; 
                 fart.play().catch(e => console.log("Браузер заблокировал звук:", e));
             }
         }
 
-        // --- БАЗА ДАННЫХ ПРОЦЕДУРНОЙ ГЕНЕРАЦИИ ---
         const vars = ['v1', 'v2', 'magicNumber', 'chaosLevel'];
-        const strings = ['"ПЫШЬ!"', '"ОЙ!"', '"АААА!"', '"УСПЕХ"', '"ПУК"'];
+        const strings = ['"ПЫШЬ!"', '"ЧО-ЧО!"', '"АААА!"', '"УПЯЧКА"', '"ПУК"'];
         const colors = ['"#ff0000"', '"#00ff00"', '"#0000ff"', '"#1a1a1a"', '"#ff00ff"', '"#ffff00"'];
         const ops = ['+', '-', '*', '/', '===', '>', '<'];
 
         function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-        // Генерация простого значения
         function generateValue() {
             const type = Math.random();
             if (type < 0.3) return Math.floor(Math.random() * 100); 
@@ -105,13 +104,11 @@
             return `Math.random()`;                                 
         }
 
-        // Рекурсивная генерация выражений
         function generateExpression(depth = 0) {
             if (depth > 2 || Math.random() < 0.5) return generateValue();
             return `(${generateExpression(depth + 1)} ${randomChoice(ops)} ${generateExpression(depth + 1)})`;
         }
 
-        // Генератор конкретного действия (Statement)
         function generateStatement() {
             const actions = [
                 `var ${randomChoice(vars)} = ${generateExpression()};`,
