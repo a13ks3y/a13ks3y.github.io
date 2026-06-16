@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <title>Умная кнопка ПЫШЬ! (Ультра-Хаос)</title>
+    <style>
+        html, body {
+            position: absolute;
+            left: 0; top: 0; bottom: 0; right: 0;
+            margin: 0; padding: 0;
+            overflow: hidden; /* Чтобы спам элементами не ломал верстку */
+        }
+
+        body { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; background: #1a1a1a; color: #fff; font-family: monospace; 
+            transition: all 0.3s ease-in-out; 
+        }
+        
+        #pysh-btn {
+            font-size: 50px; font-weight: bold; padding: 30px 60px; border-radius: 50px;
+            background: #ff0000; color: white; border: 5px solid #8b0000; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255,0,0,0.5); transition: all 0.2s; z-index: 100;
+        }
+        #pysh-btn:active { transform: translateY(10px) scale(0.95) !important; box-shadow: none; }
+        
+        #log { 
+            margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.8); width: 80%; height: 250px; 
+            overflow-y: auto; border: 1px solid #555; border-radius: 10px; z-index: 100;
+        }
+        .code-block { color: #f8f8f2; background: #282a36; padding: 5px; border-radius: 5px; font-family: monospace; }
+        .success { color: #50fa7b; font-size: 16px; margin-bottom: 10px; display: block; }
+        .fail { color: #ff5555; }
+        
+        /* Стилизация скроллбара */
+        ::-webkit-scrollbar { width: 0.6rem; }
+        ::-webkit-scrollbar-track { background-color: black; border-radius: 16px; }
+        ::-webkit-scrollbar-thumb {
+            background-image: linear-gradient(180deg, #422742 0%, #282a36 99%);
+            box-shadow: inset 2px 2px 5px 0 rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+        }
+        
+        /* Летающий мусор */
+        .chaos-element {
+            position: absolute; font-weight: bold; pointer-events: none;
+            animation: float 3s linear forwards; opacity: 0.8;
+        }
+        @keyframes float { 100% { transform: translateY(-100px) rotate(180deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="hidden" style="display: none;">
+        <audio id="fart-1"><source src="https://fartjs.com/farts/fart1.mp3"/></audio>
+        <audio id="fart-2"><source src="https://fartjs.com/farts/fart2.mp3"/></audio>
+        <audio id="fart-3"><source src="https://fartjs.com/farts/fart3.mp3"/></audio>
+        <audio id="fart-4"><source src="https://fartjs.com/farts/fart4.mp3"/></audio>
+        <audio id="fart-5"><source src="https://fartjs.com/farts/fart5.mp3"/></audio>
+        <audio id="fart-6"><source src="https://fartjs.com/farts/fart6.mp3"/></audio>
+        <audio id="fart-7"><source src="https://fartjs.com/farts/fart7.mp3"/></audio>
+        <audio id="fart-8"><source src="https://fartjs.com/farts/fart8.mp3"/></audio>
+    </div>
+
+    <button id="pysh-btn" onclick="executeProceduralChaos()">ПЫШЬ!</button>
+    <div id="log">Нажмите кнопку для генерации процедурного кода...<br></div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        var v1, v2, magicNumber, chaosLevel;
+
+        function log(msg, className = '') {
+            const time = new Date().toLocaleTimeString();
+            // Исправлено: добавляем логи в конец, чтобы скролл работал правильно
+            logDiv.innerHTML += `<span class="${className}">[${time}] ${msg}</span><br><hr style="border-color: #333;">`;
+            
+            logDiv.scrollTo({
+                left: 0, top: logDiv.scrollHeight,
+                behavior: "smooth"
+            });
+            
+            // Исправлено: ID от 1 до 8 (раньше могло выпасть 0 и выдать ошибку)
+            const fartId = Math.floor(Math.random() * 8) + 1;
+            const fart = document.getElementById('fart-' + fartId);
+            if (fart) {
+                fart.currentTime = 0; // Сбрасываем время, чтобы можно было спамить
+                fart.play().catch(e => console.log("Браузер заблокировал звук:", e));
+            }
+        }
+
+        // --- БАЗА ДАННЫХ ПРОЦЕДУРНОЙ ГЕНЕРАЦИИ ---
+        const vars = ['v1', 'v2', 'magicNumber', 'chaosLevel'];
+        const strings = ['"ПЫШЬ!"', '"ОЙ!"', '"АААА!"', '"УСПЕХ"', '"ПУК"'];
+        const colors = ['"#ff0000"', '"#00ff00"', '"#0000ff"', '"#1a1a1a"', '"#ff00ff"', '"#ffff00"'];
+        const ops = ['+', '-', '*', '/', '===', '>', '<'];
+
+        function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        // Генерация простого значения
+        function generateValue() {
+            const type = Math.random();
+            if (type < 0.3) return Math.floor(Math.random() * 100); 
+            if (type < 0.5) return randomChoice(strings);           
+            if (type < 0.7) return randomChoice(vars);              
+            return `Math.random()`;                                 
+        }
+
+        // Рекурсивная генерация выражений
+        function generateExpression(depth = 0) {
+            if (depth > 2 || Math.random() < 0.5) return generateValue();
+            return `(${generateExpression(depth + 1)} ${randomChoice(ops)} ${generateExpression(depth + 1)})`;
+        }
+
+        // Генератор конкретного действия (Statement)
+        function generateStatement() {
+            const actions = [
+                `var ${randomChoice(vars)} = ${generateExpression()};`,
+                `document.body.style.backgroundColor = ${randomChoice(colors)};`,
+                // Новое: Изменение фильтров страницы
+                `document.body.style.filter = "hue-rotate(" + Math.floor(Math.random() * 360) + "deg) invert(" + Math.round(Math.random()) + ")";`,
+                // Новое: Искажение самой кнопки
+                `document.getElementById("pysh-btn").style.transform = "rotate(" + (Math.random() * 40 - 20) + "deg) scale(" + (Math.random() * 0.5 + 0.8) + ")";`,
+                // Новое: Спам элементов в DOM
+                `let el = document.createElement("div"); el.className = "chaos-element"; el.innerText = ${randomChoice(strings)}; el.style.left = Math.random() * 100 + "vw"; el.style.top = Math.random() * 100 + "vh"; el.style.color = ${randomChoice(colors)}; el.style.fontSize = (Math.random() * 50 + 20) + "px"; document.body.appendChild(el);`,
+                `if (${generateExpression()} > 50) { var ${randomChoice(vars)} = 999; }`
+            ];
+            return randomChoice(actions);
+        }
+
+        // Сборка финального скрипта
+        function generateProceduralCode() {
+            const linesCount = Math.floor(Math.random() * 5) + 1; // Больше строк - больше хаоса
+            let code = '';
+            for (let i = 0; i < linesCount; i++) {
+                code += generateStatement() + '\n';
+            }
+            return code;
+        }
+
+        function executeProceduralChaos() {
+            const codeToTry = generateProceduralCode();
+            
+            try {
+                let result = eval(codeToTry);
+                
+                let logMsg = `Сгенерирован и выполнен код:<br><div class="code-block">${codeToTry.replace(/\n/g, '<br>')}</div>`;
+                if (result !== undefined) logMsg += `-> Вернуло: ${result}`;
+                
+                log(logMsg, 'success');
+            } catch (e) {
+                log(`Ошибка выполнения: ${e.message}<br><div class="code-block">${codeToTry.replace(/\n/g, '<br>')}</div>`, 'fail');
+            }
+        }
+    </script>
+</body>
+</html>

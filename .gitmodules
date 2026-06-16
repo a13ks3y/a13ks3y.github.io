@@ -1,0 +1,6 @@
+[submodule "vendor/musicgen"]
+	path = vendor/musicgen
+	url = https://github.com/hugowxyz/musicgen.cpp.git
+[submodule "vendor/encodec"]
+	path = vendor/encodec
+	url = https://github.com/PABannier/encodec.cpp.git
