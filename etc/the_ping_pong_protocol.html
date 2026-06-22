@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ping-Pong Protocol | AI-TDD Manifesto</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #0a0a0c;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-red: #ff4a4a;
+            --accent-red-glow: rgba(255, 74, 74, 0.15);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
+            --border-dim: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            margin-bottom: 5rem;
+            position: relative;
+        }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .quote-block {
+            border-left: 4px solid var(--text-main);
+            padding: 2rem;
+            margin: 4rem 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote-block p {
+            font-size: 1.25rem;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .quote-block strong {
+            font-weight: 600;
+            color: white;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 3rem 0 1.5rem 0;
+            border-bottom: 1px solid var(--border-dim);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+
+        /* The Interactive Flow Styles */
+        .ping-pong-board {
+            margin: 4rem 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .ping-pong-board::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background: var(--border-dim);
+            z-index: 0;
+        }
+
+        .step {
+            position: relative;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            background: #111827;
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            margin-left: 2rem;
+            transition: all 0.3s ease;
+            z-index: 1;
+            opacity: 0.5;
+            animation: pingPongCycle 9s infinite;
+        }
+
+        /* Synchronized Delays for 3 steps, 3 seconds each */
+        .step:nth-child(1) { animation-delay: 0s; }
+        .step:nth-child(2) { animation-delay: 3s; }
+        .step:nth-child(3) { animation-delay: 6s; }
+
+        @keyframes pingPongCycle {
+            0% { opacity: 0.5; transform: translateX(0); }
+            3.33%, 30% { opacity: 1; transform: translateX(-10px); }
+            33.33%, 100% { opacity: 0.5; transform: translateX(0); }
+        }
+
+        /* Hover interactions: Kill animation on board hover, highlight specific step */
+        .ping-pong-board:hover .step {
+            animation: none;
+            opacity: 0.5;
+            transform: translateX(0);
+        }
+
+        .ping-pong-board .step:hover {
+            opacity: 1;
+            transform: translateX(-10px);
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 2.5rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 2px solid var(--border-dim);
+            z-index: 2;
+        }
+
+        .step.human { border-color: rgba(255, 74, 74, 0.3); box-shadow: 0 0 20px var(--accent-red-glow); }
+        .step.human::before { border-color: var(--accent-red); background: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
+        
+        .step.ai { border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 20px var(--accent-green-glow); }
+        .step.ai::before { border-color: var(--accent-green); background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+
+        .step-actor {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .step.human .step-actor { color: var(--accent-red); }
+        .step.ai .step-actor { color: var(--accent-green); }
+
+        .step h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .critical-insight {
+            background: #111827;
+            border: 1px solid var(--accent-red);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 3rem;
+        }
+
+        .critical-insight h3 {
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255,255,255,0.05);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .container { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <span class="eyebrow">A new development paradigm</span>
+            <h1>The Ping-Pong Protocol</h1>
+            <p>Mastering AI pair-programming through weaponized Test-Driven Development.</p>
+        </header>
+
+        <article>
+            <p>The tech industry is currently obsessed with "prompt-and-pray" development. We are told to treat AI as an oracle, feeding it vague descriptions and copying back massive, opaque blocks of code. This is dangerous. It creates fragile architectures maintained by developers who have become mere passengers in their own codebases.</p>
+
+            <div class="quote-block">
+                <p>It is infinitely better to be a <strong>2x developer who possesses a 100% holistic understanding</strong> of the entire codebase, than a 10x developer who knows nothing but how to write prompts.</p>
+            </div>
+
+            <h2>The True Ping-Pong Flow</h2>
+            <p>The solution is not to reject AI, but to harness it within a strict constraint. Enter <strong>AI-TDD Ping-Pong</strong>. In traditional pair programming, "ping-pong" means alternating who writes the tests and who writes the code. When you apply this to an AI partner, something magical happens.</p>
+            <p>The cycle can begin anywhere, but the hand-off is absolute:</p>
+
+            <div class="ping-pong-board">
+                <div class="step human">
+                    <div class="step-actor">Human Turn</div>
+                    <h3>Implementation + Next Red Test</h3>
+                    <p class="step-desc">You write the implementation to satisfy the AI's previous failing test. Then, you write the <strong>next failing test</strong> outlining the new behavior you want, and hand it to the AI.</p>
+                </div>
+
+                <div class="step ai">
+                    <div class="step-actor">AI Turn</div>
+                    <h3>Implementation + Next Red Test</h3>
+                    <p class="step-desc">The AI writes the exact minimal code required to pass your test. Then, it writes the <strong>next failing test</strong> (based on context or your prompts) and hands it back to you.</p>
+                </div>
+
+                <div class="step human">
+                    <div class="step-actor">Human Turn</div>
+                    <h3>Forced Code Review</h3>
+                    <p class="step-desc">To write the implementation for the AI's new test, you <em>must</em> understand what it's asking. To verify it didn't break anything, you <em>must</em> read the implementation it just wrote for your previous test.</p>
+                </div>
+            </div>
+
+            <h2>The Beautiful Side Effect: Forced Comprehension</h2>
+            <p>This is the core discovery of the Ping-Pong method. The alternating cycle creates an inescapable trap of cognitive engagement. <strong>It weaponizes the TDD loop to force continuous, line-by-line code review.</strong></p>
+            
+            <p>Both the AI and the human are constantly reviewing each other's code. While it's helpful for the AI to review human code, <strong>it is absolutely critical for the human to review the AI's code</strong>. By forcing yourself to implement the AI's tests, and forcing yourself to write tests based on the AI's implementations, you are physically unable to "check out" mentally.</p>
+
+            <div class="critical-insight">
+                <h3>High-Stakes Environments</h3>
+                <p>In standard web-dev CRUD apps, a hallucinated variable means a broken shopping cart. But in <strong>healthcare, military logistics, or aircraft avionics</strong>, the cost of a software error is human lives.</p>
+                <p style="margin-bottom: 0;">Mission-critical software requires deterministic, fully understood codebases. The Ping-Pong method neutralizes the biggest threat of AI—developer atrophy—allowing you to move faster while maintaining the iron-clad, 100% architectural comprehension of someone who typed every single line themselves.</p>
+            </div>
+
+        </article>
+    </div>
+</body>
+</html>
