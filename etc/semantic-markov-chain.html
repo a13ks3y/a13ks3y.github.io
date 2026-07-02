@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Markov Chain</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        input, button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+            min-height: 60px;
+            line-height: 1.6;
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Semantic Markov Chain Text Generator</h1>
+        
+        <div class="controls">
+            <input type="text" id="seedText" placeholder="Enter seed text..." value="the">
+            <input type="number" id="chainLength" placeholder="Chain length" min="1" max="100" value="10">
+            <button onclick="generateText()">Generate Text</button>
+            <button onclick="trainModel()">Train Model</button>
+        </div>
+
+        <div class="controls">
+            <textarea id="trainingData"></textarea>
+        </div>
+        
+        <div id="output">Generated text will appear here...</div>
+    </div>
+
+    <script>
+        let semanticChain = {};
+
+        // Sample training data
+        let trainingData = '';
+
+        function trainModel() {
+            trainingData = document.getElementById('trainingData').value;
+            const words = trainingData.toLowerCase().match(/\b\w+\b/g) || [];
+            semanticChain = {};
+
+            for (let i = 0; i < words.length - 1; i++) {
+                const current = words[i];
+                const next = words[i + 1];
+
+                if (!semanticChain[current]) {
+                    semanticChain[current] = [];
+                }
+                semanticChain[current].push(next);
+            }
+
+            document.getElementById('output').textContent = 'Model trained on ' + words.length + ' words. Ready to generate text.';
+        }
+
+        function generateText() {
+            if (Object.keys(semanticChain).length === 0) {
+                trainModel();
+            }
+
+            const seedText = document.getElementById('seedText').value.toLowerCase() || 'the';
+            const chainLength = parseInt(document.getElementById('chainLength').value) || 10;
+            
+            let result = [seedText];
+            let currentWord = seedText;
+
+            for (let i = 0; i < chainLength - 1; i++) {
+                if (semanticChain[currentWord]) {
+                    const options = semanticChain[currentWord];
+                    currentWord = options[Math.floor(Math.random() * options.length)];
+                    result.push(currentWord);
+                } else {
+                    break;
+                }
+            }
+
+            document.getElementById('output').textContent = result.join(' ') + '.';
+        }
+
+        // Train on page load
+        //trainModel();
+    </script>
+</body>
+</html>

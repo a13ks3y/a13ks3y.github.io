@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meccano Patterns - Auto Pagination</title>
+    <style>
+        body {
+            background: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px 0;
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            text-align: center;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+        #pages {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .page-wrapper {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            /* This tells the printer to break pages correctly */
+            page-break-after: always;
+            break-after: page; 
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body {
+                background: white;
+                padding: 0;
+            }
+            .controls {
+                display: none;
+            }
+            #pages {
+                gap: 0;
+            }
+            .page-wrapper {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>Meccano Multi-Page Print Generator</h2>
+        <p>Ensure printer is set to <b>A4</b> and strictly <b>100% Scale / Actual Size</b>.</p>
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Print All Pages</button>
+    </div>
+
+    <div id="pages"></div>
+
+    <script>
+        const svgNS = "http://www.w3.org/2000/svg";
+        const pagesContainer = document.getElementById('pages');
+
+        // Standard Specs (mm)
+        const PITCH = 12.7; 
+        const HOLE_R = 2.05; 
+        const CENTER_R = 0.25; 
+        const MARGIN = PITCH / 2; 
+
+        // Pagination State
+        let currentSvg = null;
+        let cursorX = 15;
+        let cursorY = 15;
+        let currentRowHeight = 0;
+        
+        const PAGE_MAX_X = 195; // 210mm minus 15mm margin
+        const PAGE_MAX_Y = 282; // 297mm minus 15mm margin
+        const PADDING = 6;      // Space between printed parts
+
+        // Utility: Create elements
+        function createEl(type, attrs) {
+            const el = document.createElementNS(svgNS, type);
+            for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+            return el;
+        }
+
+        // Creates a new A4 SVG page
+        function addPage() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'page-wrapper';
+            
+            currentSvg = createEl('svg', { viewBox: '0 0 210 297' });
+            wrapper.appendChild(currentSvg);
+            pagesContainer.appendChild(wrapper);
+            
+            cursorX = 15;
+            cursorY = 15;
+            currentRowHeight = 0;
+        }
+
+        // The auto-layout engine
+        function placePart(w, h, renderFn) {
+            // Wrap to next row if not enough width
+            if (cursorX + w > PAGE_MAX_X) {
+                cursorX = 15;
+                cursorY += currentRowHeight + PADDING;
+                currentRowHeight = 0;
+            }
+            // Wrap to next page if not enough height
+            if (cursorY + h > PAGE_MAX_Y) {
+                addPage();
+            }
+            
+            // Call the specific part generator with its allocated top-left coordinate
+            renderFn(cursorX, cursorY);
+            
+            cursorX += w + PADDING;
+            currentRowHeight = Math.max(currentRowHeight, h);
+        }
+
+        // Standard hole with crosshairs
+        function drawHole(x, y, group) {
+            group.appendChild(createEl('circle', { cx: x, cy: y, r: HOLE_R, fill: 'none', stroke: 'black', 'stroke-width': '0.3' }));
+            group.appendChild(createEl('circle', { cx: x, cy: y, r: CENTER_R, fill: 'black' }));
+            group.appendChild(createEl('line', { x1: x-3, y1: y, x2: x+3, y2: y, stroke: 'black', 'stroke-width': '0.1' }));
+            group.appendChild(createEl('line', { x1: x, y1: y-3, x2: x, y2: y+3, stroke: 'black', 'stroke-width': '0.1' }));
+        }
+
+        // --- PART GENERATORS ---
+
+        function addStrip(holes) {
+            const w = (holes - 1) * PITCH + 2 * MARGIN;
+            const h = 2 * MARGIN;
+            
+            placePart(w, h, (bx, by) => {
+                const cx = bx + MARGIN;
+                const cy = by + MARGIN;
+                const g = createEl('g', {});
+                const len = (holes - 1) * PITCH;
+                
+                const d = `M ${cx} ${cy - MARGIN} 
+                           L ${cx + len} ${cy - MARGIN} 
+                           A ${MARGIN} ${MARGIN} 0 0 1 ${cx + len} ${cy + MARGIN}
+                           L ${cx} ${cy + MARGIN}
+                           A ${MARGIN} ${MARGIN} 0 0 1 ${cx} ${cy - MARGIN} Z`;
+                
+                g.appendChild(createEl('path', { d, fill: 'none', stroke: 'black', 'stroke-width': '0.5' }));
+                for (let i = 0; i < holes; i++) drawHole(cx + (i * PITCH), cy, g);
+                currentSvg.appendChild(g);
+            });
+        }
+
+function addVerticalStrip(holes) {
+            const w = 2 * MARGIN;
+            const h = (holes - 1) * PITCH + 2 * MARGIN;
+            
+            placePart(w, h, (bx, by) => {
+                const cx = bx + MARGIN;
+                const cy = by + MARGIN;
+                const g = createEl('g', {});
+                const len = (holes - 1) * PITCH;
+                
+                // Starts top-left, arcs over the top, lines down right side, 
+                // arcs under the bottom, and closes up the left side (Z).
+                const d = `M ${cx - MARGIN} ${cy}
+                           A ${MARGIN} ${MARGIN} 0 0 1 ${cx + MARGIN} ${cy}
+                           L ${cx + MARGIN} ${cy + len}
+                           A ${MARGIN} ${MARGIN} 0 0 1 ${cx - MARGIN} ${cy + len} Z`;
+                
+                g.appendChild(createEl('path', { d, fill: 'none', stroke: 'black', 'stroke-width': '0.5' }));
+                
+                for (let i = 0; i < holes; i++) {
+                    drawHole(cx, cy + (i * PITCH), g);
+                }
+                
+                currentSvg.appendChild(g);
+            });
+        }
+
+        function addPlate(holesX, holesY) {
+            const w = (holesX - 1) * PITCH + 2 * MARGIN;
+            const h = (holesY - 1) * PITCH + 2 * MARGIN;
+            
+            placePart(w, h, (bx, by) => {
+                const cx = bx + MARGIN;
+                const cy = by + MARGIN;
+                const g = createEl('g', {});
+                
+                g.appendChild(createEl('rect', {
+                    x: bx, y: by, width: w, height: h, rx: 3, ry: 3,
+                    fill: 'none', stroke: 'black', 'stroke-width': '0.5'
+                }));
+                
+                for (let x = 0; x < holesX; x++) {
+                    for (let y = 0; y < holesY; y++) {
+                        drawHole(cx + (x * PITCH), cy + (y * PITCH), g);
+                    }
+                }
+                currentSvg.appendChild(g);
+            });
+        }
+
+        function addLShape(holesX, holesY) {
+            const w = (holesX - 1) * PITCH + 2 * MARGIN;
+            const h = (holesY - 1) * PITCH + 2 * MARGIN;
+            
+            placePart(w, h, (bx, by) => {
+                const cx = bx + MARGIN;
+                const cy = by + MARGIN;
+                const W = (holesX - 1) * PITCH;
+                const H = (holesY - 1) * PITCH;
+                const M = MARGIN;
+                const g = createEl('g', {});
+                
+                // Traces continuous outer boundary of an L bracket
+                const d = `M ${cx} ${cy - M}
+                           L ${cx + W} ${cy - M}
+                           A ${M} ${M} 0 0 1 ${cx + W} ${cy + M}
+                           L ${cx + M} ${cy + M}
+                           L ${cx + M} ${cy + H}
+                           A ${M} ${M} 0 0 1 ${cx - M} ${cy + H}
+                           L ${cx - M} ${cy}
+                           A ${M} ${M} 0 0 1 ${cx} ${cy - M} Z`;
+                           
+                g.appendChild(createEl('path', { d, fill: 'none', stroke: 'black', 'stroke-width': '0.5' }));
+                
+                for(let i=0; i<holesX; i++) drawHole(cx + i*PITCH, cy, g);
+                for(let j=1; j<holesY; j++) drawHole(cx, cy + j*PITCH, g); // Start at 1 to not redraw corner hole
+                currentSvg.appendChild(g);
+            });
+        }
+
+        function addTShape(holesTopX, holesStemY) {
+            // Standard T-shapes should have an odd number of holes on top (e.g., 3, 5)
+            const w = (holesTopX - 1) * PITCH + 2 * MARGIN;
+            const h = (holesStemY - 1) * PITCH + 2 * MARGIN;
+            
+            placePart(w, h, (bx, by) => {
+                const startX = bx + MARGIN;
+                const startY = by + MARGIN;
+                const W2 = ((holesTopX - 1) / 2) * PITCH; 
+                const H = (holesStemY - 1) * PITCH;
+                const cx = startX + W2; // Center intersection hole
+                const cy = startY;
+                const M = MARGIN;
+                const g = createEl('g', {});
+                
+                // Traces continuous outer boundary of a T bracket
+                const d = `M ${cx - W2} ${cy - M}
+                           L ${cx + W2} ${cy - M}
+                           A ${M} ${M} 0 0 1 ${cx + W2} ${cy + M}
+                           L ${cx + M} ${cy + M}
+                           L ${cx + M} ${cy + H}
+                           A ${M} ${M} 0 0 1 ${cx - M} ${cy + H}
+                           L ${cx - M} ${cy + M}
+                           L ${cx - W2} ${cy + M}
+                           A ${M} ${M} 0 0 1 ${cx - W2} ${cy - M} Z`;
+                           
+                g.appendChild(createEl('path', { d, fill: 'none', stroke: 'black', 'stroke-width': '0.5' }));
+                
+                for(let i=0; i<holesTopX; i++) drawHole(startX + i*PITCH, cy, g);
+                for(let j=1; j<holesStemY; j++) drawHole(cx, cy + j*PITCH, g);
+                currentSvg.appendChild(g);
+            });
+        }
+
+        // --- BUILD THE DOCUMENT ---
+        
+        // Initialize the first page
+        addPage();
+
+        // Let's generate a massive batch of parts to trigger the pagination.
+        // It will perfectly flow to page 2, page 3, etc.
+        
+        for(let i=0; i<4; i++) addStrip(11);
+        for(let i=0; i<6; i++) addStrip(9);
+        for(let i=0; i<6; i++) addStrip(7);
+        for(let i=0; i<8; i++) addStrip(5);
+        for(let i=0; i<8; i++) addStrip(3);
+
+            for(let y = 0; y<3; y++) {    
+        for(let x = 0; x<3; x++){
+                addPlate(x + 5, y + 5);
+                addPlate(x + 5, y + 5);
+                addPlate(x + 3, y + 3);
+                addPlate(x + 3, y + 3);
+                addPlate(x + 5, y + 3);
+                addPlate(x + 5, y + 3);
+                addPlate(x + 9, y + 16);
+                addPlate(x + 4, y + 12);
+            }
+        }
+        
+        // Standard L-Shapes (3x3 and 2x2 holes)
+        for(let i=0; i<4; i++) addLShape(3, 3);
+        for(let i=0; i<4; i++) addLShape(2, 2);
+        for(let i=0; i<2; i++) addLShape(4, 4);
+
+        // Standard T-Shapes (3 across top, 3 down stem)
+
+            for(let i=0; i<4; i++) addTShape(i + 3, i + 3);
+            for(let i=0; i<2; i++) addTShape(i +5,  i+ 3);
+            for(let i=0; i<2; i++) addTShape(i + 5, i + 5);
+        
+        // Throw in a few more long strips just to prove it wraps indefinitely
+        for(let i=0; i<8; i++) addStrip(15);
+
+        for(let i=0; i<8; i++) addVerticalStrip(10);
+
+    </script>
+</body>
+</html>

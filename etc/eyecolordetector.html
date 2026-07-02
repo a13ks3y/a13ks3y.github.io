@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Access Control</title>
+    
+    <!-- Local script definitions remove all third-party script CDN failures -->
+    <script src="./camera_utils.js"></script>
+    <script src="./face_mesh.js"></script>
+    
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white; margin: 0; }
+        #video-container { position: relative; width: 640px; height: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        canvas { z-index: 10; pointer-events: none; }
+        #status { margin-top: 20px; font-size: 1.2rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; }
+        .scanning { background: #1e293b; color: #38bdf8; }
+        .granted { background: #065f46; color: #34d399; }
+        .denied { background: #991b1b; color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <h2>Biometric Eye Color Verification</h2>
+    <div id="video-container">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+    </div>
+    <div id="status" class="scanning">Initializing camera and local AI engines...</div>
+
+<script>
+const videoElement = document.getElementById('webcam');
+const canvasElement = document.getElementById('overlay');
+const canvasCtx = canvasElement.getContext('2d');
+const statusElement = document.getElementById('status');
+
+// TARGET EYE COLOR CONFIGURATION (Example: Light/Blue eye profile bounds)
+const TARGET_R_MIN = 30, TARGET_R_MAX = 110;
+const TARGET_G_MIN = 60, TARGET_G_MAX = 150;
+const TARGET_B_MIN = 90, TARGET_B_MAX = 220;
+
+let verificationComplete = false;
+
+// 1. Initialize Face Mesh via a CORS-friendly unpkg asset mirror
+const faceMesh = new FaceMesh({
+  locateFile: (file) => `https://unpkg.com{file}`
+});
+
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true, // Enables explicit iris index locations (468-477)
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+faceMesh.onResults(onResults);
+
+// 2. Start Camera Feed
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    if (!verificationComplete) {
+        await faceMesh.send({image: videoElement});
+    }
+  },
+  width: 640,
+  height: 480
+});
+
+statusElement.innerText = "Camera active. Calibrating face position...";
+camera.start();
+
+// 3. Process Video Frames and Analyze Iris Pixels
+function onResults(results) {
+  if (verificationComplete) return;
+
+  canvasElement.width = results.image.width;
+  canvasElement.height = results.image.height;
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+  if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+    const landmarks = results.multiFaceLandmarks[0];
+
+    // Reference primary center landmarks for the iris structures
+    const leftIrisCenter = landmarks[468];
+    const rightIrisCenter = landmarks[473];
+
+    const leftX = Math.floor(leftIrisCenter.x * canvasElement.width);
+    const leftY = Math.floor(leftIrisCenter.y * canvasElement.height);
+    const rightX = Math.floor(rightIrisCenter.x * canvasElement.width);
+    const rightY = Math.floor(rightIrisCenter.y * canvasElement.height);
+
+    drawIrisIndicator(leftX, leftY);
+    drawIrisIndicator(rightX, rightY);
+
+    const leftColor = samplePixelColor(results.image, leftX, leftY);
+    const rightColor = samplePixelColor(results.image, rightX, rightY);
+
+    if (leftColor && rightColor) {
+        const avgR = (leftColor.r + rightColor.r) / 2;
+        const avgG = (leftColor.g + rightColor.g) / 2;
+        const avgB = (leftColor.b + rightColor.b) / 2;
+        verifyEyeColor(avgR, avgG, avgB);
+    }
+  } else {
+    statusElement.className = "scanning";
+    statusElement.innerText = "Adjust position. Face alignment required.";
+  }
+}
+
+function samplePixelColor(imageElement, x, y) {
+    try {
+        const samplerCanvas = document.createElement('canvas');
+        samplerCanvas.width = 1;
+        samplerCanvas.height = 1;
+        const samplerCtx = samplerCanvas.getContext('2d');
+        samplerCtx.drawImage(imageElement, x, y, 1, 1, 0, 0, 1, 1);
+        const pixelData = samplerCtx.getImageData(0, 0, 1, 1).data;
+        return { r: pixelData[0], g: pixelData[1], b: pixelData[2] };
+    } catch (e) {
+        return null;
+    }
+}
+
+function drawIrisIndicator(x, y) {
+    canvasCtx.beginPath();
+    canvasCtx.arc(x, y, 5, 0, 2 * Math.PI);
+    canvasCtx.fillStyle = '#00ffcc';
+    canvasCtx.fill();
+}
+
+function verifyEyeColor(r, g, b) {
+    statusElement.className = "scanning";
+    statusElement.innerText = `Analyzing: R:${Math.round(r)} G:${Math.round(g)} B:${Math.round(b)}`;
+
+    const matchesTarget = (r >= TARGET_R_MIN && r <= TARGET_R_MAX) &&
+                          (g >= TARGET_G_MIN && g <= TARGET_G_MAX) &&
+                          (b >= TARGET_B_MIN && b <= TARGET_B_MAX);
+
+    if (matchesTarget) {
+        verificationComplete = true;
+        statusElement.className = "granted";
+        statusElement.innerText = "Access Verified! Loading content area...";
+        
+        const stream = videoElement.srcObject;
+        if (stream) stream.getTracks().forEach(track => track.stop());
+
+        setTimeout(() => {
+            alert("Biometric validation successful.");
+        }, 1000);
+    }
+}
+</script>
+</body>
+</html>

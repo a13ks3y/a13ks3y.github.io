@@ -8,25 +8,30 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> -->
     <link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         .hidden {
             display: none!important;
         }
         html {
             font-size: 16px;
+            overflow-x: hidden;
         }
         body {
-            /* font-family: 'Roboto', sans-serif; */
-            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
-            font-family: 'Helvetica', 'Comic Sans MS', monospace;
+            font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 0;
             background: #121212;
             color: #e0e0e0;
             line-height: 1.6;
+            overflow-x: hidden;
+            max-width: 100%;
         }
         header {
             background: linear-gradient(135deg, #0ec666, #1f1f1f);
-            padding: 3rem;
+            padding: clamp(1.5rem, 5vw, 3rem);
             text-align: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
@@ -34,36 +39,43 @@
             font-size: 3rem;
             margin: 0;
             color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.03em;
         }
         .sub-header {
             font-size: 1.5rem;
             margin-top: 0.5rem;
             color: #d4d4d4;
+            font-weight: 400;
         }
         .content {
-            padding: 4rem;
+            padding: clamp(1.25rem, 4vw, 4rem);
             max-width: 1000px;
+            width: min(100%, 1000px);
             margin: 0 auto;
         }
         .section-title {
             font-size: 2.3rem;
             margin-bottom: 1.3rem;
             color: #0ee666;
-            /* border-bottom: 1px solid #eee666; */
             padding-bottom: 0.6rem;
+            letter-spacing: 0.02em;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(14, 230, 102, 0.2);
         }
         .projects {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: clamp(1.2rem, 3vw, 3rem);
         }
         .project-card {
             background: #1f1f1f;
-            padding: 2rem;
+            padding: clamp(1rem, 3vw, 2rem);
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #3c3c3c;
+            overflow-wrap: anywhere;
         }
         .project-card:hover {
             transform: translateY(-10px);
@@ -73,6 +85,8 @@
             font-size: 1.8rem;
             margin-bottom: 0.8rem;
             color: #c0e666;
+            font-weight: 700;
+            letter-spacing: 0.01em;
         }
         .project-description {
             font-size: 1.1rem;
@@ -89,7 +103,8 @@
         .cv-links {
             display: flex;
             justify-content: center;
-            gap: 1.6rem;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.6rem;
             margin-top: 1.6rem;
         }
         .cv-link {
@@ -105,9 +120,11 @@
         .project-image {
             width: 100%;
             height: auto;
+            display: block;
             border-radius: 8px;
             margin-bottom: 1.6rem;
             box-shadow: 0 0 16px rgba(0, 0, 0, 0.6);
+            padding: 0.35rem;
         }
         .pet-projects {
             display: flex;
@@ -131,21 +148,27 @@
         }
 
                 /* Scrollbar Styles */
-                body::-webkit-scrollbar {
-            width: 8px;
+                html {
+            scrollbar-width: thin;
+            scrollbar-color: #2f8f57 #171717;
+        }
+
+        body::-webkit-scrollbar {
+            width: 10px;
         }
 
         body::-webkit-scrollbar-track {
-            background: darkgreen;
+            background: #171717;
         }
 
         body::-webkit-scrollbar-thumb {
-            background: lime;
-            border-radius: 0;
+            background: linear-gradient(180deg, #3baf6b, #2f8f57);
+            border-radius: 999px;
+            border: 2px solid #171717;
         }
 
         body::-webkit-scrollbar-thumb:hover {
-            background: greenyellow;
+            background: linear-gradient(180deg, #46c67a, #2f8f57);
         }
 
     </style>
@@ -156,11 +179,6 @@
     /* Header text shadow */
     .header-title, .sub-header {
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Project card image padding */
-    .project-image {
-        padding: 0.5rem;
     }
 
     /* Footer styling enhancement */
@@ -184,6 +202,57 @@
     /* Add a glow effect on project card hover */
     .project-card:hover {
         box-shadow: 0 0 30px rgba(0, 255, 106, 0.9);
+    }
+
+    @media (max-width: 640px) {
+        .header-title {
+            font-size: 2.2rem;
+            line-height: 1.2;
+        }
+
+        .sub-header {
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 1.25rem 0.9rem 2rem;
+        }
+
+        .section-title {
+            font-size: 1.7rem;
+            margin-bottom: 1rem;
+        }
+
+        .projects {
+            grid-template-columns: 1fr;
+            gap: 1.1rem;
+        }
+
+        .project-card {
+            padding: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.35rem;
+        }
+
+        .project-description {
+            font-size: 1rem;
+        }
+
+        .pet-projects {
+            justify-content: flex-start;
+            gap: 0.7rem;
+        }
+
+        .pet-project-link {
+            padding: 0.7rem 0.9rem;
+        }
+
+        footer {
+            padding: 1.5rem 1rem;
+            margin-top: 2rem;
+        }
     }
 </style>
 
@@ -209,8 +278,8 @@
                         <em>Tech Stack: Delphi 12, C# (.NET), MS SQL Server, DevExpress VCL, Git.</em>
                     </p>
                 </div>
-                <div class="hidden project-card">
-                    <img style="display: none;" src="https://e-tender.ua/img/logo.png" alt="Government Tender Platform" class="project-image">
+                <div class="project-card">
+                    <img style="scale: 66%; background-color: white; padding: 0.6rem 1.6rem;" src="assets/e-tender-logo.svg" alt="Government Tender Platform" class="project-image">
                     <h3 class="project-title">E-Tender Platform</h3>
                     <p class="project-description">
                         Led the development of a government tender platform, transitioning from AngularJS to modern Angular versions. Managed a small team, delivered features on time, and focused on optimization for better user experience.
